@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { 
   ArrowRight, 
   ArrowUpRight, 
@@ -140,7 +141,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           style={{ opacity }}
-          className="mb-12"
+          className="mb-12 mt-20 md:mt-32"
         >
           <span className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-emerald-600 text-white rounded-full text-sm font-bold uppercase tracking-widest shadow-lg">
             Empowering Policy Action
@@ -186,28 +187,36 @@ const Hero = () => {
           className="flex flex-wrap gap-6 mb-16"
         >
           {[
-            { label: 'Planet', color: 'from-emerald-600 to-emerald-700' },
-            { label: 'People', color: 'from-purple-600 to-purple-700' },
-            { label: 'Profit', color: 'from-emerald-700 to-purple-700' }
+            { label: 'Planet', gradient: 'from-emerald-600 to-emerald-700', textColor: 'text-emerald-700' },
+            { label: 'People', gradient: 'from-purple-600 to-purple-700', textColor: 'text-purple-700' },
+            { label: 'Profit', gradient: 'from-emerald-700 to-purple-700', textColor: 'text-purple-700' }
           ].map((pillar, i) => (
             <motion.div
               key={pillar.label}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.7 + i * 0.1 }}
-              className="relative group"
+              className="relative group cursor-pointer"
             >
+              {/* Glow effect on hover */}
               <div className={cn(
-                "absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 blur-xl transition-opacity",
-                pillar.color
+                "absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500",
+                pillar.gradient
               )} />
-              <div className="relative px-6 py-3 bg-white/70 backdrop-blur-sm rounded-full border border-purple-200/50 group-hover:border-purple-400 transition-all">
-                <span className="text-xs font-bold uppercase tracking-[0.3em] bg-gradient-to-r bg-clip-text text-transparent" style={{
-                  backgroundImage: `linear-gradient(to right, var(--tw-gradient-stops))`,
-                  ...pillar.color.includes('emerald-6') ? { '--tw-gradient-from': '#059669', '--tw-gradient-to': '#047857' } :
-                     pillar.color.includes('purple-6') ? { '--tw-gradient-from': '#9333ea', '--tw-gradient-to': '#7e22ce' } :
-                     { '--tw-gradient-from': '#047857', '--tw-gradient-to': '#7e22ce' }
-                } as any}>
+              
+              {/* Pill container */}
+              <div className={cn(
+                "relative px-8 py-3 bg-white/80 backdrop-blur-sm rounded-full border-2 transition-all duration-300",
+                "group-hover:scale-105 group-hover:shadow-lg",
+                i === 0 ? "border-emerald-300 group-hover:border-emerald-500" :
+                i === 1 ? "border-purple-300 group-hover:border-purple-500" :
+                "border-purple-300 group-hover:border-emerald-500"
+              )}>
+                <span className={cn(
+                  "text-xs font-bold uppercase tracking-[0.3em] transition-colors",
+                  pillar.textColor,
+                  "group-hover:scale-105"
+                )}>
                   {pillar.label}
                 </span>
               </div>
@@ -220,7 +229,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
-          className="max-w-2xl ml-auto relative"
+          className="max-w-2xl ml-auto relative mb-16 md:mb-24"
         >
           <div className="absolute -left-8 top-0 bottom-0 w-[2px] bg-gradient-to-b from-purple-600 via-emerald-500 to-purple-600" />
           <div className="pl-12 pr-8 py-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-purple-100/50 shadow-xl">
@@ -253,14 +262,9 @@ const Hero = () => {
 }
 
 const AboutSection = () => {
-    const { scrollYProgress } = useScroll();
-    const scale = useTransform(scrollYProgress, [0.1, 0.3], [0.95, 1]);
-    const opacity = useTransform(scrollYProgress, [0.1, 0.2], [0, 1]);
-
     return (
-        <motion.section 
+        <section 
             id="about" 
-            style={{ scale, opacity }}
             className="py-32 px-6 lg:px-12 bg-white rounded-t-[4rem] -mt-32 relative z-20 shadow-2xl"
         >
             <div className="max-w-[1400px] mx-auto">
@@ -321,17 +325,17 @@ const AboutSection = () => {
                                     className="relative group"
                                 >
                                     <div className={cn(
-                                        "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 blur-xl transition-opacity rounded-2xl",
+                                        "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-20 blur-xl transition-opacity rounded-2xl",
                                         stat.gradient
                                     )} />
-                                    <div className="relative p-6 bg-gradient-to-br from-purple-50 to-emerald-50 rounded-2xl border border-purple-100 group-hover:border-purple-300 transition-all">
+                                    <div className="relative p-6 bg-gradient-to-br from-purple-50 to-emerald-50 rounded-2xl border-2 border-purple-200 group-hover:border-purple-400 transition-all">
                                         <h4 className={cn(
-                                            "text-xl font-serif mb-2 bg-gradient-to-br bg-clip-text text-transparent",
+                                            "text-xl font-serif mb-2 bg-gradient-to-br bg-clip-text text-transparent font-bold",
                                             stat.gradient
                                         )}>
                                             {stat.title}
                                         </h4>
-                                        <span className="text-[10px] uppercase tracking-widest text-zinc-500">{stat.sub}</span>
+                                        <span className="text-[10px] uppercase tracking-widest text-zinc-600 font-bold">{stat.sub}</span>
                                     </div>
                                 </motion.div>
                             ))}
@@ -345,19 +349,19 @@ const AboutSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="relative bg-gradient-to-br from-purple-50 via-white to-emerald-50 p-10 md:p-20 rounded-3xl border border-purple-100 overflow-hidden"
+                    className="relative bg-gradient-to-br from-purple-50 via-white to-emerald-50 p-10 md:p-20 rounded-3xl border-2 border-purple-200 overflow-hidden"
                 >
                     {/* Decorative elements */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-200/30 to-transparent rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-emerald-200/30 to-transparent rounded-full blur-3xl" />
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-200/20 to-transparent rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-emerald-200/20 to-transparent rounded-full blur-3xl" />
                     
                     <div className="max-w-3xl mx-auto relative z-10">
-                        <span className="block text-center text-xs font-bold uppercase tracking-widest text-purple-600 mb-8">Our Story</span>
-                        <h3 className="text-4xl md:text-5xl font-serif text-center mb-16 bg-gradient-to-r from-purple-900 to-emerald-900 bg-clip-text text-transparent">
+                        <span className="block text-center text-xs font-bold uppercase tracking-widest text-purple-700 mb-8">Our Story</span>
+                        <h3 className="text-4xl md:text-5xl font-serif text-center mb-16 bg-gradient-to-r from-purple-900 to-emerald-900 bg-clip-text text-transparent font-bold">
                             "From Resilience to Purpose"
                         </h3>
                         
-                        <div className="space-y-8 text-lg text-zinc-700 leading-loose font-serif">
+                        <div className="space-y-8 text-lg text-zinc-800 leading-loose font-serif">
                             <p>
                                 <span className="text-5xl float-left mr-4 mt-[-6px] bg-gradient-to-br from-purple-600 to-emerald-600 bg-clip-text text-transparent font-bold">O</span>
                                 ur story began in the period following COVID-19, a time when many professionals were navigating uncertainty. As two mothers balancing careers and caregiving, we found ourselves seeking meaningful ways to stay engaged.
@@ -375,7 +379,7 @@ const AboutSection = () => {
                     </div>
                 </motion.div>
             </div>
-        </motion.section>
+        </section>
     )
 }
 
@@ -667,10 +671,18 @@ const TeamSection = () => {
                     transition={{ duration: 0.8 }}
                     className="group"
                   >
-                      <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-purple-100 to-purple-50 mb-8 rounded-2xl overflow-hidden border-2 border-purple-200 group-hover:border-purple-400 transition-all">
-                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-purple-900/20"></div>
+                      <div className="relative w-full aspect-[4/5] mb-8 rounded-2xl overflow-hidden border-2 border-purple-200 group-hover:border-purple-400 group-hover:shadow-2xl transition-all bg-gradient-to-br from-purple-100 to-purple-50">
+                           <Image 
+                              src="/Arti Mishra Saran.png" 
+                              alt="Arti Mishra Saran - Founder" 
+                              fill
+                              className="object-cover object-center"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              priority
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-purple-900/30 group-hover:to-purple-900/40 transition-all"></div>
                            {/* Decorative corner */}
-                           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/20 to-transparent rounded-bl-3xl" />
+                           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/20 to-transparent rounded-bl-3xl group-hover:from-emerald-500/30 transition-all" />
                       </div>
                       <h3 className="text-4xl font-serif bg-gradient-to-r from-purple-900 to-purple-600 bg-clip-text text-transparent">
                           Arti Mishra Saran
@@ -722,10 +734,18 @@ const TeamSection = () => {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="group lg:mt-24"
                   >
-                      <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-emerald-100 to-emerald-50 mb-8 rounded-2xl overflow-hidden border-2 border-emerald-200 group-hover:border-emerald-400 transition-all">
-                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-emerald-900/20"></div>
+                      <div className="relative w-full aspect-[4/5] mb-8 rounded-2xl overflow-hidden border-2 border-emerald-200 group-hover:border-emerald-400 group-hover:shadow-2xl transition-all bg-gradient-to-br from-emerald-100 to-emerald-50">
+                           <Image 
+                              src="/Dr. V Neha.png" 
+                              alt="Dr. V Neha - Co-Founder" 
+                              fill
+                              className="object-cover object-center"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              priority
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-emerald-900/30 group-hover:to-emerald-900/40 transition-all"></div>
                            {/* Decorative corner */}
-                           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-500/20 to-transparent rounded-bl-3xl" />
+                           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-500/20 to-transparent rounded-bl-3xl group-hover:from-purple-500/30 transition-all" />
                       </div>
                       <h3 className="text-4xl font-serif bg-gradient-to-r from-emerald-900 to-emerald-600 bg-clip-text text-transparent">
                           Dr. V Neha
@@ -903,8 +923,15 @@ export default function TheCapitalPLab() {
           <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-emerald-600 blur-xl opacity-20" />
           
           <div className="relative bg-white/80 backdrop-blur-md rounded-full px-2 py-2 flex items-center gap-2 shadow-2xl border-2 border-purple-100">
-             <a href="#" className="relative w-10 h-10 bg-gradient-to-br from-purple-600 to-emerald-600 rounded-full flex items-center justify-center font-serif font-bold mr-2 hover:scale-110 transition-transform group">
-                <span className="text-white group-hover:rotate-12 transition-transform">P</span>
+             <a href="#" className="relative w-10 h-10 rounded-full flex items-center justify-center mr-2 hover:scale-110 transition-transform group overflow-hidden bg-white">
+                <Image 
+                  src="/logo.png" 
+                  alt="The Capital P Lab Logo" 
+                  fill
+                  className="object-contain p-1.5"
+                  sizes="40px"
+                  priority
+                />
              </a>
              
              <div className="hidden md:flex items-center">
@@ -1014,11 +1041,29 @@ export default function TheCapitalPLab() {
                </motion.div>
             </div>
             
-            <div className="flex flex-col md:flex-row justify-between items-end border-t border-white/10 pt-12">
-               <span className="text-[12vw] leading-none font-serif text-white/10 pointer-events-none select-none">
-                  The Capital P Lab
-               </span>
-               <div className="flex flex-wrap items-center gap-2 mb-4 font-bold text-xs uppercase tracking-widest mt-8 md:mt-0 text-purple-300">
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end border-t border-white/10 pt-12 gap-8">
+               {/* Logo and company name */}
+               <div className="flex items-center gap-6">
+                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-white p-2 shadow-lg">
+                     <Image 
+                        src="/logo.png" 
+                        alt="The Capital P Lab Logo" 
+                        fill
+                        className="object-contain p-1"
+                        sizes="80px"
+                     />
+                  </div>
+                  <div>
+                     <span className="text-2xl md:text-3xl font-serif text-white block">
+                        The Capital P Lab
+                     </span>
+                     <span className="text-xs text-purple-300 uppercase tracking-widest">
+                        Planet · People · Profit
+                     </span>
+                  </div>
+               </div>
+               
+               <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-purple-300">
                   <span>© 2024</span>
                   <span className="mx-2 text-emerald-400">·</span>
                   <span className="text-emerald-400">Planet</span>
