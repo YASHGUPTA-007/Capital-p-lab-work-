@@ -160,7 +160,7 @@ export const ContactForm = () => {
                         onChange={handleChange}
                         required
                         className="w-full pl-12 pr-4 py-3 bg-[#f4f7f5] border-2 border-[#c1b4df]/30 rounded-xl text-[#2b2e34] placeholder:text-[#4f75d]/40 focus:outline-none focus:ring-2 focus:ring-[#755eb1] focus:border-transparent transition-all"
-                        placeholder="ex -Yash gupta"
+                        placeholder="ex -John doe"
                         disabled={status === 'loading'}
                       />
                     </div>
@@ -181,7 +181,7 @@ export const ContactForm = () => {
                         onChange={handleChange}
                         required
                         className="w-full pl-12 pr-4 py-3 bg-[#f4f7f5] border-2 border-[#c1b4df]/30 rounded-xl text-[#2b2e34] placeholder:text-[#4f75d]/40 focus:outline-none focus:ring-2 focus:ring-[#755eb1] focus:border-transparent transition-all"
-                        placeholder="ex-yash@example.com"
+                        placeholder="ex-john@example.com"
                         disabled={status === 'loading'}
                       />
                     </div>
