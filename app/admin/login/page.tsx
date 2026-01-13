@@ -5,8 +5,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -24,7 +23,31 @@ export default function AdminLogin() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/admin');
     } catch (err: any) {
-      setError('Invalid credentials. Please try again.');
+      console.error('Login error:', err);
+      
+      // More detailed error messages
+      switch (err.code) {
+        case 'auth/invalid-email':
+          setError('Invalid email address format.');
+          break;
+        case 'auth/user-disabled':
+          setError('This account has been disabled.');
+          break;
+        case 'auth/user-not-found':
+          setError('No account found with this email.');
+          break;
+        case 'auth/wrong-password':
+          setError('Incorrect password.');
+          break;
+        case 'auth/invalid-credential':
+          setError('Invalid credentials. Please check your email and password.');
+          break;
+        case 'auth/configuration-not-found':
+          setError('Authentication not configured. Please enable Email/Password in Firebase Console.');
+          break;
+        default:
+          setError('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -36,7 +59,6 @@ export default function AdminLogin() {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 right-20 w-72 h-72 bg-[#c1b4df]/20 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-[#c7d6c1]/20 rounded-full blur-3xl" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md px-6">
@@ -44,25 +66,19 @@ export default function AdminLogin() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#c1b4df] to-[#c7d6c1] p-1 mb-6 shadow-xl">
             <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-              <Image 
-                src="/logo.png" 
-                alt="The Capital P Lab" 
-                width={48}
-                height={48}
-                className="object-contain"
-              />
+              <span className="text-4xl font-bold text-[#755eb1]">P</span>
             </div>
           </div>
           <h1 className="text-3xl font-serif text-[#755eb1] font-bold mb-2">
             The Capital P Lab
           </h1>
-          <p className="text-[#4f75d] text-sm">Administrator Portal</p>
+          <p className="text-[#4f759d] text-sm">Administrator Portal</p>
         </div>
         
         {/* Login Card */}
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-[#c1b4df]/30 overflow-hidden">
           {/* Header Gradient */}
-          <div className="h-2 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#4f75d]" />
+          <div className="h-2 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#4f759d]" />
           
           <div className="p-8">
             <h2 className="text-xl font-serif text-[#755eb1] mb-6 text-center">
@@ -72,7 +88,7 @@ export default function AdminLogin() {
             <form onSubmit={handleLogin} className="space-y-5">
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-[#4f75d] mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-[#4f759d] mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -91,7 +107,7 @@ export default function AdminLogin() {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-[#4f75d] mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-[#4f759d] mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -110,8 +126,16 @@ export default function AdminLogin() {
 
               {/* Error Message */}
               {error && (
-                <div className="bg-red-50 border-2 border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium">
-                  {error}
+                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3">
+                  <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-red-600 text-sm font-medium">{error}</p>
+                    {error.includes('Firebase Console') && (
+                      <p className="text-red-500 text-xs mt-1">
+                        Go to Firebase Console → Authentication → Sign-in method → Enable Email/Password
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -119,7 +143,7 @@ export default function AdminLogin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-[#755eb1] to-[#4f75d] hover:from-[#6b54a5] hover:to-[#5a8a6a] text-white font-bold py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
+                className="w-full bg-gradient-to-r from-[#755eb1] to-[#4f759d] hover:from-[#6b54a5] hover:to-[#5a8a6a] text-white font-bold py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
               >
                 {loading ? (
                   <>
@@ -138,7 +162,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Footer Note */}
-        <p className="text-center text-[#4f75d]/60 text-xs mt-6">
+        <p className="text-center text-[#4f759d]/60 text-xs mt-6">
           Authorized access only • {new Date().getFullYear()}
         </p>
       </div>
