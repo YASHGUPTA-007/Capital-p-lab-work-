@@ -7,7 +7,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { LayoutDashboard, Mail, LogOut, Trash2, Eye, CheckCircle, X, Search, Filter, MoreVertical } from 'lucide-react';
+import { LayoutDashboard, Mail, LogOut, Trash2, Eye, CheckCircle, X, Search, Users, Download } from 'lucide-react';
 
 interface Contact {
   id: string;
@@ -21,13 +21,26 @@ interface Contact {
   userAgent?: string;
 }
 
+interface Subscriber {
+  id: string;
+  name: string;
+  email: string;
+  subscribedAt: any;
+  status: string;
+  source: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [subscriberSearchQuery, setSubscriberSearchQuery] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -43,6 +56,7 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, [router]);
 
+  // Fetch contacts
   useEffect(() => {
     const q = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'));
     
@@ -52,6 +66,21 @@ export default function AdminDashboard() {
         contactsData.push({ id: doc.id, ...doc.data() } as Contact);
       });
       setContacts(contactsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch newsletter subscribers
+  useEffect(() => {
+    const q = query(collection(db, 'newsletter-subscribers'), orderBy('subscribedAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const subscribersData: Subscriber[] = [];
+      snapshot.forEach((doc) => {
+        subscribersData.push({ id: doc.id, ...doc.data() } as Subscriber);
+      });
+      setSubscribers(subscribersData);
     });
 
     return () => unsubscribe();
@@ -77,6 +106,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteSubscriber = async (id: string) => {
+    if (confirm('Are you sure you want to remove this subscriber?')) {
+      try {
+        await deleteDoc(doc(db, 'newsletter-subscribers', id));
+      } catch (error) {
+        console.error('Error deleting subscriber:', error);
+      }
+    }
+  };
+
   const handleMarkAsRead = async (id: string) => {
     try {
       await updateDoc(doc(db, 'contacts', id), {
@@ -85,6 +124,25 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error updating contact:', error);
     }
+  };
+
+  const exportSubscribers = () => {
+    const csv = [
+      ['Name', 'Email', 'Subscribed At', 'Source'],
+      ...subscribers.map(sub => [
+        sub.name,
+        sub.email,
+        formatDate(sub.subscribedAt),
+        sub.source
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `newsletter-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
   };
 
   const formatDate = (timestamp: any) => {
@@ -103,6 +161,11 @@ export default function AdminDashboard() {
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contact.subject.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredSubscribers = subscribers.filter(subscriber =>
+    subscriber.name.toLowerCase().includes(subscriberSearchQuery.toLowerCase()) ||
+    subscriber.email.toLowerCase().includes(subscriberSearchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -166,6 +229,20 @@ export default function AdminDashboard() {
                 </span>
               )}
             </button>
+            <button
+              onClick={() => setActiveTab('subscribers')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative ${
+                activeTab === 'subscribers'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <Users size={18} />
+              Newsletter
+              <span className="ml-auto bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                {subscribers.length}
+              </span>
+            </button>
           </nav>
 
           {/* User Section */}
@@ -197,7 +274,7 @@ export default function AdminDashboard() {
                 {/* Header */}
                 <div className="mb-8">
                   <h1 className="text-2xl font-semibold text-gray-900 mb-1">Dashboard</h1>
-                  <p className="text-sm text-gray-600">Overview of all inquiries</p>
+                  <p className="text-sm text-gray-600">Overview of all activities</p>
                 </div>
                 
                 {/* Stats */}
@@ -205,7 +282,7 @@ export default function AdminDashboard() {
                   {[
                     { label: 'Total Inquiries', value: contacts.length, subtext: 'All time' },
                     { label: 'New', value: contacts.filter(c => c.status === 'new').length, subtext: 'Unread' },
-                    { label: 'Completed', value: contacts.filter(c => c.status === 'read').length, subtext: 'Processed' },
+                    { label: 'Newsletter Subscribers', value: subscribers.length, subtext: 'Active' },
                     { 
                       label: 'This Week', 
                       value: contacts.filter(c => {
@@ -389,15 +466,128 @@ export default function AdminDashboard() {
                 )}
               </div>
             )}
+
+            {activeTab === 'subscribers' && (
+              <div className="p-8">
+                {/* Header */}
+                <div className="mb-6">
+                  <h1 className="text-2xl font-semibold text-gray-900 mb-1">Newsletter Subscribers</h1>
+                  <p className="text-sm text-gray-600">Manage all newsletter subscriptions</p>
+                </div>
+
+                {/* Toolbar */}
+                <div className="bg-white border border-gray-200 rounded-lg mb-6">
+                  <div className="px-4 py-3 flex items-center justify-between gap-4">
+                    <div className="flex-1 max-w-md">
+                      <div className="relative">
+                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Search subscribers..."
+                          value={subscriberSearchQuery}
+                          onChange={(e) => setSubscriberSearchQuery(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-gray-600">
+                        {filteredSubscribers.length} {filteredSubscribers.length === 1 ? 'subscriber' : 'subscribers'}
+                      </span>
+                      <button
+                        onClick={exportSubscribers}
+                        disabled={subscribers.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download size={16} />
+                        Export CSV
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table */}
+                {filteredSubscribers.length === 0 ? (
+                  <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+                    <Users size={48} className="mx-auto mb-3 text-gray-300" />
+                    <p className="text-sm font-medium text-gray-900 mb-1">No subscribers found</p>
+                    <p className="text-sm text-gray-500">
+                      {subscriberSearchQuery ? 'Try adjusting your search' : 'Newsletter subscriptions will appear here'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-gray-50 border-b border-gray-200">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Subscriber
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Email
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Subscribed
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Source
+                            </th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {filteredSubscribers.map((subscriber) => (
+                            <tr key={subscriber.id} className="hover:bg-gray-50 transition-colors group">
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700 flex-shrink-0">
+                                    {subscriber.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <p className="text-sm font-medium text-gray-900">{subscriber.name}</p>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <p className="text-sm text-gray-900">{subscriber.email}</p>
+                              </td>
+                              <td className="px-6 py-4">
+                                <p className="text-sm text-gray-500">{formatDate(subscriber.subscribedAt)}</p>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                  {subscriber.source}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button 
+                                    onClick={() => handleDeleteSubscriber(subscriber.id)}
+                                    className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
+                                    title="Remove subscriber"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </main>
       </div>
 
-      {/* Modal */}
+      {/* Contact Details Modal (existing code) */}
       {selectedContact && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-xl">
-            {/* Header */}
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Inquiry Details</h2>
               <button 
@@ -408,7 +598,6 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Content */}
             <div className="px-6 py-6 overflow-y-auto flex-1 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
@@ -450,7 +639,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
               <div className="flex gap-2">
                 {selectedContact.status === 'new' ? (

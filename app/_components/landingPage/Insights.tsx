@@ -1,11 +1,56 @@
+// app/_components/landingPage/Insights.tsx
 'use client'
 
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Sparkles, CheckCircle, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const InsightsSection = () => {
+    const [newsletterData, setNewsletterData] = useState({
+        name: '',
+        email: ''
+    });
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleNewsletterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewsletterData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleNewsletterSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus('loading');
+        setErrorMessage('');
+
+        try {
+            const response = await fetch('/api/newsletter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newsletterData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to subscribe');
+            }
+
+            setStatus('success');
+            setNewsletterData({ name: '', email: '' });
+            
+            // Reset success message after 5 seconds
+            setTimeout(() => setStatus('idle'), 5000);
+        } catch (error: any) {
+            setStatus('error');
+            setErrorMessage(error.message || 'Something went wrong. Please try again.');
+            setTimeout(() => setStatus('idle'), 5000);
+        }
+    };
+
     return (
         <section id="insights" className="py-20 sm:py-24 md:py-28 bg-gradient-to-br from-[#c1b4df]/20 via-white to-[#c7d6c1]/20 border-t-2 border-[#c1b4df]/30 relative overflow-hidden">
             {/* Optimized background decoration */}
@@ -82,21 +127,82 @@ export const InsightsSection = () => {
                             Curated research and perspectives on sustainability, delivered to your inbox.
                         </p>
                         
-                        <form className="max-w-md mx-auto space-y-4">
-                            <input 
-                                type="text" 
-                                placeholder="Your Name" 
-                                className="w-full border-b-2 border-[#c1b4df] focus:border-[#755eb1] py-3 focus:outline-none transition-colors bg-transparent text-[#2b2e34] placeholder:text-[#4f75d]/40" 
-                            />
-                            <input 
-                                type="email" 
-                                placeholder="Email Address" 
-                                className="w-full border-b-2 border-[#c7d6c1] focus:border-[#4f75d] py-3 focus:outline-none transition-colors bg-transparent text-[#2b2e34] placeholder:text-[#4f75d]/40" 
-                            />
-                            <button className="w-full bg-gradient-to-r from-[#755eb1] to-[#4f75d] text-white py-3 sm:py-4 mt-6 sm:mt-8 font-bold uppercase tracking-widest text-xs rounded-full hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-lg hover:shadow-xl">
-                                Subscribe
-                            </button>
-                        </form>
+                        <AnimatePresence mode="wait">
+                            {status === 'success' ? (
+                                <motion.div
+                                    key="success"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    className="max-w-md mx-auto py-8"
+                                >
+                                    <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                        <CheckCircle size={32} className="text-green-600" />
+                                    </div>
+                                    <h4 className="text-lg font-serif text-[#755eb1] mb-2">Successfully Subscribed!</h4>
+                                    <p className="text-sm text-[#4f75d]">
+                                        Thank you for joining our newsletter. Check your inbox soon!
+                                    </p>
+                                </motion.div>
+                            ) : (
+                                <motion.form
+                                    key="form"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onSubmit={handleNewsletterSubmit}
+                                    className="max-w-md mx-auto space-y-4"
+                                >
+                                    <input 
+                                        type="text"
+                                        name="name"
+                                        value={newsletterData.name}
+                                        onChange={handleNewsletterChange}
+                                        placeholder="Your Name"
+                                        required
+                                        disabled={status === 'loading'}
+                                        className="w-full border-b-2 border-[#c1b4df] focus:border-[#755eb1] py-3 focus:outline-none transition-colors bg-transparent text-[#2b2e34] placeholder:text-[#4f75d]/40 disabled:opacity-50" 
+                                    />
+                                    <input 
+                                        type="email"
+                                        name="email"
+                                        value={newsletterData.email}
+                                        onChange={handleNewsletterChange}
+                                        placeholder="Email Address"
+                                        required
+                                        disabled={status === 'loading'}
+                                        className="w-full border-b-2 border-[#c7d6c1] focus:border-[#4f75d] py-3 focus:outline-none transition-colors bg-transparent text-[#2b2e34] placeholder:text-[#4f75d]/40 disabled:opacity-50" 
+                                    />
+                                    
+                                    {status === 'error' && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="flex items-center justify-center gap-2 text-red-600 text-sm"
+                                        >
+                                            <AlertCircle size={16} />
+                                            <span>{errorMessage}</span>
+                                        </motion.div>
+                                    )}
+                                    
+                                    <button
+                                        type="submit"
+                                        disabled={status === 'loading'}
+                                        className="w-full bg-gradient-to-r from-[#755eb1] to-[#4f75d] text-white py-3 sm:py-4 mt-6 sm:mt-8 font-bold uppercase tracking-widest text-xs rounded-full hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {status === 'loading' ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                <span>Subscribing...</span>
+                                            </>
+                                        ) : (
+                                            'Subscribe'
+                                        )}
+                                    </button>
+                                </motion.form>
+                            )}
+                        </AnimatePresence>
+                        
                         <p className="text-xs text-[#4f75d]/50 mt-4 sm:mt-6">Respecting your privacy. No spam, ever.</p>
                     </div>
                 </motion.div>
