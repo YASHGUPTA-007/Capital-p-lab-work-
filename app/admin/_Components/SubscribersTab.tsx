@@ -39,6 +39,50 @@ export default function SubscribersTab({
         <h1 className="text-2xl font-semibold text-gray-900 mb-1">Newsletter Subscribers</h1>
         <p className="text-sm text-gray-600">Manage all newsletter subscribers</p>
       </div>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Users size={20} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
+              <p className="text-2xl font-semibold text-gray-900">{subscribers.length}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <Users size={20} className="text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Active</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {subscribers.filter(s => s.status === 'active').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <Users size={20} className="text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">This Month</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {subscribers.filter(s => {
+                  const subDate = s.subscribedAt?.toDate ? s.subscribedAt.toDate() : new Date(s.subscribedAt);
+                  const now = new Date();
+                  return subDate.getMonth() === now.getMonth() && 
+                         subDate.getFullYear() === now.getFullYear();
+                }).length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="bg-white border border-gray-200 rounded-lg mb-6">
         <div className="px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
@@ -50,7 +94,7 @@ export default function SubscribersTab({
                 placeholder="Search subscribers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-600 text-gray-900"
               />
             </div>
           </div>
@@ -58,10 +102,10 @@ export default function SubscribersTab({
             <select
               value={filterSource}
               onChange={(e) => setFilterSource(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
             >
               {sources.map(source => (
-                <option key={source} value={source}>
+                <option key={source} value={source} className="text-gray-900">
                   {source === 'all' ? 'All Sources' : source}
                 </option>
               ))}
@@ -160,50 +204,7 @@ export default function SubscribersTab({
       )}
 
       {/* Stats Card */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Users size={20} className="text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
-              <p className="text-2xl font-semibold text-gray-900">{subscribers.length}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-              <Users size={20} className="text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Active</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {subscribers.filter(s => s.status === 'active').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <Users size={20} className="text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">This Month</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {subscribers.filter(s => {
-                  const subDate = s.subscribedAt?.toDate ? s.subscribedAt.toDate() : new Date(s.subscribedAt);
-                  const now = new Date();
-                  return subDate.getMonth() === now.getMonth() && 
-                         subDate.getFullYear() === now.getFullYear();
-                }).length}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }

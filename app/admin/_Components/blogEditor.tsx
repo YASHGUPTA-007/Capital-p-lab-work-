@@ -114,7 +114,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-600 text-gray-900"
                 placeholder="Enter blog title"
               />
             </div>
@@ -125,7 +125,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 type="text"
                 value={formData.slug}
                 onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-600 text-gray-900"
                 placeholder="blog-post-slug"
               />
               <p className="text-xs text-gray-500 mt-1">URL: /blog/{formData.slug || 'your-slug'}</p>
@@ -137,7 +137,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 type="text"
                 value={formData.author}
                 onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-600 text-gray-900"
                 placeholder="Author name"
               />
             </div>
@@ -147,14 +147,14 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
               <select
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
               >
-                <option value="Sustainability">Sustainability</option>
-                <option value="Policy">Policy</option>
-                <option value="Research">Research</option>
-                <option value="ESG">ESG</option>
-                <option value="Climate">Climate</option>
-                <option value="Inclusion">Inclusion</option>
+                <option value="Sustainability" className="text-gray-900">Sustainability</option>
+                <option value="Policy" className="text-gray-900">Policy</option>
+                <option value="Research" className="text-gray-900">Research</option>
+                <option value="ESG" className="text-gray-900">ESG</option>
+                <option value="Climate" className="text-gray-900">Climate</option>
+                <option value="Inclusion" className="text-gray-900">Inclusion</option>
               </select>
             </div>
 
@@ -164,7 +164,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 type="text"
                 value={formData.tags}
                 onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-600 text-gray-900"
                 placeholder="tag1, tag2, tag3"
               />
               <p className="text-xs text-gray-500 mt-1">Separate tags with commas</p>
@@ -176,7 +176,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 type="text"
                 value={formData.featuredImage}
                 onChange={(e) => setFormData(prev => ({ ...prev, featuredImage: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-600 text-gray-900"
                 placeholder="https://example.com/image.jpg"
               />
             </div>
@@ -187,7 +187,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 value={formData.excerpt}
                 onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none placeholder:text-gray-600 text-gray-900"
                 placeholder="Brief description of the blog post"
               />
             </div>
@@ -198,7 +198,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 rows={12}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none font-mono text-sm"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none font-mono text-sm placeholder:text-gray-600 text-gray-900"
                 placeholder="Write your blog content here..."
               />
             </div>
@@ -208,10 +208,10 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
               <select
                 value={formData.status}
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
               >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
+                <option value="draft" className="text-gray-900">Draft</option>
+                <option value="published" className="text-gray-900">Published</option>
               </select>
             </div>
           </div>
