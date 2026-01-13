@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,7 +22,13 @@ export const Navbar = () => {
   }, [])
 
   const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    if (!isHomePage) {
+      // If not on homepage, navigate to homepage with hash
+      window.location.href = `/#${id}`
+    } else {
+      // If on homepage, smooth scroll to section
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    }
     setIsMobileMenuOpen(false)
   }
 
@@ -34,16 +44,12 @@ export const Navbar = () => {
       >
         <div className="relative pointer-events-auto w-full sm:w-auto">
           {/* Subtle glow effect */}
-          <div className={`absolute inset-0 bg-gradient-to-r from-[#755eb1] to-[#4f75d] blur-xl transition-opacity duration-300 ${scrolled ? 'opacity-30' : 'opacity-20'}`} />
+          <div className={`absolute inset-0 bg-gradient-to-r from-[#755eb1] to-[#4f475d] blur-xl transition-opacity duration-300 ${scrolled ? 'opacity-30' : 'opacity-20'}`} />
           
           <div className="relative bg-white/90 backdrop-blur-md rounded-full px-3 sm:px-2 py-2 flex items-center justify-between sm:gap-2 shadow-xl border-2 border-[#c1b4df]/40">
                {/* Logo */}
-               <a 
-                 href="#" 
-                 onClick={(e) => {
-                   e.preventDefault()
-                   window.scrollTo({ top: 0, behavior: 'smooth' })
-                 }}
+               <Link 
+                 href="/"
                  className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center sm:mr-2 hover:scale-110 transition-transform overflow-hidden bg-white flex-shrink-0"
                >
                   <Image 
@@ -54,7 +60,7 @@ export const Navbar = () => {
                     sizes="40px"
                     priority
                   />
-               </a>
+               </Link>
                
                {/* Desktop Navigation */}
                <div className="hidden md:flex items-center">
@@ -62,17 +68,29 @@ export const Navbar = () => {
                     <button 
                       key={item} 
                       onClick={() => scrollToSection(item.toLowerCase())} 
-                      className="px-4 lg:px-5 py-2 text-[10px] lg:text-xs font-bold uppercase tracking-widest text-[#4f75d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1] rounded-full transition-all"
+                      className="px-4 lg:px-5 py-2 text-[10px] lg:text-xs font-bold uppercase tracking-widest text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1] rounded-full transition-all"
                     >
                       {item}
                     </button>
                  ))}
+                 
+                 {/* Blog Link */}
+                 <Link 
+                   href="/blog"
+                   className={`px-4 lg:px-5 py-2 text-[10px] lg:text-xs font-bold uppercase tracking-widest rounded-full transition-all ${
+                     pathname.startsWith('/blog')
+                       ? 'bg-gradient-to-r from-[#c1b4df]/30 to-[#c7d6c1]/30 text-[#755eb1]'
+                       : 'text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1]'
+                   }`}
+                 >
+                   Blog
+                 </Link>
                </div>
 
                {/* Contact Button */}
                <button 
                  onClick={() => scrollToSection('contact')} 
-                 className="hidden sm:block px-4 lg:px-6 py-2 bg-gradient-to-r from-[#755eb1] to-[#4f75d] text-white rounded-full text-[10px] lg:text-xs font-bold uppercase tracking-widest hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all sm:ml-2 shadow-lg"
+                 className="hidden sm:block px-4 lg:px-6 py-2 bg-gradient-to-r from-[#755eb1] to-[#4f475d] text-white rounded-full text-[10px] lg:text-xs font-bold uppercase tracking-widest hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all sm:ml-2 shadow-lg"
                >
                  Contact
                </button>
@@ -119,19 +137,38 @@ export const Navbar = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => scrollToSection(item.toLowerCase())}
-                    className="w-full text-left px-5 py-3 text-sm font-bold uppercase tracking-widest text-[#4f75d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1] rounded-xl transition-all"
+                    className="w-full text-left px-5 py-3 text-sm font-bold uppercase tracking-widest text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1] rounded-xl transition-all"
                   >
                     {item}
                   </motion.button>
                 ))}
                 
+                {/* Blog Link in Mobile */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: navItems.length * 0.05 }}
+                >
+                  <Link
+                    href="/blog"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block w-full text-left px-5 py-3 text-sm font-bold uppercase tracking-widest rounded-xl transition-all ${
+                      pathname.startsWith('/blog')
+                        ? 'bg-gradient-to-r from-[#c1b4df]/30 to-[#c7d6c1]/30 text-[#755eb1]'
+                        : 'text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1]'
+                    }`}
+                  >
+                    Blog
+                  </Link>
+                </motion.div>
+                
                 {/* Contact Button in Mobile */}
                 <motion.button
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: navItems.length * 0.05 }}
+                  transition={{ delay: (navItems.length + 1) * 0.05 }}
                   onClick={() => scrollToSection('contact')}
-                  className="w-full px-5 py-3 bg-gradient-to-r from-[#755eb1] to-[#4f75d] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-lg"
+                  className="w-full px-5 py-3 bg-gradient-to-r from-[#755eb1] to-[#4f475d] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-lg"
                 >
                   Contact
                 </motion.button>

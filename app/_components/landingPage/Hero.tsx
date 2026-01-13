@@ -63,11 +63,11 @@ export const Hero = () => {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#f4f7f5]/95 via-[#f4f7f5]/85 to-[#f4f7f5]/95" />
         
-        {/* Static Blobs - No Animation */}
+        {/* Static Blobs */}
         <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] bg-[#c7d6c1]/30 rounded-full blur-[100px] mix-blend-multiply" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-[#c1b4df]/30 rounded-full blur-[100px] mix-blend-multiply" />
         
-        {/* Subtle Texture */}
+        {/* Texture */}
         <div className="absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
@@ -75,7 +75,11 @@ export const Hero = () => {
       {/* --- MAIN CONTENT --- */}
       <motion.div 
         style={{ y: contentY, opacity }}
-        className="relative z-10 w-full max-w-[1600px] px-4 sm:px-6 md:px-12 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 lg:gap-20"
+        // UPDATED:
+        // 1. `gap-16` (increased from 8) to prevents rings from overlapping text on mobile
+        // 2. `py-12` ensures top/bottom rings aren't cut off by the screen edge
+        // 3. `md:pl-32` keeps your desktop right-shift
+        className="relative z-10 w-full max-w-[1600px] px-6 py-12 md:px-12 md:pl-32 flex flex-col md:flex-row items-center justify-center gap-16 md:gap-20"
       >
         
         {/* --- LOGO (Left) --- */}
@@ -85,7 +89,8 @@ export const Hero = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="relative z-20 flex-shrink-0 group order-1"
         >
-          {/* Simplified Rings - CSS Only */}
+          {/* Rings - CSS Only */}
+          {/* Note: The largest ring is -m-12 (3rem/48px). The gap-16 (4rem/64px) above ensures it doesn't touch the text. */}
           <div className="absolute inset-0 -m-6 sm:-m-8 border border-[#755eb1]/10 rounded-full" />
           <div className="absolute inset-0 -m-12 sm:-m-16 border border-[#4f75d]/10 rounded-full" />
 
