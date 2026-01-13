@@ -18,7 +18,7 @@ export default function WhatsAppFloat() {
   const [isHovered, setIsHovered] = useState(false)
   
   // Replace with actual WhatsApp number
-  const whatsappNumber = '919999999999' 
+  const whatsappNumber = '+919866139840' 
   const message = 'Hello! I would like to know more about The Capital P Lab.'
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
 

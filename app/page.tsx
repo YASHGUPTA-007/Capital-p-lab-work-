@@ -13,6 +13,7 @@ import { TeamSection } from "./_components/landingPage/Team";
 import { InsightsSection } from "./_components/landingPage/Insights";
 import { ContactForm } from "./_components/landingPage/ContactForm";
 import { Footer } from "./_components/landingPage/Footer";
+import WhatsAppFloat from "./WhatsAppFloat";
 
 export default function TheCapitalPLab() {
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function TheCapitalPLab() {
       </main>
 
       <Footer />
+      <WhatsAppFloat />
     </div>
   );
 }
