@@ -8,8 +8,11 @@ import { collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } fro
 import { useRouter } from 'next/navigation';
 import Sidebar from './_Components/sidebar';
 import OverviewTab from './_Components/overview';
+import ContactsTab from './_Components/ContactsTab';
+import SubscribersTab from './_Components/SubscribersTab';
 import BlogsTab from './_Components/blogManagement';
 import BlogEditorModal from './_Components/blogEditor';
+import ContactDetailModal from './_Components/ContactDetailModal';
 import { Contact, Subscriber, BlogPost } from '@/types/admin';
 
 export default function AdminDashboard() {
@@ -19,6 +22,7 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const router = useRouter();
@@ -84,6 +88,37 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteContact = async (id: string) => {
+    if (confirm('Are you sure you want to delete this inquiry?')) {
+      try {
+        await deleteDoc(doc(db, 'contacts', id));
+        if (selectedContact?.id === id) setSelectedContact(null);
+      } catch (error) {
+        console.error('Error deleting contact:', error);
+      }
+    }
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'contacts', id), {
+        status: 'read'
+      });
+    } catch (error) {
+      console.error('Error updating contact:', error);
+    }
+  };
+
+  const handleDeleteSubscriber = async (id: string) => {
+    if (confirm('Are you sure you want to remove this subscriber?')) {
+      try {
+        await deleteDoc(doc(db, 'newsletter-subscribers', id));
+      } catch (error) {
+        console.error('Error deleting subscriber:', error);
+      }
+    }
+  };
+
   const handleDeleteBlog = async (id: string) => {
     if (confirm('Are you sure you want to delete this blog post?')) {
       try {
@@ -102,6 +137,27 @@ export default function AdminDashboard() {
   const handleNewBlog = () => {
     setEditingBlog(null);
     setShowBlogEditor(true);
+  };
+
+  const exportSubscribers = () => {
+    const csv = [
+      ['Name', 'Email', 'Subscribed At', 'Source', 'Status'],
+      ...subscribers.map(sub => [
+        sub.name,
+        sub.email,
+        formatDate(sub.subscribedAt),
+        sub.source,
+        sub.status
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `newsletter-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const formatDate = (timestamp: any) => {
@@ -155,19 +211,22 @@ export default function AdminDashboard() {
             )}
 
             {activeTab === 'contacts' && (
-              <div className="p-8">
-                {/* Add ContactsTab component here */}
-                <h1 className="text-2xl font-semibold text-gray-900">Contacts Tab</h1>
-                <p className="text-sm text-gray-600">Implement ContactsTab component</p>
-              </div>
+              <ContactsTab
+                contacts={contacts}
+                onDeleteContact={handleDeleteContact}
+                onMarkAsRead={handleMarkAsRead}
+                onViewContact={setSelectedContact}
+                formatDate={formatDate}
+              />
             )}
 
             {activeTab === 'subscribers' && (
-              <div className="p-8">
-                {/* Add SubscribersTab component here */}
-                <h1 className="text-2xl font-semibold text-gray-900">Subscribers Tab</h1>
-                <p className="text-sm text-gray-600">Implement SubscribersTab component</p>
-              </div>
+              <SubscribersTab
+                subscribers={subscribers}
+                onDeleteSubscriber={handleDeleteSubscriber}
+                onExportSubscribers={exportSubscribers}
+                formatDate={formatDate}
+              />
             )}
 
             {activeTab === 'blogs' && (
@@ -183,6 +242,7 @@ export default function AdminDashboard() {
         </main>
       </div>
 
+      {/* Modals */}
       {showBlogEditor && (
         <BlogEditorModal
           blog={editingBlog}
@@ -194,6 +254,14 @@ export default function AdminDashboard() {
             setShowBlogEditor(false);
             setEditingBlog(null);
           }}
+        />
+      )}
+
+      {selectedContact && (
+        <ContactDetailModal
+          contact={selectedContact}
+          onClose={() => setSelectedContact(null)}
+          formatDate={formatDate}
         />
       )}
     </div>
