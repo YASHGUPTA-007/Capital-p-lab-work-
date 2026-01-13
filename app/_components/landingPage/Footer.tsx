@@ -100,7 +100,7 @@ export const Footer = () => {
                </div>
                
                <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-purple-300">
-                  <span>© 2024</span>
+                  <span>© 2026</span>
                   <span className="mx-2 text-emerald-400">·</span>
                   <span className="text-emerald-400">Planet</span>
                   <span className="mx-2">·</span>

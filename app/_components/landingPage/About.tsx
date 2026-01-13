@@ -155,7 +155,7 @@ export const AboutSection = () => {
                   </h3>
                   
                   <div className="mt-6 sm:mt-8 text-xs sm:text-sm font-medium text-[#2b2e34]/50 tracking-wide uppercase">
-                    Est. 2024 • India
+                    Est. 2026 • India
                   </div>
                </div>
 
