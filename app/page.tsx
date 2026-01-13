@@ -39,9 +39,10 @@ export default function TheCapitalPLab() {
       <main>
         <Hero />
         <AboutSection />
-        <TestimonialSection />
+        
         <FocusSection />
         <ServicesSection />
+        <TestimonialSection />
         <TeamSection />
         <InsightsSection />
       </main>

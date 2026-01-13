@@ -3,145 +3,105 @@
 import React from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { CheckCircle2 } from 'lucide-react'
 
 export const TeamSection = () => {
     return (
-      <section id="team" className="py-32 px-6 lg:px-12 bg-white relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-purple-200/30 to-transparent rounded-full blur-3xl transform-gpu" />
+      <section id="team" className="py-20 sm:py-24 md:py-28 px-4 sm:px-6 lg:px-12 bg-white relative overflow-hidden">
+          {/* Optimized background decoration */}
+          <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-[#c1b4df]/20 rounded-full blur-[100px]" />
           
           <div className="max-w-[1400px] mx-auto relative z-10">
+              {/* Header */}
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center mb-24"
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5 }}
+                className="text-center mb-16 sm:mb-20"
               >
-                  <span className="inline-block px-4 py-2 bg-gradient-to-r from-purple-100 to-emerald-100 rounded-full text-xs font-bold uppercase tracking-widest text-purple-800 mb-8">
-                      The Collaborators
+                  <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-6 sm:mb-8">
+                      The Team
                   </span>
-                  <h2 className="text-5xl md:text-6xl font-serif bg-gradient-to-r from-purple-900 to-emerald-900 bg-clip-text text-transparent">
-                      People behind the impact
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#755eb1]">
+                      Meet our Team
                   </h2>
               </motion.div>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-                  {/* Arti */}
+              <div className="space-y-16 sm:space-y-20 md:space-y-24">
+                  {/* Arti Mishra Saran */}
                   <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="group"
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-12 items-start"
                   >
-                      <div className="relative w-full aspect-[4/5] mb-8 rounded-2xl overflow-hidden border-2 border-purple-200 group-hover:border-purple-400 group-hover:shadow-2xl transition-all bg-gradient-to-br from-purple-100 to-purple-50">
-                           <Image 
-                             src="/Arti Mishra Saran.png" 
-                             alt="Arti Mishra Saran - Founder" 
-                             fill
-                             className="object-cover object-center"
-                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                             priority
-                           />
-                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-purple-900/30 group-hover:to-purple-900/40 transition-all"></div>
-                           {/* Decorative corner */}
-                           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/20 to-transparent rounded-bl-3xl group-hover:from-emerald-500/30 transition-all" />
-                      </div>
-                      <h3 className="text-4xl font-serif bg-gradient-to-r from-purple-900 to-purple-600 bg-clip-text text-transparent">
-                          Arti Mishra Saran
-                      </h3>
-                      <span className="inline-block mt-2 mb-8 px-4 py-1 bg-gradient-to-r from-purple-100 to-purple-50 rounded-full text-xs font-bold uppercase tracking-widest text-purple-700">
-                          Founder
-                      </span>
-                      
-                      <div className="space-y-6 text-zinc-700 leading-relaxed text-lg">
-                          <p>
-                              Arti Mishra Saran is a research and consulting professional with over 15 years of experience in <span className="text-emerald-700 font-medium">renewable energy, sustainability, and the development sector</span>. She has led cross-functional teams, managed multi-sector portfolios, and delivered research and advisory services for government, private, and development organizations.
-                          </p>
-                          <p>
-                              Her expertise spans applied research, project management, data analysis, financial modeling, and translating complex policy and technical insights into actionable strategies.
-                          </p>
+                      {/* Passport Photo */}
+                      <div className="flex-shrink-0 mx-auto sm:mx-0">
+                          <div className="relative w-32 h-40 sm:w-36 sm:h-44 md:w-40 md:h-48 rounded-2xl overflow-hidden border-2 border-[#c1b4df] shadow-lg group hover:border-[#755eb1] transition-all">
+                               <Image 
+                                 src="/Arti Mishra Saran.png" 
+                                 alt="Arti Mishra Saran - Founder" 
+                                 fill
+                                 className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                 sizes="(max-width: 640px) 128px, (max-width: 768px) 144px, 160px"
+                               />
+                               <div className="absolute inset-0 bg-gradient-to-t from-[#755eb1]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
                       </div>
 
-                      <div className="mt-8 pt-8 border-t-2 border-purple-100">
-                          <h4 className="font-bold text-xs uppercase tracking-widest text-purple-600 mb-4">Education</h4>
-                          <ul className="text-sm text-zinc-800 space-y-2">
-                              <li className="flex items-start gap-2">
-                                  <CheckCircle2 className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                                  <span>Master's in Business Management, Duke University</span>
-                              </li>
-                              <li className="flex items-start gap-2">
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                  <span>Diploma in Business Sustainability</span>
-                              </li>
-                              <li className="flex items-start gap-2">
-                                  <CheckCircle2 className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                                  <span>Certified Project Management Professional</span>
-                              </li>
-                          </ul>
-                      </div>
-                      
-                      <div className="mt-8">
-                          <h4 className="font-bold text-xs uppercase tracking-widest text-emerald-600 mb-4">Beyond the Work</h4>
-                          <p className="text-sm text-zinc-600 leading-relaxed">
-                            Beyond her professional work, Arti is committed to knowledge sharing and mentorship. She volunteers as a mentor for young students, supporting the next generation of researchers. She is driven by a <span className="text-purple-700 font-medium">people-, planet-, and prosperity-centered approach</span>.
+                      {/* Content */}
+                      <div className="flex-grow">
+                          <div className="mb-4 sm:mb-6">
+                              <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#755eb1] mb-2">
+                                  Arti Mishra Saran
+                              </h3>
+                              <span className="inline-block px-3 py-1 bg-[#c1b4df]/30 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1]">
+                                  Founder
+                              </span>
+                          </div>
+                          
+                          <p className="text-sm sm:text-base md:text-lg text-[#4f75d] leading-relaxed">
+                              Arti Mishra Saran is a research and consulting professional with over 15 years of experience in renewable energy, sustainability, and the development sector. She has led cross-functional teams, managed multi-sector portfolios, and delivered research and advisory services for government, private, and development organizations. Her expertise spans applied research, project management, data analysis, financial modeling, and translating complex policy and technical insights into actionable strategies. She holds a Master's in Business Management from Duke University, a Diploma in Business Sustainability, and is a Certified Project Management Professional. Beyond her professional work, Arti is committed to knowledge sharing and mentorship. She volunteers as a mentor for young students, supporting the next generation of researchers. She is driven by a people-, planet-, and prosperity-centered approach.
                           </p>
                       </div>
                   </motion.div>
   
-                  {/* Neha */}
+                  {/* Dr. V Neha */}
                   <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="group lg:mt-24"
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-12 items-start"
                   >
-                      <div className="relative w-full aspect-[4/5] mb-8 rounded-2xl overflow-hidden border-2 border-emerald-200 group-hover:border-emerald-400 group-hover:shadow-2xl transition-all bg-gradient-to-br from-emerald-100 to-emerald-50">
-                           <Image 
-                             src="/Dr. V Neha.png" 
-                             alt="Dr. V Neha - Co-Founder" 
-                             fill
-                             className="object-cover object-center"
-                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                             priority
-                           />
-                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-emerald-900/30 group-hover:to-emerald-900/40 transition-all"></div>
-                           {/* Decorative corner */}
-                           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-500/20 to-transparent rounded-bl-3xl group-hover:from-purple-500/30 transition-all" />
+                      {/* Passport Photo */}
+                      <div className="flex-shrink-0 mx-auto sm:mx-0">
+                          <div className="relative w-32 h-40 sm:w-36 sm:h-44 md:w-40 md:h-48 rounded-2xl overflow-hidden border-2 border-[#c7d6c1] shadow-lg group hover:border-[#4f75d] transition-all">
+                               <Image 
+                                 src="/Dr. V Neha.png" 
+                                 alt="Dr. V Neha - Co-Founder" 
+                                 fill
+                                 className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                 sizes="(max-width: 640px) 128px, (max-width: 768px) 144px, 160px"
+                               />
+                               <div className="absolute inset-0 bg-gradient-to-t from-[#4f75d]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
                       </div>
-                      <h3 className="text-4xl font-serif bg-gradient-to-r from-emerald-900 to-emerald-600 bg-clip-text text-transparent">
-                          Dr. V Neha
-                      </h3>
-                      <span className="inline-block mt-2 mb-8 px-4 py-1 bg-gradient-to-r from-emerald-100 to-emerald-50 rounded-full text-xs font-bold uppercase tracking-widest text-emerald-700">
-                          Co-Founder
-                      </span>
-                      
-                      <div className="space-y-6 text-zinc-700 leading-relaxed text-lg">
-                          <p>
-                            Dr. V Neha is a researcher, environmental educator, and learning designer who brings together <span className="text-emerald-700 font-medium">sustainability, environmental policy, and community-centred practice</span>. With nearly a decade of experience, she has designed interdisciplinary learning programmes and contributed to applied research on water security.
-                          </p>
-                      </div>
-  
-                      <div className="mt-8 pt-8 border-t-2 border-emerald-100">
-                          <h4 className="font-bold text-xs uppercase tracking-widest text-emerald-600 mb-4">Education</h4>
-                          <ul className="text-sm text-zinc-800 space-y-2">
-                              <li className="flex items-start gap-2">
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                  <span>PhD in Environmental Policy, University of Hyderabad</span>
-                              </li>
-                              <li className="flex items-start gap-2">
-                                  <CheckCircle2 className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                                  <span>Interdisciplinary grounding in social sciences</span>
-                              </li>
-                          </ul>
-                      </div>
-                      
-                      <div className="mt-8">
-                          <h4 className="font-bold text-xs uppercase tracking-widest text-purple-600 mb-4">Beyond the Work</h4>
-                          <p className="text-sm text-zinc-600 leading-relaxed">
-                            Guided by an inclusive, human-centred approach, she enjoys working at the meeting point of policy and practice. Outside her core work, she finds joy in teaching French and mentoring young learners to apply <span className="text-emerald-700 font-medium">STEM thinking to real-world issues</span>.
+
+                      {/* Content */}
+                      <div className="flex-grow">
+                          <div className="mb-4 sm:mb-6">
+                              <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#4f75d] mb-2">
+                                  Dr. V Neha
+                              </h3>
+                              <span className="inline-block px-3 py-1 bg-[#c7d6c1]/50 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#4f75d]">
+                                  Co-Founder
+                              </span>
+                          </div>
+                          
+                          <p className="text-sm sm:text-base md:text-lg text-[#4f75d] leading-relaxed">
+                              Dr. V Neha is a researcher, environmental educator, and learning designer who brings together sustainability, environmental policy, and community-centred practice. With nearly a decade of experience, she has designed interdisciplinary learning programmes and contributed to applied research on water security. She holds a PhD in Environmental Policy from the University of Hyderabad and has an interdisciplinary grounding in social sciences. Guided by an inclusive, human-centred approach, she enjoys working at the meeting point of policy and practice. Outside her core work, she finds joy in teaching French and mentoring young learners to apply STEM thinking to real-world issues.
                           </p>
                       </div>
                   </motion.div>
