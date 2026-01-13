@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-// 1. Import the component (adjust path based on where you saved it)
 import WhatsAppFloat from "./WhatsAppFloat";
 
 const geistSans = Geist({
@@ -37,11 +36,22 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        
-        {/* 2. Add the component here, usually at the bottom */}
-        <WhatsAppFloat />
-        
+        <ConditionalWhatsApp />
       </body>
     </html>
   );
+}
+
+// Client component to check pathname
+function ConditionalWhatsApp() {
+  'use client';
+  
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  
+  // Hide on admin routes
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+  
+  return <WhatsAppFloat />;
 }

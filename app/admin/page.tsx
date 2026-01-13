@@ -6,31 +6,11 @@ import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { LayoutDashboard, Mail, LogOut, Trash2, Eye, CheckCircle, X, Search, Users, Download } from 'lucide-react';
-
-interface Contact {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  status: string;
-  createdAt: any;
-  ipAddress?: string;
-  userAgent?: string;
-}
-
-interface Subscriber {
-  id: string;
-  name: string;
-  email: string;
-  subscribedAt: any;
-  status: string;
-  source: string;
-  ipAddress?: string;
-  userAgent?: string;
-}
+import Sidebar from './_Components/sidebar';
+import OverviewTab from './_Components/overview';
+import BlogsTab from './_Components/blogManagement';
+import BlogEditorModal from './_Components/blogEditor';
+import { Contact, Subscriber, BlogPost } from '@/types/admin';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -38,9 +18,9 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [subscriberSearchQuery, setSubscriberSearchQuery] = useState('');
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [showBlogEditor, setShowBlogEditor] = useState(false);
+  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,7 +39,6 @@ export default function AdminDashboard() {
   // Fetch contacts
   useEffect(() => {
     const q = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'));
-    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const contactsData: Contact[] = [];
       snapshot.forEach((doc) => {
@@ -67,14 +46,12 @@ export default function AdminDashboard() {
       });
       setContacts(contactsData);
     });
-
     return () => unsubscribe();
   }, []);
 
-  // Fetch newsletter subscribers
+  // Fetch subscribers
   useEffect(() => {
     const q = query(collection(db, 'newsletter-subscribers'), orderBy('subscribedAt', 'desc'));
-    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const subscribersData: Subscriber[] = [];
       snapshot.forEach((doc) => {
@@ -82,7 +59,19 @@ export default function AdminDashboard() {
       });
       setSubscribers(subscribersData);
     });
+    return () => unsubscribe();
+  }, []);
 
+  // Fetch blog posts
+  useEffect(() => {
+    const q = query(collection(db, 'blog-posts'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const postsData: BlogPost[] = [];
+      snapshot.forEach((doc) => {
+        postsData.push({ id: doc.id, ...doc.data() } as BlogPost);
+      });
+      setBlogPosts(postsData);
+    });
     return () => unsubscribe();
   }, []);
 
@@ -95,54 +84,24 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteContact = async (id: string) => {
-    if (confirm('Are you sure you want to delete this inquiry?')) {
+  const handleDeleteBlog = async (id: string) => {
+    if (confirm('Are you sure you want to delete this blog post?')) {
       try {
-        await deleteDoc(doc(db, 'contacts', id));
-        if (selectedContact?.id === id) setSelectedContact(null);
+        await deleteDoc(doc(db, 'blog-posts', id));
       } catch (error) {
-        console.error('Error deleting contact:', error);
+        console.error('Error deleting blog:', error);
       }
     }
   };
 
-  const handleDeleteSubscriber = async (id: string) => {
-    if (confirm('Are you sure you want to remove this subscriber?')) {
-      try {
-        await deleteDoc(doc(db, 'newsletter-subscribers', id));
-      } catch (error) {
-        console.error('Error deleting subscriber:', error);
-      }
-    }
+  const handleEditBlog = (blog: BlogPost) => {
+    setEditingBlog(blog);
+    setShowBlogEditor(true);
   };
 
-  const handleMarkAsRead = async (id: string) => {
-    try {
-      await updateDoc(doc(db, 'contacts', id), {
-        status: 'read'
-      });
-    } catch (error) {
-      console.error('Error updating contact:', error);
-    }
-  };
-
-  const exportSubscribers = () => {
-    const csv = [
-      ['Name', 'Email', 'Subscribed At', 'Source'],
-      ...subscribers.map(sub => [
-        sub.name,
-        sub.email,
-        formatDate(sub.subscribedAt),
-        sub.source
-      ])
-    ].map(row => row.join(',')).join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `newsletter-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+  const handleNewBlog = () => {
+    setEditingBlog(null);
+    setShowBlogEditor(true);
   };
 
   const formatDate = (timestamp: any) => {
@@ -156,17 +115,6 @@ export default function AdminDashboard() {
       minute: '2-digit'
     }).format(date);
   };
-
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.subject.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredSubscribers = subscribers.filter(subscriber =>
-    subscriber.name.toLowerCase().includes(subscriberSearchQuery.toLowerCase()) ||
-    subscriber.email.toLowerCase().includes(subscriberSearchQuery.toLowerCase())
-  );
 
   if (loading) {
     return (
@@ -182,497 +130,71 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-          {/* Logo */}
-          <div className="h-16 flex items-center gap-3 px-6 border-b border-gray-200">
-            <div className="w-8 h-8 relative flex-shrink-0">
-              <Image 
-                src="/logo.png" 
-                alt="Logo" 
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-semibold text-gray-900 truncate">The Capital P Lab</h1>
-              <p className="text-xs text-gray-500">Admin</p>
-            </div>
-          </div>
-          
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'overview'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <LayoutDashboard size={18} />
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('contacts')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative ${
-                activeTab === 'contacts'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <Mail size={18} />
-              Inquiries
-              {contacts.filter(c => c.status === 'new').length > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {contacts.filter(c => c.status === 'new').length}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('subscribers')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative ${
-                activeTab === 'subscribers'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <Users size={18} />
-              Newsletter
-              <span className="ml-auto bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                {subscribers.length}
-              </span>
-            </button>
-          </nav>
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          user={user}
+          contactsCount={contacts.length}
+          newContactsCount={contacts.filter(c => c.status === 'new').length}
+          subscribersCount={subscribers.length}
+          blogPostsCount={blogPosts.length}
+          onLogout={handleLogout}
+        />
 
-          {/* User Section */}
-          <div className="p-3 border-t border-gray-200">
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 mb-2">
-              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
-                {user?.email?.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-900 truncate">{user?.email}</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <LogOut size={16} />
-              Sign Out
-            </button>
-          </div>
-        </aside>
-
-        {/* Main Content */}
         <main className="flex-1 overflow-auto">
           <div className="h-full">
             {activeTab === 'overview' && (
-              <div className="p-8">
-                {/* Header */}
-                <div className="mb-8">
-                  <h1 className="text-2xl font-semibold text-gray-900 mb-1">Dashboard</h1>
-                  <p className="text-sm text-gray-600">Overview of all activities</p>
-                </div>
-                
-                {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  {[
-                    { label: 'Total Inquiries', value: contacts.length, subtext: 'All time' },
-                    { label: 'New', value: contacts.filter(c => c.status === 'new').length, subtext: 'Unread' },
-                    { label: 'Newsletter Subscribers', value: subscribers.length, subtext: 'Active' },
-                    { 
-                      label: 'This Week', 
-                      value: contacts.filter(c => {
-                        const weekAgo = new Date();
-                        weekAgo.setDate(weekAgo.getDate() - 7);
-                        const contactDate = c.createdAt?.toDate ? c.createdAt.toDate() : new Date(c.createdAt);
-                        return contactDate > weekAgo;
-                      }).length, 
-                      subtext: 'Last 7 days' 
-                    }
-                  ].map((stat, i) => (
-                    <div key={i} className="bg-white border border-gray-200 rounded-lg p-6">
-                      <p className="text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
-                      <p className="text-3xl font-semibold text-gray-900 mb-1">{stat.value}</p>
-                      <p className="text-xs text-gray-500">{stat.subtext}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Recent Activity */}
-                <div className="bg-white border border-gray-200 rounded-lg">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h2 className="text-base font-semibold text-gray-900">Recent Inquiries</h2>
-                  </div>
-                  <div className="divide-y divide-gray-200">
-                    {contacts.slice(0, 5).map((contact) => (
-                      <div key={contact.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4 flex-1 min-w-0">
-                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-700 flex-shrink-0">
-                              {contact.name.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
-                              <p className="text-sm text-gray-600 truncate">{contact.subject}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4 flex-shrink-0">
-                            <p className="text-xs text-gray-500">{formatDate(contact.createdAt)}</p>
-                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                              contact.status === 'new' 
-                                ? 'bg-blue-100 text-blue-700' 
-                                : 'bg-gray-100 text-gray-700'
-                            }`}>
-                              {contact.status}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {contacts.length === 0 && (
-                      <div className="px-6 py-12 text-center">
-                        <Mail size={48} className="mx-auto mb-3 text-gray-300" />
-                        <p className="text-sm text-gray-500">No inquiries yet</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <OverviewTab
+                contactsCount={contacts.length}
+                newContactsCount={contacts.filter(c => c.status === 'new').length}
+                subscribersCount={subscribers.length}
+                publishedBlogsCount={blogPosts.filter(b => b.status === 'published').length}
+                recentContacts={contacts.slice(0, 5)}
+                formatDate={formatDate}
+              />
             )}
 
             {activeTab === 'contacts' && (
               <div className="p-8">
-                {/* Header */}
-                <div className="mb-6">
-                  <h1 className="text-2xl font-semibold text-gray-900 mb-1">Inquiries</h1>
-                  <p className="text-sm text-gray-600">Manage all contact submissions</p>
-                </div>
-
-                {/* Toolbar */}
-                <div className="bg-white border border-gray-200 rounded-lg mb-6">
-                  <div className="px-4 py-3 flex items-center justify-between gap-4">
-                    <div className="flex-1 max-w-md">
-                      <div className="relative">
-                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder="Search inquiries..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">
-                        {filteredContacts.length} {filteredContacts.length === 1 ? 'inquiry' : 'inquiries'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Table */}
-                {filteredContacts.length === 0 ? (
-                  <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-                    <Mail size={48} className="mx-auto mb-3 text-gray-300" />
-                    <p className="text-sm font-medium text-gray-900 mb-1">No inquiries found</p>
-                    <p className="text-sm text-gray-500">
-                      {searchQuery ? 'Try adjusting your search' : 'Contact submissions will appear here'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="bg-gray-50 border-b border-gray-200">
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Contact
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Subject
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Date
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                          {filteredContacts.map((contact) => (
-                            <tr key={contact.id} className="hover:bg-gray-50 transition-colors group">
-                              <td className="px-6 py-4">
-                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                                  contact.status === 'new' 
-                                    ? 'bg-blue-100 text-blue-700' 
-                                    : 'bg-gray-100 text-gray-700'
-                                }`}>
-                                  <span className={`w-1.5 h-1.5 rounded-full ${
-                                    contact.status === 'new' ? 'bg-blue-600' : 'bg-gray-600'
-                                  }`} />
-                                  {contact.status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700 flex-shrink-0">
-                                    {contact.name.charAt(0).toUpperCase()}
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
-                                    <p className="text-sm text-gray-500 truncate">{contact.email}</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-900 truncate max-w-xs">{contact.subject}</p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-500">{formatDate(contact.createdAt)}</p>
-                              </td>
-                              <td className="px-6 py-4 text-right">
-                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button 
-                                    onClick={() => setSelectedContact(contact)}
-                                    className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
-                                    title="View details"
-                                  >
-                                    <Eye size={16} />
-                                  </button>
-                                  <button 
-                                    onClick={() => handleDeleteContact(contact.id)}
-                                    className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-                                    title="Delete"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+                {/* Add ContactsTab component here */}
+                <h1 className="text-2xl font-semibold text-gray-900">Contacts Tab</h1>
+                <p className="text-sm text-gray-600">Implement ContactsTab component</p>
               </div>
             )}
 
             {activeTab === 'subscribers' && (
               <div className="p-8">
-                {/* Header */}
-                <div className="mb-6">
-                  <h1 className="text-2xl font-semibold text-gray-900 mb-1">Newsletter Subscribers</h1>
-                  <p className="text-sm text-gray-600">Manage all newsletter subscriptions</p>
-                </div>
-
-                {/* Toolbar */}
-                <div className="bg-white border border-gray-200 rounded-lg mb-6">
-                  <div className="px-4 py-3 flex items-center justify-between gap-4">
-                    <div className="flex-1 max-w-md">
-                      <div className="relative">
-                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder="Search subscribers..."
-                          value={subscriberSearchQuery}
-                          onChange={(e) => setSubscriberSearchQuery(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600">
-                        {filteredSubscribers.length} {filteredSubscribers.length === 1 ? 'subscriber' : 'subscribers'}
-                      </span>
-                      <button
-                        onClick={exportSubscribers}
-                        disabled={subscribers.length === 0}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Download size={16} />
-                        Export CSV
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Table */}
-                {filteredSubscribers.length === 0 ? (
-                  <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-                    <Users size={48} className="mx-auto mb-3 text-gray-300" />
-                    <p className="text-sm font-medium text-gray-900 mb-1">No subscribers found</p>
-                    <p className="text-sm text-gray-500">
-                      {subscriberSearchQuery ? 'Try adjusting your search' : 'Newsletter subscriptions will appear here'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="bg-gray-50 border-b border-gray-200">
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Subscriber
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Email
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Subscribed
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Source
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                          {filteredSubscribers.map((subscriber) => (
-                            <tr key={subscriber.id} className="hover:bg-gray-50 transition-colors group">
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700 flex-shrink-0">
-                                    {subscriber.name.charAt(0).toUpperCase()}
-                                  </div>
-                                  <p className="text-sm font-medium text-gray-900">{subscriber.name}</p>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-900">{subscriber.email}</p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-500">{formatDate(subscriber.subscribedAt)}</p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                  {subscriber.source}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 text-right">
-                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button 
-                                    onClick={() => handleDeleteSubscriber(subscriber.id)}
-                                    className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-                                    title="Remove subscriber"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+                {/* Add SubscribersTab component here */}
+                <h1 className="text-2xl font-semibold text-gray-900">Subscribers Tab</h1>
+                <p className="text-sm text-gray-600">Implement SubscribersTab component</p>
               </div>
+            )}
+
+            {activeTab === 'blogs' && (
+              <BlogsTab
+                blogPosts={blogPosts}
+                onDeleteBlog={handleDeleteBlog}
+                onEditBlog={handleEditBlog}
+                onNewBlog={handleNewBlog}
+                formatDate={formatDate}
+              />
             )}
           </div>
         </main>
       </div>
 
-      {/* Contact Details Modal (existing code) */}
-      {selectedContact && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-xl">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Inquiry Details</h2>
-              <button 
-                onClick={() => setSelectedContact(null)}
-                className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="px-6 py-6 overflow-y-auto flex-1 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
-                    Contact Information
-                  </label>
-                  <p className="text-base font-semibold text-gray-900 mb-1">{selectedContact.name}</p>
-                  <a href={`mailto:${selectedContact.email}`} className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
-                    {selectedContact.email}
-                  </a>
-                </div>
-                <div className="text-right">
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
-                    Received
-                  </label>
-                  <p className="text-sm text-gray-900">{formatDate(selectedContact.createdAt)}</p>
-                  {selectedContact.ipAddress && (
-                    <p className="text-xs text-gray-500 mt-1">IP: {selectedContact.ipAddress}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-6">
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
-                  Subject
-                </label>
-                <p className="text-base text-gray-900 font-medium">{selectedContact.subject}</p>
-              </div>
-
-              <div className="border-t border-gray-200 pt-6">
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
-                  Message
-                </label>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap leading-relaxed">
-                    {selectedContact.message}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
-              <div className="flex gap-2">
-                {selectedContact.status === 'new' ? (
-                  <button
-                    onClick={() => {
-                      handleMarkAsRead(selectedContact.id);
-                      setSelectedContact(prev => prev ? {...prev, status: 'read'} : null);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    <CheckCircle size={16} />
-                    Mark as Read
-                  </button>
-                ) : (
-                  <span className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed">
-                    <CheckCircle size={16} />
-                    Processed
-                  </span>
-                )}
-              </div>
-              
-              <button
-                onClick={() => {
-                  handleDeleteContact(selectedContact.id);
-                  setSelectedContact(null);
-                }}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors"
-              >
-                <Trash2 size={16} />
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
+      {showBlogEditor && (
+        <BlogEditorModal
+          blog={editingBlog}
+          onClose={() => {
+            setShowBlogEditor(false);
+            setEditingBlog(null);
+          }}
+          onSave={() => {
+            setShowBlogEditor(false);
+            setEditingBlog(null);
+          }}
+        />
       )}
     </div>
   );
