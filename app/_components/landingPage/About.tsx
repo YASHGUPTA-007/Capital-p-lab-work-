@@ -49,10 +49,9 @@ export const AboutSection = () => {
           transition={{ duration: 0.5 }}
           className="mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full border border-[#755eb1]/20 bg-[#755eb1]/5">
-            <span className="w-2 h-2 rounded-full bg-[#755eb1] animate-pulse" />
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1]">Who We Are</span>
-          </span>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight">
+            Who We Are
+          </h2>
         </motion.div>
 
         {/* MAIN GRID */}
@@ -147,15 +146,8 @@ export const AboutSection = () => {
                
                {/* LEFT: HEADER */}
                <div className="md:w-1/3 flex-shrink-0">
-                  <div className="mb-4 sm:mb-6 flex items-center gap-3">
-                     <div className="w-6 sm:w-8 h-[1px] bg-[#755eb1]" />
-                     <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-[#755eb1]">
-                       <TypewriterLabel text="OUR STORY" />
-                     </span>
-                  </div>
-
-                  <h3 className="text-4xl sm:text-5xl md:text-6xl font-serif font-medium text-[#2b2e34] leading-[0.95]">
-                    From <span className="block text-[#2b2e34] italic">Resilience</span> to <span className="block text-[#2b2e34] italic">Purpose.</span>
+                  <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-6 sm:mb-8">
+                    Our Story
                   </h3>
                </div>
 

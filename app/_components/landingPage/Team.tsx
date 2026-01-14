@@ -19,10 +19,7 @@ export const TeamSection = () => {
                 transition={{ duration: 0.5 }}
                 className="text-center mb-16 sm:mb-20"
               >
-                  <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-6 sm:mb-8">
-                      The Team
-                  </span>
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#755eb1]">
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight">
                       Meet our Team
                   </h2>
               </motion.div>
@@ -67,7 +64,7 @@ export const TeamSection = () => {
                       </div>
                   </motion.div>
   
-                  {/* Dr. V Neha */}
+                  {/* Dr. V Neha - Changed name color to green */}
                   <motion.div 
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -77,7 +74,7 @@ export const TeamSection = () => {
                   >
                       {/* Passport Photo */}
                       <div className="flex-shrink-0 mx-auto sm:mx-0">
-                          <div className="relative w-32 h-40 sm:w-36 sm:h-44 md:w-40 md:h-48 rounded-2xl overflow-hidden border-2 border-[#c7d6c1] shadow-lg group hover:border-[#4f75d] transition-all">
+                          <div className="relative w-32 h-40 sm:w-36 sm:h-44 md:w-40 md:h-48 rounded-2xl overflow-hidden border-2 border-[#c7d6c1] shadow-lg group hover:border-[#4f7f5d] transition-all">
                                <Image 
                                  src="/Dr. V Neha.png" 
                                  alt="Dr. V Neha - Co-Founder" 
@@ -85,17 +82,18 @@ export const TeamSection = () => {
                                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                  sizes="(max-width: 640px) 128px, (max-width: 768px) 144px, 160px"
                                />
-                               <div className="absolute inset-0 bg-gradient-to-t from-[#4f75d]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                               <div className="absolute inset-0 bg-gradient-to-t from-[#4f7f5d]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                           </div>
                       </div>
 
                       {/* Content */}
                       <div className="flex-grow">
                           <div className="mb-4 sm:mb-6">
-                              <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#4f75d] mb-2">
+                              {/* Changed to green #4f7f5d */}
+                              <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#4f7f5d] mb-2">
                                   Dr. V Neha
                               </h3>
-                              <span className="inline-block px-3 py-1 bg-[#c7d6c1]/50 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#4f75d]">
+                              <span className="inline-block px-3 py-1 bg-[#c7d6c1]/50 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#4f7f5d]">
                                   Co-Founder
                               </span>
                           </div>

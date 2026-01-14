@@ -66,30 +66,32 @@ export const ContactForm = () => {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-6">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-6">
               Get in Touch
-            </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#755eb1] mb-6 leading-tight">
-              Let's start a conversation
             </h2>
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#2b2e34] mb-6 leading-tight">
+              Let's start a conversation
+            </h3>
             <p className="text-base sm:text-lg text-[#4f75d] leading-relaxed mb-8">
               Ready to turn evidence into action? Share your project details and we'll get back to you within 24 hours to discuss how we can support your sustainability goals.
             </p>
             
             {/* Contact Info */}
             <div className="space-y-4">
+              {/* Email - Updated to contact@thecapitalplab.com */}
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-[#c1b4df]/30 flex items-center justify-center flex-shrink-0">
                   <Mail size={20} className="text-[#755eb1]" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#2b2e34] mb-1">Email Us</p>
-                  <a href="mailto:info@thecapitalplab.com" className="text-sm text-[#4f75d] hover:text-[#755eb1] transition-colors">
-                    info@thecapitalplab.com
+                  <a href="mailto:contact@thecapitalplab.com" className="text-sm text-[#4f75d] hover:text-[#755eb1] transition-colors">
+                    contact@thecapitalplab.com
                   </a>
                 </div>
               </div>
               
+              {/* Location - Updated to India. USA */}
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-[#c7d6c1]/50 flex items-center justify-center flex-shrink-0">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#4f75d]">
@@ -99,7 +101,7 @@ export const ContactForm = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#2b2e34] mb-1">Location</p>
-                  <p className="text-sm text-[#4f75d]">Based in India</p>
+                  <p className="text-sm text-[#4f75d]">India. USA</p>
                 </div>
               </div>
             </div>

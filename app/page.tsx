@@ -44,11 +44,11 @@ export default function TheCapitalPLab() {
         <AboutSection />
         <FocusSection />
         <ServicesSection />
-
+ <InsightsSection />
         <TestimonialSection />
         <TeamSection />
 
-        <InsightsSection />
+       
         <ContactForm />
       </main>
 

@@ -13,13 +13,13 @@ const focusDetails = {
     sections: [
       {
         title: "Our Approach",
-        content: "We work at the intersection of neurodiversity research, inclusive design, and policy advocacy. Our research examines barriers to participation across education, employment, and public services, with a focus on evidence-based interventions that advance equity."
+        content: "We work at the intersection of inclusive design and policy advocacy. Our research examines barriers to participation across education, employment, and public services, with a focus on evidence-based interventions that advance equity."
       },
       {
         title: "Key Areas",
         points: [
           "Neurodiversity awareness and workplace inclusion",
-          "Accessibility audits and inclusive design frameworks",
+          "Accessibility awareness and inclusive design frameworks",
           "Policy analysis for disability rights and social protection",
           "Community consultation and participatory research"
         ]
@@ -31,11 +31,11 @@ const focusDetails = {
     ]
   },
   emotion: {
-    fullTitle: "Sustainability Emotion",
+    fullTitle: "Sustainability Emotions",
     sections: [
       {
         title: "Our Approach",
-        content: "We explore the psychological dimensions of climate change and environmental degradation, examining how emotional responses—such as eco-anxiety, climate grief, and hope—shape engagement with sustainability. Our research integrates insights from environmental psychology and mental health."
+        content: "We explore the psychological dimensions of climate change and environmental degradation, examining how emotional responses—such as eco-anxiety, climate grief, and hope—shape engagement with sustainability. Our research integrates insights from environmental psychology and mental health practices."
       },
       {
         title: "Key Areas",
@@ -64,8 +64,7 @@ const focusDetails = {
         points: [
           "Consumer behavior and sustainable consumption",
           "Circular economy models and waste reduction",
-          "Corporate sustainability strategies and reporting",
-          "Behavioral interventions for energy and water conservation"
+          "Review of Public and Private Sector Sustainability Strategies"
         ]
       },
       {
@@ -84,9 +83,7 @@ const focusDetails = {
       {
         title: "Key Areas",
         points: [
-          "ESG risk assessment and materiality analysis",
-          "Supply chain sustainability and due diligence",
-          "Stakeholder engagement and corporate accountability",
+          "Systemic Analysis of interconnected ESG impacts across sectors",
           "Policy coherence across SDGs"
         ]
       },
@@ -112,6 +109,20 @@ interface FocusCardProps {
 const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey, index }: FocusCardProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const details = focusDetails[detailKey]
+
+  // Lock body scroll when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
 
   return (
     <>
@@ -200,6 +211,7 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
               onClick={() => setIsOpen(false)}
+              onWheel={(e) => e.stopPropagation()}
             />
 
             {/* Modal Content */}
@@ -209,8 +221,11 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3 }}
               className="fixed inset-4 sm:inset-8 md:inset-16 lg:inset-24 z-50 overflow-hidden"
+              onWheel={(e) => e.stopPropagation()}
             >
-              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl h-full flex flex-col max-w-5xl mx-auto">
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl h-full flex flex-col max-w-5xl mx-auto overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {/* Header */}
                 <div className="relative h-48 sm:h-64 flex-shrink-0">
                   <Image 
@@ -284,12 +299,12 @@ export const FocusSection = () => {
             detailKey: "accessibility" as const
         },
         { 
-            title: "Sustainability Emotion", 
+            title: "Sustainability Emotions", 
             desc: "Integrating climate research with the emotional dimensions of mental health.", 
             bgColor: "bg-[#c7d6c1]",
             textColor: "text-[#4f75d]",
             hoverBg: "hover:bg-[#bccfb6]",
-            image: "https://images.unsplash.com/photo-1518709414768-a88981a4515d?q=80&w=2670&auto=format&fit=crop",
+            image: "/sustainablity emotion.png",
             detailKey: "emotion" as const
         },
         { 
@@ -328,12 +343,13 @@ export const FocusSection = () => {
                      >
                         Areas of Focus
                      </motion.h2>
+                     {/* Increased size of Core Pillars badge */}
                      <motion.span 
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ duration: 0.5 }}
-                        className="px-4 py-2 bg-[#c7d6c1] rounded-full text-xs font-bold uppercase tracking-widest text-[#4f75d]"
+                        className="px-5 py-2.5 bg-[#c7d6c1] rounded-full text-sm font-bold uppercase tracking-widest text-[#4f75d]"
                      >
                         Core Pillars
                      </motion.span>

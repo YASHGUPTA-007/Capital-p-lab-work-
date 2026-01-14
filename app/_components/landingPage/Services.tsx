@@ -14,33 +14,27 @@ export const ServicesSection = () => {
             gradient: 'from-[#755eb1] to-[#6b54a5]' 
         },
         { 
-            title: 'Monitoring & Evaluation', 
-            desc: 'Robust frameworks to track performance and demonstrate measurable outcomes.', 
-            num: '02', 
-            gradient: 'from-[#4f75d] to-[#5a8a6a]' 
-        },
-        { 
             title: 'Strategy & Advisory', 
             desc: 'Integrating sustainability principles into decision-making and operations.', 
-            num: '03', 
+            num: '02', 
             gradient: 'from-[#755eb1] to-[#4f75d]' 
         },
         { 
             title: 'Capacity Building', 
             desc: 'Tailored training programs that strengthen institutional capacity.', 
-            num: '04', 
+            num: '03', 
             gradient: 'from-[#5a8a6a] to-[#755eb1]' 
         },
         { 
             title: 'Content Development', 
             desc: 'Designing engaging learning materials that inspire change.', 
-            num: '05', 
+            num: '04', 
             gradient: 'from-[#755eb1] to-[#4f75d]' 
         },
         { 
             title: 'Proposal Development', 
             desc: 'Articulating vision and methodology to stakeholders and funders.', 
-            num: '06', 
+            num: '05', 
             gradient: 'from-[#4f75d] to-[#755eb1]' 
         },
     ]
@@ -58,20 +52,23 @@ export const ServicesSection = () => {
             transition={{ duration: 0.5 }}
             className="mb-12 sm:mb-16 md:mb-20"
           >
-            <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-6 sm:mb-8">
-                Our Expertise
-            </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif mt-4 mb-6 sm:mb-8 leading-tight">
-                <span className="text-[#755eb1]">Impact through</span>
-                <br/>
-                <span className="italic text-[#4f75d]">precision.</span>
+            {/* Changed to "Our Services" with larger font and purple color matching Areas of Focus */}
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-6 sm:mb-8">
+                Our Services
             </h2>
+            {/* Reduced size and changed to black */}
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif mt-4 mb-6 sm:mb-8 leading-tight text-[#2b2e34]">
+                <span>Impact through</span>
+                {' '}
+                <span className="italic">precision.</span>
+            </h3>
             <p className="text-base sm:text-lg md:text-xl text-[#4f75d] max-w-2xl leading-relaxed">
                 We provide research and consulting services that help organizations create measurable impact for <span className="text-[#4f75d] font-semibold">people</span>, <span className="text-[#755eb1] font-semibold">planet</span>, and prosperity.
             </p>
           </motion.div>
   
-          <div className="flex flex-col gap-4 sm:gap-6">
+          {/* Reduced service card sizes */}
+          <div className="flex flex-col gap-3 sm:gap-4">
             {services.map((service, i) => (
               <motion.div 
                 key={i}
@@ -87,24 +84,27 @@ export const ServicesSection = () => {
                     service.gradient
                   )}
                 />
-                <div className="relative bg-white p-5 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl shadow-sm border-2 border-[#c1b4df]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6 group-hover:border-[#755eb1]/40 group-hover:shadow-lg transition-all">
-                  <div className="flex gap-4 sm:gap-6 md:gap-8 items-baseline w-full md:w-auto">
+                {/* Reduced padding */}
+                <div className="relative bg-white p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-sm border-2 border-[#c1b4df]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4 group-hover:border-[#755eb1]/40 group-hover:shadow-lg transition-all">
+                  <div className="flex gap-3 sm:gap-4 md:gap-6 items-baseline w-full md:w-auto">
                       <span className={cn(
                         "text-xs sm:text-sm font-bold font-mono bg-gradient-to-br bg-clip-text text-transparent flex-shrink-0",
                         service.gradient
                       )}>
                         {service.num}
                       </span>
-                      <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-[#2b2e34] group-hover:text-[#755eb1] transition-colors">
+                      {/* Reduced title size */}
+                      <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-[#2b2e34] group-hover:text-[#755eb1] transition-colors">
                         {service.title}
                       </h3>
                   </div>
-                  <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto md:max-w-md lg:max-w-lg">
-                      <p className="text-[#4f75d] text-sm sm:text-base md:text-lg font-light text-left md:text-right leading-relaxed flex-grow">
+                  <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto md:max-w-md lg:max-w-lg">
+                      {/* Reduced description size */}
+                      <p className="text-[#4f75d] text-xs sm:text-sm md:text-base font-light text-left md:text-right leading-relaxed flex-grow">
                           {service.desc}
                       </p>
                       <ArrowUpRight className={cn(
-                        "w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all",
+                        "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all",
                         "text-[#755eb1]"
                       )} />
                   </div>

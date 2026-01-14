@@ -3,8 +3,9 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, CheckCircle, AlertCircle } from 'lucide-react'
+import { Sparkles, CheckCircle, AlertCircle, FileText, MessageSquare, Calendar, PenTool } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 export const InsightsSection = () => {
     const [newsletterData, setNewsletterData] = useState({
@@ -51,6 +52,41 @@ export const InsightsSection = () => {
         }
     };
 
+    const insightItems = [
+        { 
+            type: "Reports", 
+            title: "The Future of Sustainable Policy in India", 
+            date: "Oct 2024", 
+            color: "purple",
+            image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop",
+            icon: FileText
+        },
+        { 
+            type: "Opinions", 
+            title: "Bridging the Gap: Mental Health & Climate", 
+            date: "Sep 2024", 
+            color: "green",
+            image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop",
+            icon: MessageSquare
+        },
+        { 
+            type: "Events", 
+            title: "Webinar: ESG Frameworks for Startups", 
+            date: "Aug 2024", 
+            color: "purple",
+            image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2670&auto=format&fit=crop",
+            icon: Calendar
+        },
+        { 
+            type: "Blogs", 
+            title: "Neurodiversity in the Modern Workplace", 
+            date: "Jul 2024", 
+            color: "green",
+            image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2670&auto=format&fit=crop",
+            icon: PenTool
+        }
+    ];
+
     return (
         <section id="insights" className="py-20 sm:py-24 md:py-28 bg-gradient-to-br from-[#c1b4df]/20 via-white to-[#c7d6c1]/20 border-t-2 border-[#c1b4df]/30 relative overflow-hidden">
             {/* Optimized background decoration */}
@@ -62,18 +98,13 @@ export const InsightsSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.5 }}
-                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif mb-12 sm:mb-16 md:mb-20 text-[#755eb1]"
+                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-12 sm:mb-16 md:mb-20"
                 >
                     Insights
                 </motion.h2>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                    {[
-                        { type: "Reports", title: "The Future of Sustainable Policy in India", date: "Oct 2024", color: "purple" },
-                        { type: "Opinions", title: "Bridging the Gap: Mental Health & Climate", date: "Sep 2024", color: "green" },
-                        { type: "Events", title: "Webinar: ESG Frameworks for Startups", date: "Aug 2024", color: "purple" },
-                        { type: "Blogs", title: "Neurodiversity in the Modern Workplace", date: "Jul 2024", color: "green" }
-                    ].map((item, i) => (
+                    {insightItems.map((item, i) => (
                         <motion.div 
                             key={i}
                             initial={{ opacity: 0, y: 30 }}
@@ -82,25 +113,77 @@ export const InsightsSection = () => {
                             transition={{ delay: i * 0.08, duration: 0.5 }}
                             className="group cursor-pointer"
                         >
-                            <div className="relative bg-white p-6 sm:p-8 h-72 sm:h-80 flex flex-col justify-between border-2 border-[#c1b4df]/30 group-hover:border-[#755eb1] rounded-xl sm:rounded-2xl group-hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                {/* Decorative corner */}
-                                <div className={cn(
-                                    "absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 rounded-bl-3xl opacity-0 group-hover:opacity-20 transition-opacity",
-                                    item.color === "purple" ? "bg-gradient-to-bl from-[#755eb1] to-transparent" : "bg-gradient-to-bl from-[#4f75d] to-transparent"
-                                )} />
-                                
-                                <div className="relative z-10">
-                                    <span className={cn(
-                                        "inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 sm:mb-6",
-                                        item.color === "purple" ? "bg-[#c1b4df]/40 text-[#755eb1]" : "bg-[#c7d6c1]/50 text-[#4f75d]"
-                                    )}>
-                                        {item.type}
-                                    </span>
-                                    <h3 className="text-xl sm:text-2xl font-serif leading-tight text-[#2b2e34] group-hover:text-[#755eb1] transition-colors">
-                                        {item.title}
-                                    </h3>
+                            <div className="relative h-80 sm:h-96 flex flex-col justify-between border-2 border-[#c1b4df]/30 group-hover:border-[#755eb1] rounded-xl sm:rounded-2xl group-hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                                {/* Background Image */}
+                                <div className="absolute inset-0 z-0">
+                                    <Image 
+                                        src={item.image}
+                                        alt={item.type}
+                                        fill
+                                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    />
+                                    {/* Gradient Overlay */}
+                                    <div className={cn(
+                                        "absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30 group-hover:from-black/95 group-hover:via-black/70 transition-all duration-300"
+                                    )} />
+                                    
+                                    {/* Color Accent Overlay */}
+                                    <div className={cn(
+                                        "absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-300",
+                                        item.color === "purple" 
+                                            ? "bg-gradient-to-br from-[#755eb1] to-transparent" 
+                                            : "bg-gradient-to-br from-[#4f7f5d] to-transparent"
+                                    )} />
                                 </div>
-                                <span className="text-xs font-bold uppercase tracking-widest text-[#4f75d]/50 relative z-10">{item.date}</span>
+
+                                {/* Content */}
+                                <div className="relative z-10 p-6 sm:p-8 h-full flex flex-col justify-between">
+                                    {/* Top Section */}
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm",
+                                                item.color === "purple" 
+                                                    ? "bg-[#755eb1]/20 border border-[#755eb1]/30" 
+                                                    : "bg-[#4f7f5d]/20 border border-[#4f7f5d]/30"
+                                            )}>
+                                                <item.icon size={16} className={cn(
+                                                    item.color === "purple" ? "text-[#c1b4df]" : "text-[#c7d6c1]"
+                                                )} />
+                                            </div>
+                                            <span className={cn(
+                                                "inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm",
+                                                item.color === "purple" 
+                                                    ? "bg-[#755eb1]/30 text-[#c1b4df] border border-[#755eb1]/30" 
+                                                    : "bg-[#4f7f5d]/30 text-[#c7d6c1] border border-[#4f7f5d]/30"
+                                            )}>
+                                                {item.type}
+                                            </span>
+                                        </div>
+                                        
+                                        <h3 className="text-xl sm:text-2xl font-serif leading-tight text-white group-hover:text-[#c1b4df] transition-colors mb-3">
+                                            {item.title}
+                                        </h3>
+                                    </div>
+                                    
+                                    {/* Bottom Section */}
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold uppercase tracking-widest text-white/70">
+                                            {item.date}
+                                        </span>
+                                        <div className={cn(
+                                            "w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1",
+                                            item.color === "purple" 
+                                                ? "bg-[#755eb1]/30 border border-[#755eb1]/50" 
+                                                : "bg-[#4f7f5d]/30 border border-[#4f7f5d]/50"
+                                        )}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
                     ))}
@@ -114,7 +197,7 @@ export const InsightsSection = () => {
                     transition={{ duration: 0.6 }}
                     className="mt-20 sm:mt-24 md:mt-32 relative"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#755eb1] via-[#6b54a5] to-[#4f75d] rounded-2xl sm:rounded-3xl" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#755eb1] via-[#6b54a5] to-[#4f7f5d] rounded-2xl sm:rounded-3xl" />
                     <div className="relative bg-white p-8 sm:p-12 lg:p-16 xl:p-20 rounded-2xl sm:rounded-3xl border-2 border-[#c1b4df] text-center m-1">
                         <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 sm:mb-6 text-[#755eb1]" />
                         <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-3 sm:mb-4">
