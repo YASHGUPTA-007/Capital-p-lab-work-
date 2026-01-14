@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  X, Upload, Image as ImageIcon, Bold, Italic, List, ListOrdered, 
+  X, Upload, Image as ImageIcon, Bold, Italic, 
   Link as LinkIcon, Underline as UnderlineIcon, Heading1, Heading2, 
-  Heading3, AlignLeft, AlignCenter, AlignRight, Code, Quote, Undo, 
+  Heading3, AlignLeft, AlignCenter, AlignRight, Undo, 
   Redo, RefreshCw, CheckCircle, AlertCircle
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
@@ -99,19 +99,16 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
   }, [blog]);
 
   // --- Tiptap Editor ---
-// --- Tiptap Editor ---
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        // Disable the default heading configuration so we can override it below
         heading: false, 
       }),
-      // Re-configure Heading with specific classes
       Heading.configure({
         levels: [1, 2, 3],
         HTMLAttributes: {
-          class: 'font-bold text-gray-900', // Default class for all headings
+          class: 'font-bold text-gray-900',
         },
       }).extend({
         renderHTML({ node, HTMLAttributes }) {
@@ -119,7 +116,6 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
             ? node.attrs.level
             : this.options.levels[0];
           
-          // Define specific classes for each level
           const classes: { [key: number]: string } = {
             1: 'text-4xl mb-4 mt-6',
             2: 'text-3xl mb-3 mt-5',
@@ -147,8 +143,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     content: blog?.content || '<p>Start writing your blog post...</p>',
     editorProps: {
       attributes: {
-        // Ensure 'prose-headings' classes are active if you are using tailwind typography
-        class: 'prose prose-lg prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900'
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl'
       }
     }
   });
@@ -356,11 +351,11 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
                         {slugChecking ? (
-                           <RefreshCw size={16} className="animate-spin text-gray-400" />
+                          <RefreshCw size={16} className="animate-spin text-gray-400" />
                         ) : isSlugUnique ? (
-                           <CheckCircle size={16} className="text-green-500" />
+                          <CheckCircle size={16} className="text-green-500" />
                         ) : (
-                           <AlertCircle size={16} className="text-red-500" />
+                          <AlertCircle size={16} className="text-red-500" />
                         )}
                       </div>
                     </div>
@@ -381,25 +376,25 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
               {/* Author & Status */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Author *</label>
-                    <input
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Author *</label>
+                  <input
                     type="text"
                     value={formData.author}
                     onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 text-gray-900"
                     placeholder="John Doe"
-                    />
+                  />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
-                    <select
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
+                  <select
                     value={formData.status}
                     onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 text-gray-900 bg-white"
-                    >
+                  >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
-                    </select>
+                  </select>
                 </div>
               </div>
 
@@ -463,7 +458,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                   ) : (
                     <label className="flex flex-col items-center justify-center gap-2 w-full h-56 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-500 hover:bg-gray-50 cursor-pointer transition-all">
                       <div className="p-3 bg-gray-100 rounded-full">
-                         <Upload size={24} className="text-gray-500" />
+                        <Upload size={24} className="text-gray-500" />
                       </div>
                       <div className="text-center">
                         <span className="text-sm font-medium text-gray-700 block">
@@ -494,8 +489,8 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                   placeholder="Brief description of the blog post..."
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
-                   <span>Used for SEO and blog cards</span>
-                   <span>{formData.excerpt.length} chars</span>
+                  <span>Used for SEO and blog cards</span>
+                  <span>{formData.excerpt.length} chars</span>
                 </div>
               </div>
             </div>
@@ -519,18 +514,13 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
               <div className="flex items-center gap-1 px-2 border-r border-gray-300">
                 <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-300' : ''}`}><Heading1 size={18} /></button>
                 <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-300' : ''}`}><Heading2 size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-300' : ''}`}><Heading3 size={18} /></button>
               </div>
 
               <div className="flex items-center gap-1 px-2 border-r border-gray-300">
-                <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('bulletList') ? 'bg-gray-300' : ''}`}><List size={18} /></button>
-                <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('orderedList') ? 'bg-gray-300' : ''}`}><ListOrdered size={18} /></button>
-                <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('blockquote') ? 'bg-gray-300' : ''}`}><Quote size={18} /></button>
-              </div>
-
-              <div className="flex items-center gap-1 px-2 border-r border-gray-300">
-                 <button type="button" onClick={() => editor.chain().focus().setTextAlign('left').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'left' }) ? 'bg-gray-300' : ''}`}><AlignLeft size={18} /></button>
-                 <button type="button" onClick={() => editor.chain().focus().setTextAlign('center').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'center' }) ? 'bg-gray-300' : ''}`}><AlignCenter size={18} /></button>
-                 <button type="button" onClick={() => editor.chain().focus().setTextAlign('right').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'right' }) ? 'bg-gray-300' : ''}`}><AlignRight size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().setTextAlign('left').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'left' }) ? 'bg-gray-300' : ''}`}><AlignLeft size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().setTextAlign('center').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'center' }) ? 'bg-gray-300' : ''}`}><AlignCenter size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().setTextAlign('right').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'right' }) ? 'bg-gray-300' : ''}`}><AlignRight size={18} /></button>
               </div>
 
               <div className="flex items-center gap-1 px-2">
@@ -542,8 +532,8 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
               </div>
               
               <div className="ml-auto flex items-center gap-1">
-                 <button type="button" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} className="p-2 rounded hover:bg-gray-200 text-gray-700 disabled:opacity-30"><Undo size={18} /></button>
-                 <button type="button" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} className="p-2 rounded hover:bg-gray-200 text-gray-700 disabled:opacity-30"><Redo size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} className="p-2 rounded hover:bg-gray-200 text-gray-700 disabled:opacity-30"><Undo size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} className="p-2 rounded hover:bg-gray-200 text-gray-700 disabled:opacity-30"><Redo size={18} /></button>
               </div>
             </div>
 
@@ -571,12 +561,12 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
             type="button"
           >
             {saving ? (
-               <>
-                 <RefreshCw size={16} className="animate-spin" />
-                 Saving...
-               </>
+              <>
+                <RefreshCw size={16} className="animate-spin" />
+                Saving...
+              </>
             ) : (
-               blog ? 'Update Post' : 'Create Post'
+              blog ? 'Update Post' : 'Create Post'
             )}
           </button>
         </div>

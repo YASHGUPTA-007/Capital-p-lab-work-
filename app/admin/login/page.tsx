@@ -5,11 +5,12 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react'; // <--- Added Eye & EyeOff
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // <--- New State
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -21,11 +22,10 @@ export default function AdminLogin() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/admin');
+      router.push('/admin/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
       
-      // More detailed error messages
       switch (err.code) {
         case 'auth/invalid-email':
           setError('Invalid email address format.');
@@ -113,14 +113,23 @@ export default function AdminLogin() {
                 <div className="relative">
                   <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#755eb1]/40" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"} // <--- Toggles type
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-[#f4f7f5] border-2 border-[#c1b4df]/30 rounded-xl text-[#2b2e34] focus:outline-none focus:ring-2 focus:ring-[#755eb1] focus:border-transparent transition-all"
+                    // Increased padding-right (pr-12) to make space for the eye button
+                    className="w-full pl-12 pr-12 py-3 bg-[#f4f7f5] border-2 border-[#c1b4df]/30 rounded-xl text-[#2b2e34] focus:outline-none focus:ring-2 focus:ring-[#755eb1] focus:border-transparent transition-all"
                     placeholder="••••••••"
                     required
                   />
+                  {/* Eye Toggle Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#755eb1]/40 hover:text-[#755eb1] transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
               </div>
 
