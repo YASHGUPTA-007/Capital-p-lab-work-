@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { 
-  collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, getDoc // Added getDoc here
+  collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, getDoc
 } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
 import Sidebar from './_Components/sidebar';
 import OverviewTab from './_Components/overview';
 import ContactsTab from './_Components/ContactsTab';
@@ -21,12 +22,14 @@ export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // New state for collapse
   
   // Data States
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [totalVisits, setTotalVisits] = useState(0); // <--- NEW STATE
+  const [totalVisits, setTotalVisits] = useState(0);
   
   // Modal States
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
@@ -49,7 +52,7 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, [router]);
 
-  // Fetch Total Visits (NEW)
+  // Fetch Total Visits
   useEffect(() => {
     const fetchVisits = async () => {
       try {
@@ -210,17 +213,70 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          user={user}
-          contactsCount={contacts.length}
-          newContactsCount={contacts.filter(c => c.status === 'new').length}
-          subscribersCount={subscribers.length}
-          blogPostsCount={blogPosts.length}
-          onLogout={handleLogout}
-        />
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#2b2e34] border-b border-white/10 flex items-center justify-between px-4 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 relative flex-shrink-0 rounded-lg bg-gradient-to-br from-[#755eb1] to-[#4f7f5d] p-0.5">
+            <div className="w-full h-full bg-white rounded-lg flex items-center justify-center text-xs font-bold">
+              P
+            </div>
+          </div>
+          <div>
+            <h1 className="text-sm font-bold text-white">The Capital P Lab</h1>
+            <p className="text-xs text-white/60">Admin</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+        >
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      <div className="flex h-screen overflow-hidden pt-16 lg:pt-0">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block">
+          <Sidebar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            user={user}
+            contactsCount={contacts.length}
+            newContactsCount={contacts.filter(c => c.status === 'new').length}
+            subscribersCount={subscribers.length}
+            blogPostsCount={blogPosts.length}
+            onLogout={handleLogout}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        </div>
+
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <>
+            <div 
+              className="lg:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <div className="lg:hidden fixed inset-y-0 left-0 w-64 z-50 pt-16">
+              <Sidebar
+                activeTab={activeTab}
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  setSidebarOpen(false);
+                }}
+                user={user}
+                contactsCount={contacts.length}
+                newContactsCount={contacts.filter(c => c.status === 'new').length}
+                subscribersCount={subscribers.length}
+                blogPostsCount={blogPosts.length}
+                onLogout={handleLogout}
+                collapsed={false}
+                onToggleCollapse={() => {}}
+              />
+            </div>
+          </>
+        )}
 
         <main className="flex-1 overflow-auto">
           <div className="h-full">
@@ -230,7 +286,7 @@ export default function AdminDashboard() {
                 newContactsCount={contacts.filter(c => c.status === 'new').length}
                 subscribersCount={subscribers.length}
                 publishedBlogsCount={blogPosts.filter(b => b.status === 'published').length}
-                totalVisits={totalVisits} // <--- PASSING THE NEW PROP
+                totalVisits={totalVisits}
                 recentContacts={contacts.slice(0, 5)}
                 formatDate={formatDate}
               />
