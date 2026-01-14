@@ -32,7 +32,7 @@ const Typewriter = ({ words }: { words: string[] }) => {
   return (
     <span className="inline-flex items-center">
       {words[index].substring(0, subIndex)}
-      <span className="ml-1 w-[2px] h-[1em] bg-[#755eb1] animate-pulse" />
+      <span className="ml-1 w-[2px] h-[1em] bg-[#2b2e34] animate-pulse" />
     </span>
   )
 }
@@ -75,10 +75,6 @@ export const Hero = () => {
       {/* --- MAIN CONTENT --- */}
       <motion.div 
         style={{ y: contentY, opacity }}
-        // UPDATED:
-        // 1. `gap-16` (increased from 8) to prevents rings from overlapping text on mobile
-        // 2. `py-12` ensures top/bottom rings aren't cut off by the screen edge
-        // 3. `md:pl-32` keeps your desktop right-shift
         className="relative z-10 w-full max-w-[1600px] px-6 py-12 md:px-12 md:pl-32 flex flex-col md:flex-row items-center justify-center gap-16 md:gap-20"
       >
         
@@ -90,7 +86,6 @@ export const Hero = () => {
           className="relative z-20 flex-shrink-0 group order-1"
         >
           {/* Rings - CSS Only */}
-          {/* Note: The largest ring is -m-12 (3rem/48px). The gap-16 (4rem/64px) above ensures it doesn't touch the text. */}
           <div className="absolute inset-0 -m-6 sm:-m-8 border border-[#755eb1]/10 rounded-full" />
           <div className="absolute inset-0 -m-12 sm:-m-16 border border-[#4f75d]/10 rounded-full" />
 
@@ -114,8 +109,8 @@ export const Hero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {/* Typewriter */}
-            <span className="block text-[#755eb1] font-serif italic text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2 sm:mb-3 h-[1.5em]">
+            {/* Typewriter - Changed to Black */}
+            <span className="block text-[#2b2e34] font-serif italic text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2 sm:mb-3 h-[1.5em]">
               <Typewriter words={["Driving", "Accelerating", "Transforming"]} />
             </span>
             
@@ -124,8 +119,9 @@ export const Hero = () => {
               Empowering
             </h1>
             
-            <h1 className="text-[#2b2e34] text-[11vw] sm:text-[10vw] md:text-[7.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
-              Policy <span className="text-[#4f75d]">Action</span><span className="text-[#755eb1]">.</span>
+            {/* Policy Action - Changed to Purple, Removed Full Stop */}
+            <h1 className="text-[#755eb1] text-[11vw] sm:text-[10vw] md:text-[7.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
+              Policy Action
             </h1>
 
             {/* Description */}
@@ -136,10 +132,11 @@ export const Hero = () => {
               className="mt-6 sm:mt-8 relative"
             >
               <div className="absolute -left-4 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#755eb1] to-[#4f75d]" />
+              {/* Changed Planet, People, and Profit to Bold Black */}
               <p className="pl-6 text-[#2b2e34]/70 max-w-lg text-sm sm:text-base md:text-lg font-medium leading-relaxed">
                 Turning evidence into reality for <br className="hidden md:block" />
-                <span className="text-[#4f75d] font-bold">Planet</span>, 
-                <span className="text-[#755eb1] font-bold mx-1">People</span>, and 
+                <span className="text-[#2b2e34] font-bold">Planet</span>, 
+                <span className="text-[#2b2e34] font-bold mx-1">People</span>, and 
                 <span className="text-[#2b2e34] font-bold"> Profit</span>.
               </p>
             </motion.div>
@@ -147,9 +144,9 @@ export const Hero = () => {
         </div>
       </motion.div>
 
-      {/* --- CORNER TAG --- */}
+      {/* --- CORNER TAG - Changed to 2025 --- */}
       <div className="absolute top-4 sm:top-6 right-4 sm:right-6 hidden sm:block z-20">
-         <span className="text-[10px] font-bold tracking-[0.2em] text-[#755eb1] opacity-50">EST. 2026</span>
+         <span className="text-[10px] font-bold tracking-[0.2em] text-[#755eb1] opacity-50">EST. 2025</span>
       </div>
 
     </section>
