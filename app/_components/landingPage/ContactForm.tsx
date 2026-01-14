@@ -66,12 +66,13 @@ export const ContactForm = () => {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-6">
+            {/* Changed "Get in Touch" to green */}
+            <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c7d6c1] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#4f7f5d] mb-6">
               Get in Touch
-            </h2>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#2b2e34] mb-6 leading-tight">
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#755eb1] mb-6 leading-tight">
               Let's start a conversation
-            </h3>
+            </h2>
             <p className="text-base sm:text-lg text-[#4f75d] leading-relaxed mb-8">
               Ready to turn evidence into action? Share your project details and we'll get back to you within 24 hours to discuss how we can support your sustainability goals.
             </p>
