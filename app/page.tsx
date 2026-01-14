@@ -14,6 +14,7 @@ import { InsightsSection } from "./_components/landingPage/Insights";
 import { ContactForm } from "./_components/landingPage/ContactForm";
 import { Footer } from "./_components/landingPage/Footer";
 import WhatsAppFloat from "./WhatsAppFloat";
+import VisitTracker from "./_components/VisitTracker";
 
 export default function TheCapitalPLab() {
   useEffect(() => {
@@ -53,6 +54,8 @@ export default function TheCapitalPLab() {
 
       <Footer />
       <WhatsAppFloat />
+      <VisitTracker/>
+      
     </div>
   );
 }

@@ -1,5 +1,5 @@
 // components/admin/OverviewTab.tsx
-import { Mail } from 'lucide-react';
+import { Mail, Eye } from 'lucide-react'; // Added Eye icon for visuals
 
 interface Contact {
   id: string;
@@ -16,6 +16,7 @@ interface OverviewTabProps {
   newContactsCount: number;
   subscribersCount: number;
   publishedBlogsCount: number;
+  totalVisits: number; // <--- NEW PROP
   recentContacts: Contact[];
   formatDate: (timestamp: any) => string;
 }
@@ -25,14 +26,17 @@ export default function OverviewTab({
   newContactsCount,
   subscribersCount,
   publishedBlogsCount,
+  totalVisits, // <--- Destructure new prop
   recentContacts,
   formatDate
 }: OverviewTabProps) {
+  
   const stats = [
-    { label: 'Total Inquiries', value: contactsCount, subtext: 'All time' },
-    { label: 'New Messages', value: newContactsCount, subtext: 'Unread' },
-    { label: 'Subscribers', value: subscribersCount, subtext: 'Active' },
-    { label: 'Blog Posts', value: publishedBlogsCount, subtext: 'Published' }
+    { label: 'Total Visits', value: totalVisits, subtext: 'Site Traffic', icon: Eye }, // <--- Added Visits
+    { label: 'Total Inquiries', value: contactsCount, subtext: 'All time', icon: Mail },
+    { label: 'New Messages', value: newContactsCount, subtext: 'Unread', icon: Mail },
+    { label: 'Subscribers', value: subscribersCount, subtext: 'Active', icon: Mail },
+    { label: 'Blog Posts', value: publishedBlogsCount, subtext: 'Published', icon: Mail }
   ];
 
   return (
@@ -42,12 +46,19 @@ export default function OverviewTab({
         <p className="text-sm text-gray-600">Overview of all activities</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Updated Grid to 5 columns or wrap nicely */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
-            <p className="text-3xl font-semibold text-gray-900 mb-1">{stat.value}</p>
-            <p className="text-xs text-gray-500">{stat.subtext}</p>
+          <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
+                <p className="text-3xl font-semibold text-gray-900 mb-1">
+                  {stat.value.toLocaleString()} {/* Adds commas for large numbers */}
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">{stat.subtext}</p>
           </div>
         ))}
       </div>

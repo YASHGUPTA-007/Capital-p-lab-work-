@@ -4,7 +4,9 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { 
+  collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, getDoc // Added getDoc here
+} from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import Sidebar from './_Components/sidebar';
 import OverviewTab from './_Components/overview';
@@ -19,14 +21,21 @@ export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Data States
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [totalVisits, setTotalVisits] = useState(0); // <--- NEW STATE
+  
+  // Modal States
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  
   const router = useRouter();
 
+  // Authentication Check
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -39,6 +48,22 @@ export default function AdminDashboard() {
 
     return () => unsubscribe();
   }, [router]);
+
+  // Fetch Total Visits (NEW)
+  useEffect(() => {
+    const fetchVisits = async () => {
+      try {
+        const docRef = doc(db, 'site-stats', 'general');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setTotalVisits(docSnap.data().totalVisits || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching visits:', error);
+      }
+    };
+    fetchVisits();
+  }, []);
 
   // Fetch contacts
   useEffect(() => {
@@ -205,6 +230,7 @@ export default function AdminDashboard() {
                 newContactsCount={contacts.filter(c => c.status === 'new').length}
                 subscribersCount={subscribers.length}
                 publishedBlogsCount={blogPosts.filter(b => b.status === 'published').length}
+                totalVisits={totalVisits} // <--- PASSING THE NEW PROP
                 recentContacts={contacts.slice(0, 5)}
                 formatDate={formatDate}
               />

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
-import { Calendar, User, Tag, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { Calendar, User, Tag, ArrowLeft, Share2, Facebook, Twitter, Linkedin, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Navbar } from '@/app/_components/landingPage/Navbar';
@@ -34,6 +34,7 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [readingTime, setReadingTime] = useState(0);
 
   useEffect(() => {
     if (slug) {
@@ -62,6 +63,7 @@ export default function BlogPostPage() {
       } as BlogPost;
       
       setPost(postData);
+      calculateReadingTime(postData.content);
       fetchRelatedPosts(postData.category, postData.id);
     } catch (error) {
       console.error('Error fetching post:', error);
@@ -69,6 +71,14 @@ export default function BlogPostPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateReadingTime = (content: string) => {
+    // Remove HTML tags and calculate word count
+    const text = content.replace(/<[^>]*>/g, '');
+    const words = text.trim().split(/\s+/).length;
+    const minutes = Math.ceil(words / 200); // Average reading speed: 200 words/minute
+    setReadingTime(minutes);
   };
 
   const fetchRelatedPosts = async (category: string, currentPostId: string) => {
@@ -122,7 +132,7 @@ export default function BlogPostPage() {
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#755eb1] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#4f75d]">Loading article...</p>
+          <p className="text-[#4f475d]">Loading article...</p>
         </div>
       </div>
     );
@@ -133,7 +143,8 @@ export default function BlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    // FIX 1: Added text-gray-900 to ensure global text color is dark
+    <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
       
       {/* Hero Section */}
@@ -182,7 +193,7 @@ export default function BlogPostPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-xl text-[#4f75d] mb-8 leading-relaxed"
+            className="text-xl text-[#4f475d] mb-8 leading-relaxed"
           >
             {post.excerpt}
           </motion.p>
@@ -194,16 +205,20 @@ export default function BlogPostPage() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-wrap items-center gap-6 pb-8 mb-8 border-b-2 border-[#c1b4df]/20"
           >
-            <div className="flex items-center gap-2 text-[#4f75d]">
+            <div className="flex items-center gap-2 text-[#4f475d]">
               <User size={18} />
               <span className="font-medium">{post.author}</span>
             </div>
-            <div className="flex items-center gap-2 text-[#4f75d]">
+            <div className="flex items-center gap-2 text-[#4f475d]">
               <Calendar size={18} />
               <span>{formatDate(post.publishedAt || post.createdAt)}</span>
             </div>
+            <div className="flex items-center gap-2 text-[#4f475d]">
+              <Clock size={18} />
+              <span>{readingTime} min read</span>
+            </div>
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-sm text-[#4f75d] mr-2">Share:</span>
+              <span className="text-sm text-[#4f475d] mr-2">Share:</span>
               <button
                 onClick={() => sharePost('twitter')}
                 className="p-2 hover:bg-[#c1b4df]/20 text-[#755eb1] rounded-lg transition-colors"
@@ -244,24 +259,35 @@ export default function BlogPostPage() {
             </motion.div>
           )}
 
-          {/* Content */}
+          {/* Content - Render HTML from Tiptap */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="prose prose-lg max-w-none mb-12"
-            style={{
-              color: '#2b2e34',
-              lineHeight: '1.8'
-            }}
+            className="mb-12"
           >
-            <div className="text-[#2b2e34] leading-relaxed space-y-6 text-lg">
-              {post.content.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="mb-6">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            {/* FIX 2: Added text-[#2b2e34] and marker:text-[#2b2e34] to force dark text color */}
+            <div 
+              className="prose prose-lg max-w-none text-[#2b2e34] marker:text-[#2b2e34]
+                prose-headings:text-[#2b2e34] prose-headings:font-serif
+                prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
+                prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-7
+                prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
+                prose-p:text-[#2b2e34] prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg
+                prose-a:text-[#755eb1] prose-a:no-underline hover:prose-a:underline hover:prose-a:text-[#6b54a5]
+                prose-strong:text-[#2b2e34] prose-strong:font-semibold
+                prose-em:text-[#2b2e34]
+                prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6
+                prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6
+                prose-li:text-[#2b2e34] prose-li:mb-2 prose-li:text-lg
+                prose-blockquote:border-l-4 prose-blockquote:border-[#755eb1] prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:my-6 prose-blockquote:bg-[#c1b4df]/5 prose-blockquote:rounded-r-lg
+                prose-blockquote:text-[#4f475d] prose-blockquote:italic
+                prose-code:text-[#755eb1] prose-code:bg-[#c1b4df]/10 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-[#2b2e34] prose-pre:text-gray-100 prose-pre:p-6 prose-pre:rounded-lg prose-pre:my-6 prose-pre:overflow-x-auto
+                prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8
+                prose-hr:border-[#c1b4df]/30 prose-hr:my-8"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
           </motion.div>
 
           {/* Tags */}
@@ -272,11 +298,11 @@ export default function BlogPostPage() {
               transition={{ duration: 0.5, delay: 0.7 }}
               className="flex flex-wrap items-center gap-3 pt-8 border-t-2 border-[#c1b4df]/20"
             >
-              <Tag size={18} className="text-[#4f75d]" />
+              <Tag size={18} className="text-[#4f475d]" />
               {post.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="px-4 py-2 bg-[#c7d6c1]/30 text-[#4f75d] text-sm font-semibold rounded-full"
+                  className="px-4 py-2 bg-[#c7d6c1]/30 text-[#4f475d] text-sm font-semibold rounded-full hover:bg-[#c7d6c1]/50 transition-colors cursor-default"
                 >
                   {tag}
                 </span>
@@ -288,34 +314,34 @@ export default function BlogPostPage() {
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#f4f7f5]">
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#f8f9fa]">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-serif text-[#755eb1] mb-8">Related Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {relatedPosts.map((relatedPost) => (
                 <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`}>
-                  <div className="bg-white border-2 border-[#c1b4df]/30 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#755eb1]/50 transition-all">
+                  <div className="bg-white border border-[#c1b4df]/20 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#755eb1]/40 transition-all group">
                     {relatedPost.featuredImage ? (
                       <div className="h-48 overflow-hidden">
                         <img
                           src={relatedPost.featuredImage}
                           alt={relatedPost.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
                     ) : (
-                      <div className="h-48 bg-gradient-to-br from-[#c1b4df]/30 to-[#c7d6c1]/30 flex items-center justify-center">
-                        <span className="text-5xl opacity-20">📝</span>
+                      <div className="h-48 bg-gradient-to-br from-[#c1b4df]/15 to-[#c7d6c1]/15 flex items-center justify-center">
+                        <span className="text-5xl opacity-15">📝</span>
                       </div>
                     )}
                     <div className="p-6">
-                      <span className="px-3 py-1 bg-[#c1b4df]/40 text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full">
+                      <span className="px-3 py-1 bg-[#c1b4df]/20 text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full">
                         {relatedPost.category}
                       </span>
-                      <h3 className="text-lg font-serif text-[#2b2e34] mt-3 mb-2 line-clamp-2 hover:text-[#755eb1] transition-colors">
+                      <h3 className="text-lg font-serif text-[#2b2e34] mt-3 mb-2 line-clamp-2 group-hover:text-[#755eb1] transition-colors">
                         {relatedPost.title}
                       </h3>
-                      <p className="text-sm text-[#4f75d] line-clamp-2">
+                      <p className="text-sm text-[#4f475d] line-clamp-2">
                         {relatedPost.excerpt}
                       </p>
                     </div>

@@ -140,7 +140,7 @@ export const Hero = () => {
                 Turning evidence into reality for <br className="hidden md:block" />
                 <span className="text-[#4f75d] font-bold">Planet</span>, 
                 <span className="text-[#755eb1] font-bold mx-1">People</span>, and 
-                <span className="text-[#2b2e34] font-bold">Profit</span>.
+                <span className="text-[#2b2e34] font-bold"> Profit</span>.
               </p>
             </motion.div>
           </motion.div>
