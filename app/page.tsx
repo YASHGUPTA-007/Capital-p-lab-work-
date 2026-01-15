@@ -20,7 +20,15 @@ export default function TheCapitalPLab() {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Initialize Lenis with optimized settings
+    // Only initialize Lenis on desktop (768px and above)
+    const isDesktop = window.innerWidth >= 768;
+    
+    if (!isDesktop) {
+      // On mobile, use native scrolling - no Lenis
+      return;
+    }
+
+    // Initialize Lenis only on desktop
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -42,10 +50,25 @@ export default function TheCapitalPLab() {
 
     requestAnimationFrame(raf);
 
+    // Handle window resize
+    const handleResize = () => {
+      const nowDesktop = window.innerWidth >= 768;
+      if (!nowDesktop && lenisRef.current) {
+        // Switched to mobile, destroy Lenis
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
     // Cleanup
     return () => {
-      lenis.destroy();
-      lenisRef.current = null;
+      window.removeEventListener('resize', handleResize);
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
     };
   }, []);
 
