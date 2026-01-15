@@ -22,11 +22,12 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Heading from '@tiptap/extension-heading';
+import Paragraph from '@tiptap/extension-paragraph';
 
 // --- Helper Functions ---
 
 const calculateReadingTime = (content: string): number => {
-  const text = content.replace(/<[^>]*>/g, ""); // Remove HTML tags
+  const text = content.replace(/<[^>]*>/g, "");
   const wordCount = text.trim().split(/\s+/).filter((word) => word.length > 0).length;
   return Math.max(1, Math.ceil(wordCount / 200));
 };
@@ -84,10 +85,8 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingFeaturedImage, setUploadingFeaturedImage] = useState(false);
 
-  // Categories list
   const categories = ["Technology", "Sustainability", "Policy", "Research", "ESG", "Climate", "Inclusion", "Custom"];
 
-  // Initialize Custom Category if needed
   useEffect(() => {
     if (blog?.category && !categories.includes(blog.category)) {
       setFormData(prev => ({
@@ -98,18 +97,29 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     }
   }, [blog]);
 
-  // --- Tiptap Editor ---
+  // --- Tiptap Editor with FIXED paragraph spacing ---
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        heading: false, 
+        heading: false,
+        paragraph: false, // We'll configure this separately
+      }),
+      // FIXED: Custom Paragraph extension with proper spacing
+      Paragraph.extend({
+        addAttributes() {
+          return {
+            class: {
+              default: null,
+            },
+          };
+        },
+        renderHTML({ HTMLAttributes }) {
+          return ['p', { class: 'mb-6 leading-relaxed' }, 0];
+        },
       }),
       Heading.configure({
         levels: [1, 2, 3],
-        HTMLAttributes: {
-          class: 'font-bold text-gray-900',
-        },
       }).extend({
         renderHTML({ node, HTMLAttributes }) {
           const level = this.options.levels.includes(node.attrs.level)
@@ -117,22 +127,28 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
             : this.options.levels[0];
           
           const classes: { [key: number]: string } = {
-            1: 'text-4xl mb-4 mt-6',
-            2: 'text-3xl mb-3 mt-5',
-            3: 'text-2xl mb-2 mt-4',
+            1: 'text-4xl font-bold mb-6 mt-10 text-gray-900',
+            2: 'text-3xl font-bold mb-5 mt-8 text-gray-900',
+            3: 'text-2xl font-bold mb-4 mt-6 text-gray-900',
           };
 
           return [
             `h${level}`, 
-            { ...HTMLAttributes, class: `${classes[level]} ${HTMLAttributes.class}` }, 
+            { ...HTMLAttributes, class: classes[level] }, 
             0
           ];
         },
       }),
-      Image.configure({ HTMLAttributes: { class: 'max-w-full h-auto rounded-lg my-4 shadow-md' } }),
+      Image.configure({ 
+        HTMLAttributes: { 
+          class: 'max-w-full h-auto rounded-lg my-8 shadow-md' 
+        } 
+      }),
       Link.configure({ 
         openOnClick: false, 
-        HTMLAttributes: { class: 'text-[#755eb1] underline hover:text-[#6b54a5]' } 
+        HTMLAttributes: { 
+          class: 'text-[#755eb1] underline hover:text-[#6b54a5] font-medium' 
+        } 
       }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Underline,
@@ -143,7 +159,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     content: blog?.content || '<p>Start writing your blog post...</p>',
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl'
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900'
       }
     }
   });
@@ -170,7 +186,6 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
       if (snapshot.empty) {
         setIsSlugUnique(true);
       } else {
-        // If editing, it's valid if the found doc is the current doc
         const isCurrentDoc = blog && snapshot.docs[0].id === blog.id;
         setIsSlugUnique(!!isCurrentDoc);
       }
@@ -181,7 +196,6 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     }
   };
 
-  // Debounce slug check
   useEffect(() => {
     const timer = setTimeout(() => {
       if (formData.slug) checkSlugUniqueness(formData.slug);
@@ -417,7 +431,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                     value={formData.customCategory}
                     onChange={(e) => setFormData(prev => ({ ...prev, customCategory: e.target.value }))}
                     placeholder="Enter custom category name"
-                    className="w-full px-4 py-2 border border-purple-300 bg-purple-50 rounded-lg focus:ring-2 focus:ring-purple-500 text-purple-900 placeholder-purple-300 animate-in fade-in slide-in-from-top-1"
+                    className="w-full px-4 py-2 border border-purple-300 bg-purple-50 rounded-lg focus:ring-2 focus:ring-purple-500 text-purple-900 placeholder-purple-300"
                   />
                 )}
               </div>
@@ -504,7 +518,6 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
             
             {/* Editor Toolbar */}
             <div className="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap items-center gap-1 sticky top-0 z-10">
-              {/* Toolbar Groups */}
               <div className="flex items-center gap-1 pr-2 border-r border-gray-300">
                 <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('bold') ? 'bg-gray-300' : ''}`}><Bold size={18} /></button>
                 <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('italic') ? 'bg-gray-300' : ''}`}><Italic size={18} /></button>

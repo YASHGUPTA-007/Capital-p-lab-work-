@@ -74,10 +74,9 @@ export default function BlogPostPage() {
   };
 
   const calculateReadingTime = (content: string) => {
-    // Remove HTML tags and calculate word count
     const text = content.replace(/<[^>]*>/g, '');
     const words = text.trim().split(/\s+/).length;
-    const minutes = Math.ceil(words / 200); // Average reading speed: 200 words/minute
+    const minutes = Math.ceil(words / 200);
     setReadingTime(minutes);
   };
 
@@ -143,7 +142,6 @@ export default function BlogPostPage() {
   }
 
   return (
-    // FIX 1: Added text-gray-900 to ensure global text color is dark
     <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
       
@@ -259,33 +257,35 @@ export default function BlogPostPage() {
             </motion.div>
           )}
 
-          {/* Content - Render HTML from Tiptap */}
+          {/* Content - FIXED: Proper paragraph spacing */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
             className="mb-12"
           >
-            {/* FIX 2: Added text-[#2b2e34] and marker:text-[#2b2e34] to force dark text color */}
             <div 
               className="prose prose-lg max-w-none text-[#2b2e34] marker:text-[#2b2e34]
-                prose-headings:text-[#2b2e34] prose-headings:font-serif
-                prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
-                prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-7
+                prose-headings:text-[#2b2e34] prose-headings:font-serif prose-headings:font-bold
+                prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-10
+                prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-8
                 prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
-                prose-p:text-[#2b2e34] prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg
-                prose-a:text-[#755eb1] prose-a:no-underline hover:prose-a:underline hover:prose-a:text-[#6b54a5]
-                prose-strong:text-[#2b2e34] prose-strong:font-semibold
-                prose-em:text-[#2b2e34]
-                prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6
-                prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6
-                prose-li:text-[#2b2e34] prose-li:mb-2 prose-li:text-lg
-                prose-blockquote:border-l-4 prose-blockquote:border-[#755eb1] prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:my-6 prose-blockquote:bg-[#c1b4df]/5 prose-blockquote:rounded-r-lg
-                prose-blockquote:text-[#4f475d] prose-blockquote:italic
-                prose-code:text-[#755eb1] prose-code:bg-[#c1b4df]/10 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
-                prose-pre:bg-[#2b2e34] prose-pre:text-gray-100 prose-pre:p-6 prose-pre:rounded-lg prose-pre:my-6 prose-pre:overflow-x-auto
+                prose-p:text-[#2b2e34] prose-p:leading-[1.8] prose-p:mb-6 prose-p:mt-0 prose-p:text-lg
+                prose-a:text-[#755eb1] prose-a:no-underline prose-a:font-medium hover:prose-a:underline hover:prose-a:text-[#6b54a5]
+                prose-strong:text-[#2b2e34] prose-strong:font-bold
+                prose-em:text-[#2b2e34] prose-em:italic
+                prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-3
+                prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-3
+                prose-li:text-[#2b2e34] prose-li:text-lg prose-li:leading-relaxed
+                prose-blockquote:border-l-4 prose-blockquote:border-[#755eb1] prose-blockquote:pl-6 prose-blockquote:py-3 prose-blockquote:my-8 prose-blockquote:bg-[#c1b4df]/5 prose-blockquote:rounded-r-lg
+                prose-blockquote:text-[#4f475d] prose-blockquote:italic prose-blockquote:text-lg
+                prose-code:text-[#755eb1] prose-code:bg-[#c1b4df]/10 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-[#2b2e34] prose-pre:text-gray-100 prose-pre:p-6 prose-pre:rounded-lg prose-pre:my-8 prose-pre:overflow-x-auto
                 prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8
-                prose-hr:border-[#c1b4df]/30 prose-hr:my-8"
+                prose-hr:border-[#c1b4df]/30 prose-hr:my-10
+                prose-table:my-8
+                prose-th:bg-[#c1b4df]/10 prose-th:text-[#2b2e34] prose-th:font-bold prose-th:p-3
+                prose-td:p-3 prose-td:border prose-td:border-[#c1b4df]/20"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </motion.div>
