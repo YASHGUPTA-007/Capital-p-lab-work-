@@ -19,21 +19,47 @@
   }
 }
 
-/* Lenis Smooth Scroll Optimization */
-html.lenis {
-  height: auto;
+/* Lenis Smooth Scroll - Desktop Only */
+@media (min-width: 768px) {
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-stopped body {
+    overflow: hidden;
+  }
+
+  /* Force GPU acceleration for smoother animations */
+  html.lenis {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Optimize rendering for smooth scroll elements */
+  [data-lenis-scroll] {
+    will-change: transform;
+  }
 }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
+/* Mobile uses native scrolling */
+@media (max-width: 767px) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 .lenis.lenis-scrolling iframe {
@@ -47,7 +73,7 @@ body {
   overscroll-behavior: none;
 }
 
-/* Prevent layout shift during scroll */
+/* Performance Optimizations */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -56,4 +82,38 @@ body {
 /* Improve rendering performance */
 #__next {
   isolation: isolate;
+}
+
+/* Reduce repaints during scroll - Desktop only */
+@media (min-width: 768px) {
+  #__next {
+    transform: translate3d(0, 0, 0);
+  }
+
+  img, 
+  video,
+  iframe {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+  }
+
+  /* Smooth transitions for scroll-triggered animations */
+  [data-scroll] {
+    will-change: transform, opacity;
+  }
+}
+
+/* Prevent animation jank */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Fix for fixed elements during Lenis scroll */
+@media (min-width: 768px) {
+  .fixed {
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+  }
 }
