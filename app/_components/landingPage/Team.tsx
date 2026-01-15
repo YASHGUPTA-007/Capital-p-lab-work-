@@ -37,7 +37,7 @@ export const TeamSection = () => {
                       <div className="flex-shrink-0 mx-auto sm:mx-0">
                           <div className="relative w-32 h-40 sm:w-36 sm:h-44 md:w-40 md:h-48 rounded-2xl overflow-hidden border-2 border-[#c1b4df] shadow-lg group hover:border-[#755eb1] transition-all">
                                <Image 
-                                 src="/Arti Mishra Saran.png" 
+                                 src="/ArtiMishraSaran.png" 
                                  alt="Arti Mishra Saran - Founder" 
                                  fill
                                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
