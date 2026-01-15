@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { CustomCursor, NoiseOverlay } from "./_components/BackgroundElements";
 import { Navbar } from "./_components/landingPage/Navbar";
@@ -17,20 +17,36 @@ import WhatsAppFloat from "./WhatsAppFloat";
 import VisitTracker from "./_components/VisitTracker";
 
 export default function TheCapitalPLab() {
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
+    // Initialize Lenis with optimized settings
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
       smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      infinite: false,
     });
 
+    lenisRef.current = lenis;
+
+    // Animation frame loop
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
+
     requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    // Cleanup
+    return () => {
+      lenis.destroy();
+      lenisRef.current = null;
+    };
   }, []);
 
   return (
@@ -44,18 +60,15 @@ export default function TheCapitalPLab() {
         <AboutSection />
         <FocusSection />
         <ServicesSection />
- <InsightsSection />
+        <InsightsSection />
         <TestimonialSection />
         <TeamSection />
-
-       
         <ContactForm />
       </main>
 
       <Footer />
       <WhatsAppFloat />
-      <VisitTracker/>
-      
+      <VisitTracker />
     </div>
   );
 }

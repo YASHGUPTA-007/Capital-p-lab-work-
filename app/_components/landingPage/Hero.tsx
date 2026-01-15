@@ -39,6 +39,13 @@ const Typewriter = ({ words }: { words: string[] }) => {
 
 export const Hero = () => {
   const { scrollY } = useScroll()
+  // Only apply scroll animations on desktop
+  const [isDesktop, setIsDesktop] = useState(false)
+  
+  useEffect(() => {
+    setIsDesktop(window.innerWidth >= 768)
+  }, [])
+  
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
   const contentY = useTransform(scrollY, [0, 400], [0, 80])
 
@@ -53,7 +60,7 @@ export const Hero = () => {
         {/* Static Background Image */}
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop" 
+            src="/Bridging the gap between research and reality.avif" 
             alt="Policy collaboration"
             className="w-full h-full object-cover grayscale-[15%]" 
             loading="eager"
@@ -74,23 +81,18 @@ export const Hero = () => {
 
       {/* --- MAIN CONTENT --- */}
       <motion.div 
-        style={{ y: contentY, opacity }}
+        style={{ y: isDesktop ? contentY : 0, opacity: isDesktop ? opacity : 1 }}
         className="relative z-10 w-full max-w-[1600px] px-6 py-12 md:px-12 md:pl-32 flex flex-col md:flex-row items-center justify-center gap-16 md:gap-20"
       >
         
         {/* --- LOGO (Left) --- */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="relative z-20 flex-shrink-0 group order-1"
-        >
-          {/* Rings - CSS Only */}
-          <div className="absolute inset-0 -m-6 sm:-m-8 border border-[#755eb1]/10 rounded-full" />
-          <div className="absolute inset-0 -m-12 sm:-m-16 border border-[#4f75d]/10 rounded-full" />
+        <div className="relative z-20 flex-shrink-0 group order-1">
+          {/* Rings - Hidden on mobile */}
+          <div className="hidden md:block absolute inset-0 -m-6 sm:-m-8 border border-[#755eb1]/10 rounded-full" />
+          <div className="hidden md:block absolute inset-0 -m-12 sm:-m-16 border border-[#4f75d]/10 rounded-full" />
 
           {/* Logo Container */}
-          <div className="relative w-[45vw] h-[45vw] sm:w-[40vw] sm:h-[40vw] md:w-[24vw] md:h-[24vw] max-w-[320px] max-h-[320px] lg:max-w-[380px] lg:max-h-[380px] bg-white/80 backdrop-blur-xl rounded-full shadow-2xl shadow-[#755eb1]/10 flex items-center justify-center p-2 border border-white/50 transition-transform duration-300 hover:scale-105">
+          <div className="relative w-[45vw] h-[45vw] sm:w-[40vw] sm:h-[40vw] md:w-[24vw] md:h-[24vw] max-w-[320px] max-h-[320px] lg:max-w-[380px] lg:max-h-[380px] bg-white/80 backdrop-blur-xl rounded-full shadow-2xl shadow-[#755eb1]/10 flex items-center justify-center p-2 border border-white/50 md:transition-transform md:duration-300 md:hover:scale-105">
             <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#c7d6c1]/40 to-[#c1b4df]/40 opacity-50" />
             <img 
               src="/logo.png" 
@@ -99,16 +101,12 @@ export const Hero = () => {
               loading="eager"
             />
           </div>
-        </motion.div>
+        </div>
 
 
         {/* --- TEXT CONTENT (Right) --- */}
         <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left order-2 min-w-0">
-          <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
+          <div>
             {/* Typewriter - Changed to Black */}
             <span className="block text-[#2b2e34] font-serif italic text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2 sm:mb-3 h-[1.5em]">
               <Typewriter words={["Driving", "Accelerating", "Transforming"]} />
@@ -125,12 +123,7 @@ export const Hero = () => {
             </h1>
 
             {/* Description */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="mt-6 sm:mt-8 relative"
-            >
+            <div className="mt-6 sm:mt-8 relative">
               <div className="absolute -left-4 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#755eb1] to-[#4f75d]" />
               {/* Changed Planet, People, and Profit to Bold Black */}
               <p className="pl-6 text-[#2b2e34]/70 max-w-lg text-sm sm:text-base md:text-lg font-medium leading-relaxed">
@@ -139,8 +132,8 @@ export const Hero = () => {
                 <span className="text-[#2b2e34] font-bold mx-1">People</span>, and 
                 <span className="text-[#2b2e34] font-bold"> Profit</span>.
               </p>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </motion.div>
 

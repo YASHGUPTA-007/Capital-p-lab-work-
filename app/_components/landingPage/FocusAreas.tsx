@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUpRight, X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -104,46 +104,63 @@ interface FocusCardProps {
   image: string
   detailKey: keyof typeof focusDetails
   index: number
+  isMobile: boolean
 }
 
-const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey, index }: FocusCardProps) => {
+const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey, index, isMobile }: FocusCardProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const details = focusDetails[detailKey]
 
   // Lock body scroll when modal is open
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
     }
     
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset'
     }
   }, [isOpen])
 
+  // Simpler animations for mobile
+  const cardVariants = isMobile 
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 }
+      }
+    : {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0 }
+      }
+
   return (
     <>
       <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ delay: index * 0.1, duration: 0.5 }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: isMobile ? "-20px" : "-50px" }}
+        transition={{ 
+          delay: isMobile ? 0 : index * 0.1, 
+          duration: isMobile ? 0.3 : 0.5 
+        }}
+        variants={cardVariants}
         className="group h-full"
       >
-        <div className={cn(
-          "relative rounded-2xl sm:rounded-3xl flex flex-col h-full min-h-[420px] sm:min-h-[450px]",
-          "transition-all duration-300 ease-out",
-          "border-2 border-transparent",
-          "overflow-hidden",
-          bgColor,
-          hoverBg,
-          "hover:shadow-xl hover:border-[#755eb1]/20",
-          "cursor-pointer"
-        )}
-        onClick={() => setIsOpen(true)}
+        <div 
+          className={cn(
+            "relative rounded-2xl sm:rounded-3xl flex flex-col h-full min-h-[420px] sm:min-h-[450px]",
+            "transition-all duration-300 ease-out",
+            "border-2 border-transparent",
+            "overflow-hidden",
+            bgColor,
+            hoverBg,
+            "active:scale-[0.98] sm:active:scale-100", // Mobile tap feedback
+            "hover:shadow-xl hover:border-[#755eb1]/20",
+            "cursor-pointer"
+          )}
+          onClick={() => setIsOpen(true)}
         >
           {/* Image Section */}
           <div className="relative w-full h-48 sm:h-56 overflow-hidden">
@@ -151,8 +168,15 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
               src={image}
               alt={title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className={cn(
+                "object-cover transition-transform",
+                isMobile ? "duration-300" : "duration-500 group-hover:scale-105"
+              )}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              priority={index < 2} // Prioritize first 2 images
+              quality={isMobile ? 75 : 85} // Lower quality on mobile
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
             />
             <div className={cn(
               "absolute inset-0 bg-gradient-to-t from-current to-transparent opacity-40",
@@ -171,8 +195,8 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
               </h3>
               <ArrowUpRight 
                 className={cn(
-                  "w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 flex-shrink-0 ml-2",
-                  "group-hover:translate-x-1 group-hover:-translate-y-1",
+                  "w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ml-2",
+                  isMobile ? "transition-transform duration-200" : "transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1",
                   textColor === "text-white" ? "text-white" : "text-[#755eb1]"
                 )} 
               />
@@ -188,13 +212,16 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
             {/* Learn More Button */}
             <button
               className={cn(
-                "inline-flex items-center gap-2 text-sm font-semibold transition-all duration-300",
-                "group-hover:gap-3",
+                "inline-flex items-center gap-2 text-sm font-semibold transition-all",
+                isMobile ? "duration-200" : "duration-300 group-hover:gap-3",
                 textColor === "text-white" ? "text-white" : "text-[#755eb1]"
               )}
             >
               <span>Learn More</span>
-              <ChevronDown className="w-4 h-4 rotate-[-90deg] group-hover:translate-x-1 transition-transform" />
+              <ChevronDown className={cn(
+                "w-4 h-4 rotate-[-90deg] transition-transform",
+                isMobile ? "duration-200" : "duration-300 group-hover:translate-x-1"
+              )} />
             </button>
           </div>
         </div>
@@ -209,67 +236,69 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: isMobile ? 0.2 : 0.3 }}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
               onClick={() => setIsOpen(false)}
-              onWheel={(e) => e.stopPropagation()}
             />
 
             {/* Modal Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: isMobile ? 50 : 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, scale: 0.95, y: isMobile ? 50 : 20 }}
+              transition={{ duration: isMobile ? 0.25 : 0.3, ease: "easeOut" }}
               className="fixed inset-4 sm:inset-8 md:inset-16 lg:inset-24 z-50 overflow-hidden"
-              onWheel={(e) => e.stopPropagation()}
             >
-              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl h-full flex flex-col max-w-5xl mx-auto overflow-hidden"
+              <div 
+                className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl h-full flex flex-col max-w-5xl mx-auto overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="relative h-48 sm:h-64 flex-shrink-0">
+                <div className="relative h-40 sm:h-48 md:h-64 flex-shrink-0">
                   <Image 
                     src={image}
                     alt={title}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 80vw"
+                    quality={isMobile ? 75 : 85}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#755eb1] to-transparent opacity-60" />
                   
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors"
+                    className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors active:scale-95"
+                    aria-label="Close modal"
                   >
                     <X className="w-5 h-5 text-[#755eb1]" />
                   </button>
 
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white font-medium">
+                  <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-white font-medium">
                       {details.fullTitle}
                     </h2>
                   </div>
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-grow overflow-y-auto p-6 sm:p-8 md:p-10">
-                  <div className="max-w-3xl space-y-8">
+                <div className="flex-grow overflow-y-auto p-5 sm:p-6 md:p-8 lg:p-10 overscroll-contain">
+                  <div className="max-w-3xl space-y-6 sm:space-y-8">
                     {details.sections.map((section, idx) => (
                       <div key={idx}>
-                        <h3 className="text-xl sm:text-2xl font-serif text-[#755eb1] mb-4">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-serif text-[#755eb1] mb-3 sm:mb-4">
                           {section.title}
                         </h3>
                         {section.content && (
-                          <p className="text-[#4f75d] leading-relaxed mb-4">
+                          <p className="text-sm sm:text-base text-[#4f75d] leading-relaxed mb-3 sm:mb-4">
                             {section.content}
                           </p>
                         )}
                         {section.points && (
-                          <ul className="space-y-3">
+                          <ul className="space-y-2 sm:space-y-3">
                             {section.points.map((point, pidx) => (
-                              <li key={pidx} className="flex items-start gap-3">
+                              <li key={pidx} className="flex items-start gap-2 sm:gap-3">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#755eb1] mt-2 flex-shrink-0" />
-                                <span className="text-[#4f75d] leading-relaxed">{point}</span>
+                                <span className="text-sm sm:text-base text-[#4f75d] leading-relaxed">{point}</span>
                               </li>
                             ))}
                           </ul>
@@ -288,81 +317,118 @@ const FocusCard = ({ title, desc, bgColor, textColor, hoverBg, image, detailKey,
 }
 
 export const FocusSection = () => {
-    const areas = [
-        { 
-            title: "Accessibility & Inclusion", 
-            desc: "Advancing inclusion through evidence-based research and neurodiversity awareness.", 
-            bgColor: "bg-[#c1b4df]",
-            textColor: "text-[#755eb1]",
-            hoverBg: "hover:bg-[#b5a6d8]",
-            image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2670&auto=format&fit=crop",
-            detailKey: "accessibility" as const
-        },
-        { 
-            title: "Sustainability Emotions", 
-            desc: "Integrating climate research with the emotional dimensions of mental health.", 
-            bgColor: "bg-[#c7d6c1]",
-            textColor: "text-[#4f75d]",
-            hoverBg: "hover:bg-[#bccfb6]",
-            image: "/sustainablity emotion.png",
-            detailKey: "emotion" as const
-        },
-        { 
-            title: "Sustainable Practices", 
-            desc: "Behavioral science-informed research supporting responsible consumption.", 
-            bgColor: "bg-[#755eb1]",
-            textColor: "text-white",
-            hoverBg: "hover:bg-[#6b54a5]",
-            image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2670&auto=format&fit=crop",
-            detailKey: "practices" as const
-        },
-        { 
-            title: "ESG Interdependencies", 
-            desc: "Analyzing how environmental and social factors interact across sectors.", 
-            bgColor: "bg-gradient-to-br from-[#c1b4df] via-[#c7d6c1] to-[#c7d6c1]",
-            textColor: "text-[#755eb1]",
-            hoverBg: "hover:brightness-95",
-            image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop",
-            detailKey: "esg" as const
-        }
-    ];
+  const [isMobile, setIsMobile] = useState(false)
 
-    return (
-        <section id="focus" className="py-20 sm:py-32 px-4 sm:px-6 lg:px-12 bg-white relative overflow-hidden">
-            {/* Background decoration - hidden on mobile for performance */}
-            <div className="hidden md:block absolute top-0 right-0 w-[400px] lg:w-[600px] h-[400px] lg:h-[600px] bg-[#c1b4df]/20 rounded-full blur-3xl" />
-            
-            <div className="max-w-[1600px] mx-auto relative z-10">
-                <div className="mb-16 sm:mb-24">
-                     <motion.h2 
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, margin: "-50px" }}
-                        transition={{ duration: 0.5 }}
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-4"
-                     >
-                        Areas of Focus
-                     </motion.h2>
-                     <motion.h3
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, margin: "-50px" }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                        className="text-2xl sm:text-3xl md:text-4xl font-serif leading-tight text-[#4f7f5d]"
-                     >
-                        <span>Where Evidence, Equity, and Sustainability</span>
-                        {' '}
-                        <span className="italic">Converge</span>
-                     </motion.h3>
-                </div>
+  useEffect(() => {
+    // Detect mobile on mount
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    
+    // Optional: Update on resize (debounced)
+    let timeoutId: NodeJS.Timeout
+    const handleResize = () => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(checkMobile, 150)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timeoutId)
+    }
+  }, [])
 
-                {/* Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                    {areas.map((area, i) => (
-                        <FocusCard key={i} {...area} index={i} />
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
+  const areas = [
+    { 
+      title: "Accessibility & Inclusion", 
+      desc: "Advancing inclusion through evidence-based research and neurodiversity awareness.", 
+      bgColor: "bg-[#c1b4df]",
+      textColor: "text-[#755eb1]",
+      hoverBg: "hover:bg-[#b5a6d8]",
+      image: "/Accessibility & Inclusion.avif",
+      detailKey: "accessibility" as const
+    },
+    { 
+      title: "Sustainability Emotions", 
+      desc: "Integrating climate research with the emotional dimensions of mental health.", 
+      bgColor: "bg-[#c7d6c1]",
+      textColor: "text-[#4f75d]",
+      hoverBg: "hover:bg-[#bccfb6]",
+      image: "/sustainablity emotion.png",
+      detailKey: "emotion" as const
+    },
+    { 
+      title: "Sustainable Practices", 
+      desc: "Behavioral science-informed research supporting responsible consumption.", 
+      bgColor: "bg-[#755eb1]",
+      textColor: "text-white",
+      hoverBg: "hover:bg-[#6b54a5]",
+      image: "/Sustainable Practices.avif",
+      detailKey: "practices" as const
+    },
+    { 
+      title: "ESG Interdependencies", 
+      desc: "Analyzing how environmental and social factors interact across sectors.", 
+      bgColor: "bg-gradient-to-br from-[#c1b4df] via-[#c7d6c1] to-[#c7d6c1]",
+      textColor: "text-[#755eb1]",
+      hoverBg: "hover:brightness-95",
+      image: "/ESG Interdependencies.avif",
+      detailKey: "esg" as const
+    }
+  ]
+
+  // Simpler animations for mobile section headers
+  const headerVariants = isMobile
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 }
+      }
+    : {
+        hidden: { opacity: 0, x: -30 },
+        visible: { opacity: 1, x: 0 }
+      }
+
+  return (
+    <section id="focus" className="py-16 sm:py-20 md:py-32 px-4 sm:px-6 lg:px-12 bg-white relative overflow-hidden">
+      {/* Background decoration - hidden on mobile for performance */}
+      <div className="hidden md:block absolute top-0 right-0 w-[400px] lg:w-[600px] h-[400px] lg:h-[600px] bg-[#c1b4df]/20 rounded-full blur-3xl pointer-events-none" />
+      
+      <div className="max-w-[1600px] mx-auto relative z-10">
+        <div className="mb-12 sm:mb-16 md:mb-24">
+          <motion.h2 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: isMobile ? "-20px" : "-50px" }}
+            transition={{ duration: isMobile ? 0.3 : 0.5 }}
+            variants={headerVariants}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif text-[#755eb1] leading-tight mb-3 sm:mb-4"
+          >
+            Areas of Focus
+          </motion.h2>
+          <motion.h3
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: isMobile ? "-20px" : "-50px" }}
+            transition={{ duration: isMobile ? 0.3 : 0.5, delay: isMobile ? 0 : 0.1 }}
+            variants={headerVariants}
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif leading-tight text-[#4f7f5d]"
+          >
+            <span>Where Evidence, Equity, and Sustainability</span>
+            {' '}
+            <span className="italic">Converge</span>
+          </motion.h3>
+        </div>
+
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {areas.map((area, i) => (
+            <FocusCard key={i} {...area} index={i} isMobile={isMobile} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 }
