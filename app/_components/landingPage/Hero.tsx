@@ -54,6 +54,7 @@ export const Hero = () => {
       
       {/* --- BACKGROUND --- */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Image */}
         <div className="absolute inset-0">
           <img 
             src="/Bridging the gap between research and reality.avif" 
@@ -62,10 +63,18 @@ export const Hero = () => {
             loading="eager"
           />
         </div>
+        
+        {/* Simple gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#f4f7f5]/95 via-[#f4f7f5]/85 to-[#f4f7f5]/95" />
-        <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] bg-[#c7d6c1]/30 rounded-full blur-[100px] mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-[#c1b4df]/30 rounded-full blur-[100px] mix-blend-multiply" />
-        <div className="absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        
+        {/* Only add heavy effects on desktop */}
+        {isDesktop && (
+          <>
+            <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] bg-[#c7d6c1]/30 rounded-full blur-[100px] mix-blend-multiply" />
+            <div className="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-[#c1b4df]/30 rounded-full blur-[100px] mix-blend-multiply" />
+            <div className="absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+          </>
+        )}
       </div>
 
 
@@ -115,13 +124,12 @@ export const Hero = () => {
       </motion.div>
 
 
-      {/* --- MOBILE LAYOUT (below 768px) --- */}
+      {/* --- MOBILE LAYOUT (below 768px) - ULTRA OPTIMIZED --- */}
       <div className="md:hidden relative z-10 w-full h-full flex flex-col items-center justify-between py-8 px-6">
         
-        {/* Top: Logo */}
+        {/* Top: Logo - NO backdrop-blur */}
         <div className="flex-shrink-0 mt-8">
-          <div className="relative w-[120px] h-[120px] bg-white/95 backdrop-blur-xl rounded-full shadow-2xl shadow-[#755eb1]/20 flex items-center justify-center p-2 border-2 border-white/80">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#c7d6c1]/50 to-[#c1b4df]/50 opacity-60" />
+          <div className="relative w-[120px] h-[120px] bg-white rounded-full shadow-xl flex items-center justify-center p-2 border-2 border-white/80">
             <img 
               src="/logo.png" 
               alt="The Capital P Lab" 
@@ -131,27 +139,18 @@ export const Hero = () => {
           </div>
         </div>
 
-        {/* Middle: Main Content */}
+        {/* Middle: Main Content - NO animations */}
         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-5 max-w-[360px]">
           
-          {/* Typewriter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          {/* Typewriter - Simple */}
+          <div>
             <span className="block text-[#2b2e34] font-serif italic text-xl h-[1.4em]">
               <Typewriter words={["Driving", "Accelerating", "Transforming"]} />
             </span>
-          </motion.div>
+          </div>
           
-          {/* Headlines */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="space-y-0"
-          >
+          {/* Headlines - NO animation */}
+          <div className="space-y-0">
             <h1 className="text-[#755eb1] text-[14vw] font-black tracking-tighter leading-[0.85] uppercase">
               Empowering
             </h1>
@@ -161,51 +160,36 @@ export const Hero = () => {
             <h1 className="text-[#755eb1] text-[14vw] font-black tracking-tighter leading-[0.85] uppercase">
               Action
             </h1>
-          </motion.div>
+          </div>
 
-          {/* Description Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="bg-white/70 backdrop-blur-lg rounded-2xl p-5 border border-white/90 shadow-lg"
-          >
+          {/* Description Card - NO backdrop-blur */}
+          <div className="bg-white/90 rounded-2xl p-5 border border-white shadow-lg">
             <p className="text-[#2b2e34]/80 text-sm font-medium leading-relaxed">
               Turning evidence into reality for{' '}
               <span className="text-[#755eb1] font-bold">Planet</span>,{' '}
               <span className="text-[#755eb1] font-bold">People</span>, and{' '}
               <span className="text-[#755eb1] font-bold">Profit</span>.
             </p>
-          </motion.div>
+          </div>
 
-          {/* 3 Pillars */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6 }}
-            className="flex items-center justify-center gap-3 mt-3"
-          >
-            <div className="bg-[#c7d6c1]/30 backdrop-blur-sm rounded-full px-4 py-2 border border-[#c7d6c1]/50">
+          {/* 3 Pillars - NO backdrop-blur */}
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <div className="bg-[#e8f1e6] rounded-full px-4 py-2 border border-[#c7d6c1]">
               <span className="text-[#2b2e34] text-xs font-bold">🌍 Planet</span>
             </div>
-            <div className="bg-[#c1b4df]/30 backdrop-blur-sm rounded-full px-4 py-2 border border-[#c1b4df]/50">
+            <div className="bg-[#ede8f5] rounded-full px-4 py-2 border border-[#c1b4df]">
               <span className="text-[#2b2e34] text-xs font-bold">👥 People</span>
             </div>
-            <div className="bg-[#755eb1]/20 backdrop-blur-sm rounded-full px-4 py-2 border border-[#755eb1]/40">
+            <div className="bg-[#f0ebf8] rounded-full px-4 py-2 border border-[#755eb1]">
               <span className="text-[#2b2e34] text-xs font-bold">💰 Profit</span>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Bottom: EST 2025 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.8 }}
-          className="flex-shrink-0 mb-4"
-        >
+        <div className="flex-shrink-0 mb-4">
           <span className="text-[9px] font-bold tracking-[0.25em] text-[#755eb1]/60">EST. 2025</span>
-        </motion.div>
+        </div>
       </div>
 
       {/* --- CORNER TAG (Desktop Only) --- */}
