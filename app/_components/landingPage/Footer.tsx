@@ -21,24 +21,20 @@ export const Footer = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                >
-                  <h2 className="text-[5rem] md:text-[7rem] leading-[0.9] font-serif mb-12 text-white">
-                     Let's talk.
-                  </h2>
-                  <p className="text-purple-200 text-xl font-light mb-16 max-w-md leading-relaxed">
-                    Ready to turn evidence into action? Reach out to discuss how we can support your sustainability goals.
-                  </p>
+                  
+                 
                   <a 
                     href="mailto:info@thecapitalplab.com" 
                     className="group inline-flex items-center gap-4 text-2xl md:text-3xl font-serif text-white hover:text-emerald-300 transition-colors"
                   >
                      <span className="border-b-2 border-emerald-400 pb-1 group-hover:border-emerald-300">
-                        info@thecapitalplab.com
+                        contact@thecapitalplab.com
                      </span>
                      <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                   <p className="mt-12 text-purple-200 flex items-center gap-2">
                     <Globe size={16} className="text-emerald-400" /> 
-                    <span>Based in India</span>
+                    <span>Based in India · USA </span>
                   </p>
                </motion.div>
                

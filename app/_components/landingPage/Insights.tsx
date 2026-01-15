@@ -55,32 +55,32 @@ export const InsightsSection = () => {
     const insightItems = [
         { 
             type: "Reports", 
-            title: "The Future of Sustainable Policy in India", 
-            date: "Oct 2024", 
+            title: "", 
+            date: "", 
             color: "purple",
             image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop",
             icon: FileText
         },
         { 
             type: "Opinions", 
-            title: "Bridging the Gap: Mental Health & Climate", 
-            date: "Sep 2024", 
+            title: "", 
+            date: "", 
             color: "green",
             image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop",
             icon: MessageSquare
         },
         { 
             type: "Events", 
-            title: "Webinar: ESG Frameworks for Startups", 
-            date: "Aug 2024", 
+            title: "", 
+            date: "", 
             color: "purple",
             image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2670&auto=format&fit=crop",
             icon: Calendar
         },
         { 
             type: "Blogs", 
-            title: "Neurodiversity in the Modern Workplace", 
-            date: "Jul 2024", 
+            title: "", 
+            date: "", 
             color: "green",
             image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2670&auto=format&fit=crop",
             icon: PenTool
@@ -98,10 +98,21 @@ export const InsightsSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.5 }}
-                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-12 sm:mb-16 md:mb-20"
+                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-4"
                 >
                     Insights
                 </motion.h2>
+                <motion.h3
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="text-2xl sm:text-3xl md:text-4xl font-serif leading-tight text-[#4f7f5d] mb-12 sm:mb-16 md:mb-20"
+                >
+                    <span>Dialogue and</span>
+                    {' '}
+                    <span className="italic">Conversations</span>
+                </motion.h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
                     {insightItems.map((item, i) => (
@@ -195,18 +206,18 @@ export const InsightsSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.6 }}
-                    className="mt-20 sm:mt-24 md:mt-32 relative"
+                    className="mt-20 sm:mt-24 md:mt-32 relative max-w-3xl mx-auto"
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-[#755eb1] via-[#6b54a5] to-[#4f7f5d] rounded-2xl sm:rounded-3xl" />
-                    <div className="relative bg-white p-8 sm:p-12 lg:p-16 xl:p-20 rounded-2xl sm:rounded-3xl border-2 border-[#c1b4df] text-center m-1">
-                        <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 sm:mb-6 text-[#755eb1]" />
-                        <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-3 sm:mb-4">
+                    <div className="relative bg-white p-6 sm:p-8 lg:p-10 xl:p-12 rounded-2xl sm:rounded-3xl border-2 border-[#c1b4df] text-center m-1">
+                        <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-3 sm:mb-4 text-[#755eb1]" />
+                        <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#c1b4df] to-[#c7d6c1] rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#755eb1] mb-2 sm:mb-3">
                             Newsletter
                         </span>
-                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif mt-3 sm:mt-4 mb-3 sm:mb-4 text-[#755eb1]">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-serif mt-2 sm:mt-3 mb-2 sm:mb-3 text-[#755eb1]">
                             Stay informed.
                         </h3>
-                        <p className="text-sm sm:text-base text-[#4f75d] mb-8 sm:mb-12 max-w-md mx-auto">
+                        <p className="text-sm sm:text-base text-[#4f75d] mb-6 sm:mb-8 max-w-md mx-auto">
                             Curated research and perspectives on sustainability, delivered to your inbox.
                         </p>
                         
@@ -271,7 +282,7 @@ export const InsightsSection = () => {
                                     <button
                                         type="submit"
                                         disabled={status === 'loading'}
-                                        className="w-full bg-gradient-to-r from-[#755eb1] to-[#4f75d] text-white py-3 sm:py-4 mt-6 sm:mt-8 font-bold uppercase tracking-widest text-xs rounded-full hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full bg-gradient-to-r from-[#755eb1] to-[#4f75d] text-white py-3 sm:py-4 mt-4 sm:mt-6 font-bold uppercase tracking-widest text-xs rounded-full hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {status === 'loading' ? (
                                             <>
@@ -286,7 +297,7 @@ export const InsightsSection = () => {
                             )}
                         </AnimatePresence>
                         
-                        <p className="text-xs text-[#4f75d]/50 mt-4 sm:mt-6">Respecting your privacy. No spam, ever.</p>
+                        <p className="text-xs text-[#4f75d]/50 mt-3 sm:mt-4">Respecting your privacy. No spam, ever.</p>
                     </div>
                 </motion.div>
             </div>

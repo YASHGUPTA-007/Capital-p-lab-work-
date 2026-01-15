@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'The Capital P Lab - Planet. People. Profit.',
-  description: 'We help turn evidence into impact for people, the planet, and prosperity. Research and consulting services for sustainable development.',
+  description: 'We help turn evidence into impact for people, the planet, and profit. Research and consulting services for sustainable development.',
   keywords: 'sustainability, ESG, SDG, research, consulting, environmental policy, social impact',
   authors: [{ name: 'The Capital P Lab' }],
   openGraph: {

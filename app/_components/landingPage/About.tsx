@@ -41,7 +41,7 @@ export const AboutSection = () => {
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         
-        {/* SECTION BADGE */}
+        {/* SECTION BADGE - VERSION 2: Added green subtitle */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -49,9 +49,12 @@ export const AboutSection = () => {
           transition={{ duration: 0.5 }}
           className="mb-8 sm:mb-12"
         >
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-4">
             Who We Are
           </h2>
+          <p className="text-xl sm:text-2xl md:text-3xl font-serif italic text-[#4f7f5d] leading-tight">
+            Bridging the gap between research and reality
+          </p>
         </motion.div>
 
         {/* MAIN GRID */}
@@ -74,13 +77,6 @@ export const AboutSection = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-[#755eb1]/70 to-[#4f75d]/30 mix-blend-multiply" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              
-              {/* Removed quotation marks and full stop */}
-              <div className="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 right-4 sm:right-8 text-white">
-                 <p className="font-serif italic text-lg sm:text-2xl md:text-3xl leading-tight opacity-90">
-                   Bridging the gap between research and reality
-                 </p>
-              </div>
             </div>
 
             <div className="absolute inset-0 rounded-2xl sm:rounded-[2.5rem] border-2 border-[#c1b4df] translate-x-3 translate-y-3 sm:translate-x-4 sm:translate-y-4 -z-10" />
@@ -105,7 +101,7 @@ export const AboutSection = () => {
                The impact we seek goes beyond reports. We aim to strengthen institutions and translate evidence into actions that enhance social equity, economic value and climate resilience.
             </p>
             
-            {/* PILLARS GRID - Changed all boxes to light purple #d4cbea */}
+            {/* PILLARS GRID - Changed all boxes to darker purple #d4cbea */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-6 sm:pt-8">
               {[
                 { title: "SDG Aligned", sub: "Research Frameworks", color: "#2b2e34", icon: Target },
@@ -114,7 +110,7 @@ export const AboutSection = () => {
               ].map((item, i) => (
                 <div 
                   key={i}
-                  className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border hover:border-current transition-colors duration-300 bg-[#d4cbea]/30"
+                  className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border hover:border-current transition-colors duration-300 bg-[#d4cbea]/70"
                   style={{ borderColor: `${item.color}30` }}
                 >
                   <item.icon size={20} color={item.color} className="mb-2 sm:mb-3 opacity-80" />
@@ -142,17 +138,15 @@ export const AboutSection = () => {
           <div className="absolute inset-0 rounded-2xl sm:rounded-[3rem] border border-[#755eb1]/10 z-10" />
 
           <div className="max-w-5xl mx-auto relative z-20">
-            <div className="flex flex-col md:flex-row gap-10 sm:gap-16 items-start">
-               
-               {/* LEFT: HEADER */}
-               <div className="md:w-1/3 flex-shrink-0">
-                  <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-6 sm:mb-8">
-                    Our Story
-                  </h3>
-               </div>
+            {/* CENTER ALIGNED HEADER */}
+            <div className="text-center mb-10 sm:mb-16">
+              <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight">
+                Our Story
+              </h3>
+            </div>
 
-               {/* RIGHT: STORY */}
-               <div className="md:w-2/3 space-y-6 sm:space-y-8 font-sans text-[#2b2e34] text-base sm:text-lg leading-relaxed">
+            {/* STORY CONTENT */}
+            <div className="space-y-6 sm:space-y-8 font-sans text-[#2b2e34] text-base sm:text-lg leading-relaxed max-w-4xl mx-auto">
                   
                   <p className="first-letter:text-5xl first-letter:sm:text-6xl first-letter:md:text-7xl first-letter:float-left first-letter:mr-3 first-letter:sm:mr-4 first-letter:leading-none first-letter:text-[#755eb1] first-letter:font-serif first-letter:font-bold first-letter:drop-shadow-sm">
                     Our story began in the period following COVID-19, a time when many professionals were navigating uncertainty. As two mothers balancing careers and caregiving, we found ourselves seeking meaningful ways to stay engaged.
@@ -178,7 +172,6 @@ export const AboutSection = () => {
                       Our journey reflects <span className="text-[#2b2e34] font-semibold">resilience</span>, curiosity, and collaboration. What began as a response to disruption has grown into a <span className="text-[#2b2e34] font-semibold">purpose-driven</span> venture aimed at turning knowledge into action.
                     </p>
                   </div>
-               </div>
             </div>
           </div>
         </motion.div>

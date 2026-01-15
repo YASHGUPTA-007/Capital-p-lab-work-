@@ -114,8 +114,8 @@ export const Hero = () => {
               <Typewriter words={["Driving", "Accelerating", "Transforming"]} />
             </span>
             
-            {/* Main Headline */}
-            <h1 className="text-[#2b2e34] text-[11vw] sm:text-[10vw] md:text-[7.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
+            {/* Main Headline - Changed to Purple */}
+            <h1 className="text-[#755eb1] text-[11vw] sm:text-[10vw] md:text-[7.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
               Empowering
             </h1>
             

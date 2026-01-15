@@ -333,26 +333,27 @@ export const FocusSection = () => {
             <div className="hidden md:block absolute top-0 right-0 w-[400px] lg:w-[600px] h-[400px] lg:h-[600px] bg-[#c1b4df]/20 rounded-full blur-3xl" />
             
             <div className="max-w-[1600px] mx-auto relative z-10">
-                <div className="mb-16 sm:mb-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 sm:gap-8">
+                <div className="mb-16 sm:mb-24">
                      <motion.h2 
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight"
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-4"
                      >
                         Areas of Focus
                      </motion.h2>
-                     {/* Increased size of Core Pillars badge */}
-                     <motion.span 
-                        initial={{ opacity: 0, x: 30 }}
+                     <motion.h3
+                        initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
-                        transition={{ duration: 0.5 }}
-                        className="px-5 py-2.5 bg-[#c7d6c1] rounded-full text-sm font-bold uppercase tracking-widest text-[#4f75d]"
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="text-2xl sm:text-3xl md:text-4xl font-serif leading-tight text-[#4f7f5d]"
                      >
-                        Core Pillars
-                     </motion.span>
+                        <span>Where Evidence, Equity, and Sustainability</span>
+                        {' '}
+                        <span className="italic">Converge</span>
+                     </motion.h3>
                 </div>
 
                 {/* Cards Grid */}
