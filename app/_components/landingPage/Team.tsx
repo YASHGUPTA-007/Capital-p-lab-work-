@@ -38,18 +38,21 @@ export const TeamSection = () => {
       <div className="absolute top-1/2 right-0 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#c1b4df]/20 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none" />
       
       <div className="max-w-[1400px] mx-auto relative z-10">
-        {/* Header */}
+        {/* Header - Now Left Aligned */}
         <motion.div 
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: isMobile ? "-20px" : "-50px" }}
           transition={{ duration: isMobile ? 0.3 : 0.5 }}
           variants={headerVariants}
-          className="text-center mb-10 sm:mb-12 md:mb-16 lg:mb-20"
+          className="mb-10 sm:mb-12 md:mb-16 lg:mb-20"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif text-[#755eb1] leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif text-[#755eb1] leading-tight mb-3 sm:mb-4">
             Meet our Team
           </h2>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif italic text-[#4f7f5d] leading-tight">
+            Expertise meets purpose
+          </p>
         </motion.div>
         
         <div className="space-y-10 sm:space-y-12 md:space-y-16 lg:space-y-20 xl:space-y-24">

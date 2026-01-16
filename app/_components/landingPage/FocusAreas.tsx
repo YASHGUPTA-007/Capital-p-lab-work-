@@ -397,7 +397,8 @@ export const FocusSection = () => {
       <div className="hidden md:block absolute top-0 right-0 w-[400px] lg:w-[600px] h-[400px] lg:h-[600px] bg-[#c1b4df]/20 rounded-full blur-3xl pointer-events-none" />
       
       <div className="max-w-[1600px] mx-auto relative z-10">
-        <div className="mb-12  px-8e sm:mb-16 md:mb-24">
+        <div className="mb-12 sm:mb-16 md:mb-24">
+          {/* Main Heading - Matching "Who We Are" style */}
           <motion.h2 
             initial="hidden"
             whileInView="visible"
@@ -408,18 +409,17 @@ export const FocusSection = () => {
           >
             Areas of Focus
           </motion.h2>
-          <motion.h3
+          {/* Subheading - Matching "Who We Are" style */}
+          <motion.p
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: isMobile ? "-20px" : "-50px" }}
             transition={{ duration: isMobile ? 0.3 : 0.5, delay: isMobile ? 0 : 0.1 }}
             variants={headerVariants}
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif leading-tight text-[#4f7f5d]"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif italic text-[#4f7f5d] leading-tight"
           >
-            <span>Where Evidence, Equity and Sustainability</span>
-            {' '}
-            <span className="italic">Converge</span>
-          </motion.h3>
+            Where evidence, equity and sustainability converge
+          </motion.p>
         </div>
 
         {/* Cards Grid */}

@@ -144,8 +144,8 @@ export const AboutSection = () => {
           transition={{ duration: isMobile ? 0.3 : 0.6 }}
           variants={fadeVariants}
         >
-          {/* Header - Matching "Who We Are" position exactly */}
-          <div className="mb-6 sm:mb-8 md:mb-12">
+          {/* Header - Reduced bottom margin */}
+          <div className="mb-2 sm:mb-5 md:mb-2 lg:mb-4">
             <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif text-[#755eb1] leading-tight">
               Our Story
             </h3>

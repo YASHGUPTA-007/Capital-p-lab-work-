@@ -58,15 +58,16 @@ export const ServicesSection = () => {
             transition={{ duration: 0.5 }}
             className="mb-12 sm:mb-16 md:mb-20"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-6 sm:mb-8">
+            {/* Main Heading - Matching "Who We Are" style */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif text-[#755eb1] leading-tight mb-3 sm:mb-4">
                 Our Services
             </h2>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif mt-4 mb-6 sm:mb-8 leading-tight text-[#4f7f5d]">
-                <span>Impact through</span>
-                {' '}
-                <span className="italic">precision.</span>
-            </h3>
-            <p className="text-base sm:text-lg md:text-xl text-[#4f75d] max-w-2xl leading-relaxed">
+            {/* Subheading - Matching "Who We Are" style */}
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif italic text-[#4f7f5d] leading-tight mb-6 sm:mb-8">
+                Impact through precision
+            </p>
+            {/* Description */}
+            <p className="text-sm sm:text-base md:text-lg text-[#4f75d] max-w-3xl leading-relaxed">
                 We provide research and consulting services that help organizations create measurable impact for <span className="text-[#755eb1] font-semibold">planet</span>, <span className="text-[#755eb1] font-semibold">people</span> and <span className="text-[#755eb1] font-semibold">profit</span>
             </p>
           </motion.div>

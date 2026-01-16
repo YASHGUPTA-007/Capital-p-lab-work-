@@ -95,26 +95,26 @@ export const InsightsSection = () => {
             <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-[#c1b4df]/20 rounded-full blur-[100px]" />
             
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+                {/* Main Heading - Matching "Who We Are" style */}
                 <motion.h2 
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.5 }}
-                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#755eb1] leading-tight mb-4"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif text-[#755eb1] leading-tight mb-3 sm:mb-4"
                 >
                     Insights
                 </motion.h2>
-                <motion.h3
+                {/* Subheading - Matching "Who We Are" style */}
+                <motion.p
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="text-2xl sm:text-3xl md:text-4xl font-serif leading-tight text-[#4f7f5d] mb-12 sm:mb-16 md:mb-20"
+                    className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif italic text-[#4f7f5d] leading-tight mb-12 sm:mb-16 md:mb-20"
                 >
-                    <span>Dialogue and</span>
-                    {' '}
-                    <span className="italic">Conversations</span>
-                </motion.h3>
+                    Dialogue and conversations
+                </motion.p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
                     {insightItems.map((item, i) => (
