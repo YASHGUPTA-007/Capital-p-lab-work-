@@ -18,17 +18,19 @@ import VisitTracker from "./_components/VisitTracker";
 
 export default function TheCapitalPLab() {
   const lenisRef = useRef<Lenis | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Only initialize Lenis on desktop (768px and above)
+    // Check if we're on client side and desktop
+    if (typeof window === 'undefined') return;
+    
     const isDesktop = window.innerWidth >= 768;
     
     if (!isDesktop) {
-      // On mobile, use native scrolling - no Lenis
       return;
     }
 
-    // Initialize Lenis only on desktop
+    // Initialize Lenis for smooth scrolling on desktop
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -42,35 +44,58 @@ export default function TheCapitalPLab() {
 
     lenisRef.current = lenis;
 
-    // Animation frame loop
+    // Optimized RAF loop
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafRef.current = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    rafRef.current = requestAnimationFrame(raf);
 
     // Handle window resize
     const handleResize = () => {
       const nowDesktop = window.innerWidth >= 768;
       if (!nowDesktop && lenisRef.current) {
-        // Switched to mobile, destroy Lenis
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+        }
         lenisRef.current.destroy();
         lenisRef.current = null;
+      } else if (nowDesktop && !lenisRef.current) {
+        const newLenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          orientation: 'vertical',
+          gestureOrientation: 'vertical',
+          smoothWheel: true,
+          wheelMultiplier: 1,
+          touchMultiplier: 2,
+          infinite: false,
+        });
+        lenisRef.current = newLenis;
+        
+        function newRaf(time: number) {
+          newLenis.raf(time);
+          rafRef.current = requestAnimationFrame(newRaf);
+        }
+        rafRef.current = requestAnimationFrame(newRaf);
       }
     };
 
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
       if (lenisRef.current) {
         lenisRef.current.destroy();
         lenisRef.current = null;
       }
     };
   }, []);
+
 
   return (
     <div className="bg-white min-h-screen text-zinc-900 selection:bg-[#c7d6c1] selection:text-[#4f75d] font-sans">

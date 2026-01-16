@@ -114,9 +114,8 @@ export const Hero = () => {
               <div className="absolute -left-4 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#755eb1] to-[#4f75d]" />
               <p className="pl-6 text-[#2b2e34]/70 max-w-lg text-lg font-medium leading-relaxed">
                 Turning evidence into reality for <br />
-                <span className="text-[#2b2e34] font-bold">Planet</span>, 
-                <span className="text-[#2b2e34] font-bold mx-1">People</span> and 
-                <span className="text-[#2b2e34] font-bold"> Profit</span>
+                <span className="text-[#2b2e34] font-bold">  Planet · People · Profit</span>
+       
               </p>
             </div>
           </div>

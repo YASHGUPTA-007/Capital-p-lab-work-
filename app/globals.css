@@ -19,58 +19,21 @@
   }
 }
 
-/* Lenis Smooth Scroll - Desktop Only */
-@media (min-width: 768px) {
-  html.lenis,
-  html.lenis body {
-    height: auto;
-  }
-
-  .lenis.lenis-smooth {
-    scroll-behavior: auto !important;
-  }
-
-  .lenis.lenis-smooth [data-lenis-prevent] {
-    overscroll-behavior: contain;
-  }
-
-  .lenis.lenis-stopped {
-    overflow: hidden;
-  }
-
-  .lenis.lenis-stopped body {
-    overflow: hidden;
-  }
-
-  /* Force GPU acceleration for smoother animations */
-  html.lenis {
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
-
-  /* Optimize rendering for smooth scroll elements */
-  [data-lenis-scroll] {
-    will-change: transform;
-  }
-}
-
-/* Mobile uses native scrolling */
-@media (max-width: 767px) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
+/* Base styles - Fixed for Lenis */
+html {
+  scroll-behavior: auto;
+  overflow-x: hidden;
 }
 
 body {
+  margin: 0;
+  padding: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   overscroll-behavior: none;
+  overflow-x: hidden;
+  min-height: 100vh; /* Changed from height: 100% */
 }
 
 /* Performance Optimizations */
@@ -79,41 +42,45 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Improve rendering performance */
-#__next {
-  isolation: isolate;
+/* Reduce layout shift */
+img, 
+video,
+iframe {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-/* Reduce repaints during scroll - Desktop only */
+/* Optimize animations */
 @media (min-width: 768px) {
-  #__next {
-    transform: translate3d(0, 0, 0);
+  * {
+    will-change: auto !important;
   }
-
-  img, 
-  video,
-  iframe {
-    transform: translate3d(0, 0, 0);
+  
+  /* Only apply GPU acceleration to animating elements */
+  [data-animate],
+  .animate {
+    will-change: transform, opacity;
+    transform: translateZ(0);
     backface-visibility: hidden;
   }
-
-  /* Smooth transitions for scroll-triggered animations */
-  [data-scroll] {
-    will-change: transform, opacity;
-  }
 }
 
-/* Prevent animation jank */
-@media (prefers-reduced-motion: no-preference) {
-  * {
+/* Mobile uses native scrolling */
+@media (max-width: 767px) {
+  html {
     scroll-behavior: smooth;
   }
+  
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }
 
-/* Fix for fixed elements during Lenis scroll */
+/* Prevent scrollbar from causing layout shift */
 @media (min-width: 768px) {
-  .fixed {
-    backface-visibility: hidden;
-    transform: translate3d(0, 0, 0);
+  html {
+    overflow-y: scroll; /* Always show scrollbar space */
   }
 }

@@ -64,10 +64,10 @@ export const ServicesSection = () => {
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif mt-4 mb-6 sm:mb-8 leading-tight text-[#4f7f5d]">
                 <span>Impact through</span>
                 {' '}
-                <span className="italic">precision</span>
+                <span className="italic">precision.</span>
             </h3>
             <p className="text-base sm:text-lg md:text-xl text-[#4f75d] max-w-2xl leading-relaxed">
-                We provide research and consulting services that help organizations create measurable impact for <span className="text-[#755eb1] font-semibold">people</span>, <span className="text-[#755eb1] font-semibold">planet</span> and <span className="text-[#755eb1] font-semibold">profit</span>
+                We provide research and consulting services that help organizations create measurable impact for <span className="text-[#755eb1] font-semibold">planet</span>, <span className="text-[#755eb1] font-semibold">people</span> and <span className="text-[#755eb1] font-semibold">profit</span>
             </p>
           </motion.div>
   

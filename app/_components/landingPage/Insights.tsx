@@ -218,10 +218,10 @@ export const InsightsSection = () => {
                             Newsletter
                         </span>
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-serif mt-2 sm:mt-3 mb-2 sm:mb-3 text-[#755eb1]">
-                            Stay informed.
+                            Stay informed
                         </h3>
                         <p className="text-sm sm:text-base text-[#4f75d] mb-6 sm:mb-8 max-w-md mx-auto">
-                            Curated research and perspectives on sustainability, delivered to your inbox.
+                            Curated research and perspectives on sustainability, delivered to your inbox
                         </p>
                         
                         <AnimatePresence mode="wait">

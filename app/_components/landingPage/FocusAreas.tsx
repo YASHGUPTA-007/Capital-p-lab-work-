@@ -416,7 +416,7 @@ export const FocusSection = () => {
             variants={headerVariants}
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif leading-tight text-[#4f7f5d]"
           >
-            <span>Where Evidence, Equity, and Sustainability</span>
+            <span>Where Evidence, Equity and Sustainability</span>
             {' '}
             <span className="italic">Converge</span>
           </motion.h3>
