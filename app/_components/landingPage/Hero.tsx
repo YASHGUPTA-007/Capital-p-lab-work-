@@ -115,8 +115,8 @@ export const Hero = () => {
               <p className="pl-6 text-[#2b2e34]/70 max-w-lg text-lg font-medium leading-relaxed">
                 Turning evidence into reality for <br />
                 <span className="text-[#2b2e34] font-bold">Planet</span>, 
-                <span className="text-[#2b2e34] font-bold mx-1">People</span>, and 
-                <span className="text-[#2b2e34] font-bold"> Profit</span>.
+                <span className="text-[#2b2e34] font-bold mx-1">People</span> and 
+                <span className="text-[#2b2e34] font-bold"> Profit</span>
               </p>
             </div>
           </div>
@@ -167,7 +167,7 @@ export const Hero = () => {
             <p className="text-[#2b2e34]/80 text-sm font-medium leading-relaxed">
               Turning evidence into reality for{' '}
               <span className="text-[#755eb1] font-bold">Planet</span>,{' '}
-              <span className="text-[#755eb1] font-bold">People</span>, and{' '}
+              <span className="text-[#755eb1] font-bold">People</span> and{' '}
               <span className="text-[#755eb1] font-bold">Profit</span>.
             </p>
           </div>
@@ -188,7 +188,7 @@ export const Hero = () => {
 
         {/* Bottom: EST 2025 */}
         <div className="flex-shrink-0 mb-4">
-          <span className="text-[9px] font-bold tracking-[0.25em] text-[#755eb1]/60">EST. 2025</span>
+          <span className="text-[9px] font-bold tracking-[0.25em] text-[#755eb1]/60"></span>
         </div>
       </div>
 

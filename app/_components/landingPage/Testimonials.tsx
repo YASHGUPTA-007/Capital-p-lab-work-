@@ -57,7 +57,7 @@ export const TestimonialSection = () => {
             Client Voices
           </h2>
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-[#2b2e34] font-medium">
-            Impact in <span className="italic text-[#2b2e34]">their words.</span>
+            Impact in <span className="italic text-[#2b2e34]">their words</span>
           </h3>
         </motion.div>
 

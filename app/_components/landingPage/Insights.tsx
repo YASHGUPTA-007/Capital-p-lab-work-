@@ -6,8 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, CheckCircle, AlertCircle, FileText, MessageSquare, Calendar, PenTool } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 export const InsightsSection = () => {
+    const router = useRouter()
     const [newsletterData, setNewsletterData] = useState({
         name: '',
         email: ''
@@ -50,6 +52,12 @@ export const InsightsSection = () => {
             setErrorMessage(error.message || 'Something went wrong. Please try again.');
             setTimeout(() => setStatus('idle'), 5000);
         }
+    };
+
+    const handleCardClick = (type: string) => {
+        // Navigate to /blog for all insight types
+        // You can customize this to navigate to different routes based on type
+        router.push('/blog')
     };
 
     const insightItems = [
@@ -123,6 +131,7 @@ export const InsightsSection = () => {
                             viewport={{ once: true, margin: "-50px" }}
                             transition={{ delay: i * 0.08, duration: 0.5 }}
                             className="group cursor-pointer"
+                            onClick={() => handleCardClick(item.type)}
                         >
                             <div className="relative h-80 sm:h-96 flex flex-col justify-between border-2 border-[#c1b4df]/30 group-hover:border-[#755eb1] rounded-xl sm:rounded-2xl group-hover:shadow-2xl transition-all duration-300 overflow-hidden">
                                 {/* Background Image */}
