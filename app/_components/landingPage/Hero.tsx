@@ -194,7 +194,7 @@ export const Hero = () => {
 
       {/* --- CORNER TAG (Desktop Only) --- */}
       <div className="absolute top-6 right-6 hidden md:block z-20">
-        <span className="text-[10px] font-bold tracking-[0.2em] text-[#755eb1] opacity-50">EST. 2025</span>
+       
       </div>
 
     </section>
