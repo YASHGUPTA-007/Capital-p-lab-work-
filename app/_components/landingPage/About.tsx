@@ -73,11 +73,11 @@ export const AboutSection = () => {
             variants={fadeVariants}
             className="relative"
           >
-            <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden aspect-[4/3] shadow-xl sm:shadow-2xl shadow-[#755eb1]/10">
+                <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden aspect-[4/3] shadow-xl sm:shadow-2xl shadow-[#755eb1]/10">
               <img 
                 src="/Bridging the gap between research and reality.avif" 
                 alt="Our Team at Work" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover scale-150 object-center"
                 loading="lazy"
               />
               {/* Simplified overlay on mobile */}
