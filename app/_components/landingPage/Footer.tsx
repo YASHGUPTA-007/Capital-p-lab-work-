@@ -64,8 +64,8 @@ export const Footer = () => {
                        <div>
                            <h4 className="font-bold text-xs uppercase tracking-widest text-[#c7d6c1] mb-6">Social</h4>
                            <ul className="space-y-4 text-sm text-white/80 font-medium">
-                               <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
-                               <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
+                               {/* <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
+                               <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li> */}
                                <li><a href="mailto:contact@thecapitalplab.com" className="hover:text-white transition-colors">Email</a></li>
                            </ul>
                        </div>
