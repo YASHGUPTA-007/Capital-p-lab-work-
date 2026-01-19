@@ -257,7 +257,7 @@ export default function BlogPostPage() {
             </motion.div>
           )}
 
-          {/* Content - FIXED: Proper paragraph spacing */}
+          {/* Content - FIXED: Proper paragraph spacing with empty paragraph support */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -270,7 +270,7 @@ export default function BlogPostPage() {
                 prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-10
                 prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-8
                 prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
-                prose-p:text-[#2b2e34] prose-p:leading-[1.8] prose-p:mb-6 prose-p:mt-0 prose-p:text-lg
+                prose-p:text-[#2b2e34] prose-p:leading-[1.8] prose-p:mb-6 prose-p:mt-0 prose-p:text-lg prose-p:min-h-[1.8em]
                 prose-a:text-[#755eb1] prose-a:no-underline prose-a:font-medium hover:prose-a:underline hover:prose-a:text-[#6b54a5]
                 prose-strong:text-[#2b2e34] prose-strong:font-bold
                 prose-em:text-[#2b2e34] prose-em:italic
@@ -285,7 +285,8 @@ export default function BlogPostPage() {
                 prose-hr:border-[#c1b4df]/30 prose-hr:my-10
                 prose-table:my-8
                 prose-th:bg-[#c1b4df]/10 prose-th:text-[#2b2e34] prose-th:font-bold prose-th:p-3
-                prose-td:p-3 prose-td:border prose-td:border-[#c1b4df]/20"
+                prose-td:p-3 prose-td:border prose-td:border-[#c1b4df]/20
+                [&_p:empty]:min-h-[1.8em] [&_p:empty]:mb-6"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </motion.div>

@@ -5,7 +5,7 @@ import {
   X, Upload, Image as ImageIcon, Bold, Italic, 
   Link as LinkIcon, Underline as UnderlineIcon, Heading1, Heading2, 
   Heading3, AlignLeft, AlignCenter, AlignRight, Undo, 
-  Redo, RefreshCw, CheckCircle, AlertCircle
+  Redo, RefreshCw, CheckCircle, AlertCircle, List, ListOrdered
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { 
@@ -22,7 +22,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Heading from '@tiptap/extension-heading';
-import Paragraph from '@tiptap/extension-paragraph';
 
 // --- Helper Functions ---
 
@@ -97,25 +96,27 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     }
   }, [blog]);
 
-  // --- Tiptap Editor with FIXED paragraph spacing ---
+  // --- Tiptap Editor with paragraph spacing and lists ---
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: false,
-        paragraph: false, // We'll configure this separately
-      }),
-      // FIXED: Custom Paragraph extension with proper spacing
-      Paragraph.extend({
-        addAttributes() {
-          return {
-            class: {
-              default: null,
-            },
-          };
+        // Keep list extensions enabled
+        bulletList: {
+          HTMLAttributes: {
+            class: 'list-disc pl-6 my-6 space-y-3',
+          },
         },
-        renderHTML({ HTMLAttributes }) {
-          return ['p', { class: 'mb-6 leading-relaxed' }, 0];
+        orderedList: {
+          HTMLAttributes: {
+            class: 'list-decimal pl-6 my-6 space-y-3',
+          },
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: 'text-gray-900 text-lg leading-relaxed',
+          },
         },
       }),
       Heading.configure({
@@ -534,6 +535,11 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 <button type="button" onClick={() => editor.chain().focus().setTextAlign('left').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'left' }) ? 'bg-gray-300' : ''}`}><AlignLeft size={18} /></button>
                 <button type="button" onClick={() => editor.chain().focus().setTextAlign('center').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'center' }) ? 'bg-gray-300' : ''}`}><AlignCenter size={18} /></button>
                 <button type="button" onClick={() => editor.chain().focus().setTextAlign('right').run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive({ textAlign: 'right' }) ? 'bg-gray-300' : ''}`}><AlignRight size={18} /></button>
+              </div>
+
+              <div className="flex items-center gap-1 px-2 border-r border-gray-300">
+                <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('bulletList') ? 'bg-gray-300' : ''}`} title="Bullet List"><List size={18} /></button>
+                <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('orderedList') ? 'bg-gray-300' : ''}`} title="Numbered List"><ListOrdered size={18} /></button>
               </div>
 
               <div className="flex items-center gap-1 px-2">
