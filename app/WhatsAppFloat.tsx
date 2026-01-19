@@ -25,7 +25,7 @@ export default function WhatsAppFloat() {
   return (
     <a
       href={whatsappUrl}
-      target="_blank"
+      target="_blank"                                                                                                                                                                                         
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 group"
       onMouseEnter={() => setIsHovered(true)}

@@ -22,7 +22,7 @@ export default function AdminLogin() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/admin/dashboard');
+      router.push('/admin');
     } catch (err: any) {
       console.error('Login error:', err);
       
