@@ -1,36 +1,41 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
-export const Navbar = () => {
+export const Navbar = memo(() => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === '/'
 
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 50)
+          ticking = false
+        })
+        ticking = true
+      }
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = useCallback((id: string) => {
     if (!isHomePage) {
-      // If not on homepage, navigate to homepage with hash
       window.location.href = `/#${id}`
     } else {
-      // If on homepage, smooth scroll to section
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
     }
     setIsMobileMenuOpen(false)
-  }
+  }, [isHomePage])
 
   const navItems = ['About', 'Focus', 'Services', 'Insights', 'Team']
 
@@ -44,7 +49,7 @@ export const Navbar = () => {
       >
         <div className="relative pointer-events-auto w-full sm:w-auto">
           {/* Subtle glow effect */}
-          <div className={`absolute inset-0 bg-gradient-to-r from-[#755eb1] to-[#4f475d] blur-xl transition-opacity duration-300 ${scrolled ? 'opacity-30' : 'opacity-20'}`} />
+          <div className={`absolute inset-0 bg-gradient-to-r from-[#755eb1] to-[#4f475d] blur-xl transition-opacity duration-300 will-change-transform ${scrolled ? 'opacity-30' : 'opacity-20'}`} />
           
           <div className="relative bg-white/90 backdrop-blur-md rounded-full px-3 sm:px-2 py-2 flex items-center justify-between sm:gap-2 shadow-xl border-2 border-[#c1b4df]/40">
                {/* Logo */}
@@ -59,6 +64,7 @@ export const Navbar = () => {
                     className="object-contain p-1.5"
                     sizes="40px"
                     priority
+                    quality={90}
                   />
                </Link>
                
@@ -179,4 +185,5 @@ export const Navbar = () => {
       </AnimatePresence>
     </>
   )
-}
+})
+Navbar.displayName = 'Navbar'

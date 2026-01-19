@@ -396,7 +396,7 @@ export const FocusSection = () => {
       {/* Background decoration - hidden on mobile for performance */}
       <div className="hidden md:block absolute top-0 right-0 w-[400px] lg:w-[600px] h-[400px] lg:h-[600px] bg-[#c1b4df]/20 rounded-full blur-3xl pointer-events-none" />
       
-      <div className="max-w-[1600px] mx-auto relative z-10">
+   <div className="max-w-[1600px] mx-auto relative z-10 px-6 sm:px-0">
         <div className="mb-12 sm:mb-16 md:mb-24">
           {/* Main Heading - Matching "Who We Are" style */}
           <motion.h2 
