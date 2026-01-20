@@ -5,11 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
-import { Calendar, User, Tag, ArrowLeft, Share2, Facebook, Twitter, Linkedin, Clock } from 'lucide-react';
+import { Calendar, User, Tag, ArrowLeft, Twitter, Facebook, Linkedin, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Navbar } from '@/app/_components/landingPage/Navbar';
 import { Footer } from '@/app/_components/landingPage/Footer';
+import '../blog-content.css';
 
 interface BlogPost {
   id: string;
@@ -257,7 +258,7 @@ export default function BlogPostPage() {
             </motion.div>
           )}
 
-          {/* Content - FIXED: Proper paragraph spacing with empty paragraph support */}
+          {/* Content - Enhanced with font support */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -265,7 +266,7 @@ export default function BlogPostPage() {
             className="mb-12"
           >
             <div 
-              className="prose prose-lg max-w-none text-[#2b2e34] marker:text-[#2b2e34]
+              className="blog-content prose prose-lg max-w-none text-[#2b2e34] marker:text-[#2b2e34]
                 prose-headings:text-[#2b2e34] prose-headings:font-serif prose-headings:font-bold
                 prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-10
                 prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-8

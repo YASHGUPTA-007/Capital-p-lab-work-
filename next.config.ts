@@ -23,6 +23,8 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Add quality configuration
+    qualities: [75, 85],
   },
   
   // Enable compression

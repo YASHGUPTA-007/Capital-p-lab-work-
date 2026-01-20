@@ -23,7 +23,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // New state for collapse
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Data States
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -116,14 +116,14 @@ export default function AdminDashboard() {
     }
   };
 
+  // ✅ UPDATED: Removed confirm() - ContactsTab handles confirmation now
   const handleDeleteContact = async (id: string) => {
-    if (confirm('Are you sure you want to delete this inquiry?')) {
-      try {
-        await deleteDoc(doc(db, 'contacts', id));
-        if (selectedContact?.id === id) setSelectedContact(null);
-      } catch (error) {
-        console.error('Error deleting contact:', error);
-      }
+    try {
+      await deleteDoc(doc(db, 'contacts', id));
+      if (selectedContact?.id === id) setSelectedContact(null);
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+      throw error;
     }
   };
 
@@ -134,26 +134,27 @@ export default function AdminDashboard() {
       });
     } catch (error) {
       console.error('Error updating contact:', error);
+      throw error;
     }
   };
 
+  // ✅ UPDATED: Removed confirm() - SubscribersTab handles confirmation now
   const handleDeleteSubscriber = async (id: string) => {
-    if (confirm('Are you sure you want to remove this subscriber?')) {
-      try {
-        await deleteDoc(doc(db, 'newsletter-subscribers', id));
-      } catch (error) {
-        console.error('Error deleting subscriber:', error);
-      }
+    try {
+      await deleteDoc(doc(db, 'newsletter-subscribers', id));
+    } catch (error) {
+      console.error('Error deleting subscriber:', error);
+      throw error;
     }
   };
 
+  // ✅ UPDATED: Removed confirm() - BlogsTab handles confirmation now
   const handleDeleteBlog = async (id: string) => {
-    if (confirm('Are you sure you want to delete this blog post?')) {
-      try {
-        await deleteDoc(doc(db, 'blog-posts', id));
-      } catch (error) {
-        console.error('Error deleting blog:', error);
-      }
+    try {
+      await deleteDoc(doc(db, 'blog-posts', id));
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+      throw error;
     }
   };
 

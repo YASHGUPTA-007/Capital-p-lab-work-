@@ -148,13 +148,7 @@ export default function Sidebar({
           {!collapsed && (
             <>
               <span className="truncate flex-1 text-left">Newsletter</span>
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
-                activeTab === 'subscribers' 
-                  ? 'bg-white/20 text-white' 
-                  : 'bg-white/10 text-white/60'
-              }`}>
-                {subscribersCount}
-              </span>
+           
             </>
           )}
         </button>

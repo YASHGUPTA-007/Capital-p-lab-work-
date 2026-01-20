@@ -5,7 +5,7 @@ export interface Contact {
   email: string;
   subject: string;
   message: string;
-  status: string;
+  status: 'new' | 'read';
   createdAt: any;
   ipAddress?: string;
   userAgent?: string;
