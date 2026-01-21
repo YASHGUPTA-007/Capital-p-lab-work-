@@ -13,16 +13,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'The Capital P Lab - Planet. People. Profit.',
-  description: 'We help turn evidence into impact for people, the planet, and profit. Research and consulting services for sustainable development.',
-  keywords: 'sustainability, ESG, SDG, research, consulting, environmental policy, social impact',
-  authors: [{ name: 'The Capital P Lab' }],
-  openGraph: {
-    title: 'The Capital P Lab',
-    description: 'Turning evidence into impact for people, planet, and prosperity',
-    type: 'website',
+  metadataBase: new URL("https://www.capitalp.org"),
+
+  title: "The Capital P Lab - Planet. People. Profit.",
+  description:
+    "We help turn evidence into impact for people, the planet, and profit. Research and consulting services for sustainable development.",
+
+  keywords:
+    "sustainability, ESG, SDG, research, consulting, environmental policy, social impact",
+
+  authors: [{ name: "The Capital P Lab" }],
+
+  alternates: {
+    canonical: "/",
   },
-}
+
+  openGraph: {
+    title: "The Capital P Lab",
+    description: "Turning evidence into impact for people, planet, and prosperity",
+    url: "https://www.capitalp.org",
+    siteName: "The Capital P Lab",
+    type: "website",
+  },
+};
 
 export default function RootLayout({
   children,
