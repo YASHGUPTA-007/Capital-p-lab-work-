@@ -1,10 +1,11 @@
+// app/blog/[slug]/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
-import { Calendar, User, Tag, ArrowLeft, Twitter, Facebook, Linkedin, Clock, Share2, Bookmark, ChevronRight, TrendingUp, Mail, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Calendar, Tag, ArrowLeft, Twitter, Facebook, Linkedin, Clock, Share2, Bookmark, ChevronRight, TrendingUp, Mail, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
@@ -162,7 +163,6 @@ export default function BlogPostPage() {
     }
   };
 
-  // Newsletter handlers
   const handleNewsletterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -256,14 +256,12 @@ export default function BlogPostPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Animated Reading Progress Bar */}
       <motion.div 
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
         style={{ scaleX: readingProgress / 100 }}
         initial={{ scaleX: 0 }}
       />
 
-      {/* Floating Action Buttons */}
       <div className="fixed right-6 bottom-6 flex flex-col gap-3 z-40">
         <motion.button
           whileHover={{ scale: 1.1 }}
@@ -288,12 +286,9 @@ export default function BlogPostPage() {
       </div>
 
       <article className="relative">
-        
-        {/* Hero Section - Modern Magazine Style */}
         <div className="relative bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
             
-            {/* Breadcrumb & Company Branding */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -325,7 +320,6 @@ export default function BlogPostPage() {
               </div>
             </motion.div>
 
-            {/* Category & Reading Info */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -347,7 +341,6 @@ export default function BlogPostPage() {
               </div>
             </motion.div>
 
-            {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -357,7 +350,6 @@ export default function BlogPostPage() {
               {post.title}
             </motion.h1>
 
-            {/* Excerpt */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -367,7 +359,6 @@ export default function BlogPostPage() {
               {post.excerpt}
             </motion.p>
 
-            {/* Author & Share Row */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -428,7 +419,6 @@ export default function BlogPostPage() {
           </div>
         </div>
 
-        {/* Featured Image - Full Display */}
         {post.featuredImage && (
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
@@ -456,51 +446,46 @@ export default function BlogPostPage() {
           </motion.div>
         )}
 
-        {/* Main Content Section */}
         <div className="relative bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
             
-            {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
               
-              {/* Main Content Column */}
               <main className="lg:col-span-8">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
+                  {/* CHANGED: Using prose-lg (18px) instead of prose-xl (20px) to match editor */}
+                  {/* REMOVED: prose-p:mb-0 and prose-p:mt-0 to allow natural spacing */}
                   <div 
-                    className="blog-content prose prose-xl max-w-none text-[#2b2e34]
+                    className="blog-content prose prose-lg max-w-none text-[#2b2e34]
                       prose-headings:text-[#2b2e34] prose-headings:font-serif prose-headings:font-bold
                       prose-h1:text-5xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
                       prose-h2:text-4xl prose-h2:mb-6 prose-h2:mt-10 prose-h2:leading-tight
                       prose-h3:text-3xl prose-h3:mb-5 prose-h3:mt-8
-                      prose-p:text-[#2b2e34] prose-p:leading-[1.9] prose-p:mb-0 prose-p:mt-0 prose-p:text-xl
+                      
                       prose-a:text-[#755eb1] prose-a:no-underline prose-a:font-semibold prose-a:underline-offset-2 hover:prose-a:underline hover:prose-a:text-[#6b54a5]
                       prose-strong:text-[#2b2e34] prose-strong:font-bold
                       prose-em:text-[#2b2e34] prose-em:italic
                       prose-ul:my-8 prose-ul:list-disc prose-ul:pl-8 prose-ul:space-y-4
                       prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-8 prose-ol:space-y-4
-                      prose-li:text-[#2b2e34] prose-li:text-xl prose-li:leading-relaxed prose-li:marker:text-[#755eb1]
+                      prose-li:text-[#2b2e34] prose-li:text-lg prose-li:leading-relaxed prose-li:marker:text-[#755eb1]
                       prose-blockquote:border-l-[6px] prose-blockquote:border-[#755eb1] prose-blockquote:pl-8 prose-blockquote:py-6 prose-blockquote:my-10 
                       prose-blockquote:bg-gradient-to-r prose-blockquote:from-[#c1b4df]/10 prose-blockquote:to-transparent prose-blockquote:rounded-r-2xl
-                      prose-blockquote:text-[#2b2e34] prose-blockquote:italic prose-blockquote:text-2xl prose-blockquote:font-serif
+                      prose-blockquote:text-[#2b2e34] prose-blockquote:italic prose-blockquote:text-xl prose-blockquote:font-serif
                       prose-code:text-[#755eb1] prose-code:bg-[#755eb1]/10 prose-code:px-3 prose-code:py-1.5 prose-code:rounded-lg prose-code:text-base prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
                       prose-pre:bg-gradient-to-br prose-pre:from-[#2b2e34] prose-pre:to-[#1a1c20] prose-pre:text-gray-100 prose-pre:p-8 prose-pre:rounded-2xl prose-pre:my-10 prose-pre:overflow-x-auto prose-pre:shadow-xl
                       prose-img:rounded-2xl prose-img:shadow-2xl prose-img:my-10 prose-img:border-4 prose-img:border-white
                       prose-hr:border-gray-200 prose-hr:my-12 prose-hr:border-t-2
                       prose-table:my-10 prose-table:border-collapse prose-table:shadow-lg prose-table:rounded-xl prose-table:overflow-hidden
                       prose-th:bg-gradient-to-br prose-th:from-[#755eb1] prose-th:to-[#6b54a5] prose-th:text-white prose-th:font-bold prose-th:p-4 prose-th:text-left
-                      prose-td:p-4 prose-td:border-t prose-td:border-gray-200
-                      [&_p]:mb-[0.6em]
-                      [&_p:empty]:min-h-[1.9em]
-                      [&_p:empty]:mb-0"
+                      prose-td:p-4 prose-td:border-t prose-td:border-gray-200"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                   />
                 </motion.div>
 
-                {/* Tags */}
                 {post.tags && post.tags.length > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -532,7 +517,6 @@ export default function BlogPostPage() {
                   </motion.div>
                 )}
 
-                {/* Article Footer CTA */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -558,11 +542,9 @@ export default function BlogPostPage() {
 
               </main>
 
-              {/* Sticky Sidebar */}
               <aside className="lg:col-span-4">
                 <div className="lg:sticky lg:top-24 space-y-6">
                   
-                  {/* Company Card */}
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -594,7 +576,6 @@ export default function BlogPostPage() {
                     </Link>
                   </motion.div>
 
-                  {/* Newsletter Subscription Box */}
                   <motion.div
                     id="newsletter-subscribe"
                     initial={{ opacity: 0, x: 20 }}
@@ -678,7 +659,6 @@ export default function BlogPostPage() {
           </div>
         </div>
 
-        {/* Related Articles - Full Width Carousel Style */}
         {relatedPosts.length > 0 && (
           <section className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

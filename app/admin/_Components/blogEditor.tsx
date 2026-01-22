@@ -13,7 +13,7 @@ import {
   doc, updateDoc, addDoc, collection, serverTimestamp, 
   query, where, getDocs 
 } from 'firebase/firestore';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, mergeAttributes } from '@tiptap/react'; // Added mergeAttributes
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
@@ -46,6 +46,35 @@ const FontSize = TextStyle.extend({
         },
       },
     };
+  },
+});
+
+// Custom Heading Extension with Tailwind Classes
+// Custom Heading Extension with Tailwind Classes
+const CustomHeading = Heading.extend({
+  renderHTML({ node, HTMLAttributes }) {
+    // Access options safely. The levels are set in .configure() inside useEditor
+    const hasLevels = this.options.levels && this.options.levels.length > 0;
+    const level = hasLevels && this.options.levels.includes(node.attrs.level) 
+      ? node.attrs.level 
+      : (hasLevels ? this.options.levels[0] : node.attrs.level);
+    
+    const classes: { [key: number]: string } = {
+      1: 'text-4xl font-bold mb-6 mt-10 text-gray-900 leading-tight',
+      2: 'text-3xl font-bold mb-5 mt-8 text-gray-900 leading-tight',
+      3: 'text-2xl font-bold mb-4 mt-6 text-gray-900 leading-snug',
+    };
+
+    // Fallback if class isn't defined for the level
+    const className = classes[level] || classes[3];
+
+    return [
+      `h${level}`, 
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { 
+        class: className
+      }), 
+      0
+    ];
   },
 });
 
@@ -156,22 +185,12 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        heading: false,
+        heading: false, // Disable default heading to use our CustomHeading
         bulletList: { HTMLAttributes: { class: 'list-disc pl-6 my-6 space-y-3' } },
         orderedList: { HTMLAttributes: { class: 'list-decimal pl-6 my-6 space-y-3' } },
         listItem: { HTMLAttributes: { class: 'text-gray-900 text-lg leading-relaxed' } },
       }),
-      Heading.configure({ levels: [1, 2, 3] }).extend({
-        renderHTML({ node, HTMLAttributes }) {
-          const level = this.options.levels.includes(node.attrs.level) ? node.attrs.level : this.options.levels[0];
-          const classes: { [key: number]: string } = {
-            1: 'text-4xl font-bold mb-6 mt-10 text-gray-900',
-            2: 'text-3xl font-bold mb-5 mt-8 text-gray-900',
-            3: 'text-2xl font-bold mb-4 mt-6 text-gray-900',
-          };
-          return [`h${level}`, { ...HTMLAttributes, class: classes[level] }, 0];
-        },
-      }),
+      CustomHeading.configure({ levels: [1, 2, 3] }),
       Image.configure({ HTMLAttributes: { class: 'max-w-full h-auto rounded-lg my-8 shadow-md' } }),
       Link.configure({ openOnClick: false, HTMLAttributes: { class: 'text-[#755eb1] underline hover:text-[#6b54a5] font-medium' } }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -673,11 +692,32 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                   </select>
                 </div>
 
-                {/* Headings */}
+                {/* Headings - FIXED */}
                 <div className="flex items-center gap-1 px-2 border-r border-gray-300">
-                  <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-300' : ''}`} title="Heading 1"><Heading1 size={18} /></button>
-                  <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-300' : ''}`} title="Heading 2"><Heading2 size={18} /></button>
-                  <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-300' : ''}`} title="Heading 3"><Heading3 size={18} /></button>
+                  <button 
+                    type="button" 
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).unsetMark('textStyle').run()} 
+                    className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-300' : ''}`} 
+                    title="Heading 1"
+                  >
+                    <Heading1 size={18} />
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).unsetMark('textStyle').run()} 
+                    className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-300' : ''}`} 
+                    title="Heading 2"
+                  >
+                    <Heading2 size={18} />
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).unsetMark('textStyle').run()} 
+                    className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-300' : ''}`} 
+                    title="Heading 3"
+                  >
+                    <Heading3 size={18} />
+                  </button>
                 </div>
 
                 {/* Text Alignment */}

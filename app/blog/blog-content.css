@@ -27,3 +27,7 @@
 .blog-content [style*="font-family: Merriweather"] { 
   font-family: Merriweather, serif !important; 
 }
+.blog-content p:empty::before {
+  content: "\00a0"; /* Non-breaking space */
+  display: inline-block;
+}
