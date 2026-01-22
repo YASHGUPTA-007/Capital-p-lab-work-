@@ -16,6 +16,9 @@ import {
   Check,
   ChevronRight,
   TrendingUp,
+  ChevronDown,
+  ChevronLeft,
+  Filter,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -37,30 +40,25 @@ interface BlogPost {
   publishedAt?: any;
 }
 
+const POSTS_PER_PAGE = 18;
+
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showNewsletter, setShowNewsletter] = useState(false);
   const [newsletterData, setNewsletterData] = useState({ name: "", email: "" });
   const [newsletterStatus, setNewsletterStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [newsletterMessage, setNewsletterMessage] = useState("");
-
-  const categories = [
-    "All",
-    "Sustainability",
-    "Policy",
-    "Research",
-    "ESG",
-    "Climate",
-    "Inclusion",
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchPosts();
+    fetchPostsAndCategories();
 
     // Show newsletter popup after 8 seconds if not shown before
     const timer = setTimeout(() => {
@@ -74,7 +72,7 @@ export default function BlogPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchPostsAndCategories = async () => {
     try {
       const q = query(
         collection(db, "blog-posts"),
@@ -84,11 +82,18 @@ export default function BlogPage() {
 
       const querySnapshot = await getDocs(q);
       const postsData: BlogPost[] = [];
+      const categoriesSet = new Set<string>();
+
       querySnapshot.forEach((doc) => {
-        postsData.push({ id: doc.id, ...doc.data() } as BlogPost);
+        const postData = { id: doc.id, ...doc.data() } as BlogPost;
+        postsData.push(postData);
+        if (postData.category) {
+          categoriesSet.add(postData.category);
+        }
       });
 
       setPosts(postsData);
+      setCategories(["All", ...Array.from(categoriesSet).sort()]);
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
@@ -149,8 +154,97 @@ export default function BlogPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const featuredPost = filteredPosts[0];
-  const regularPosts = filteredPosts.slice(1);
+  // Pagination logic
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const currentPosts = filteredPosts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-12">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronLeft size={20} className="text-gray-600" />
+        </button>
+
+        {startPage > 1 && (
+          <>
+            <button
+              onClick={() => handlePageChange(1)}
+              className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all text-gray-600"
+            >
+              1
+            </button>
+            {startPage > 2 && <span className="text-gray-400">...</span>}
+          </>
+        )}
+
+        {pageNumbers.map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`px-4 py-2 rounded-lg border transition-all font-semibold ${
+              currentPage === page
+                ? "bg-[#755eb1] text-white border-[#755eb1]"
+                : "border-gray-200 text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="text-gray-400">...</span>}
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all text-gray-600"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronRight size={20} className="text-gray-600" />
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -279,9 +373,10 @@ export default function BlogPage() {
             </div>
           </div>
 
-          {/* Search and Filter */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
+          {/* Enhanced Search and Filter */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search Bar */}
               <div className="flex-1 relative">
                 <Search
                   size={20}
@@ -292,94 +387,91 @@ export default function BlogPage() {
                   placeholder="Search articles, topics, or authors..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#2b2e34] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#755eb1]/30 focus:border-[#755eb1] transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-[#2b2e34] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#755eb1]/30 focus:border-[#755eb1] transition-all"
                 />
+              </div>
+
+              {/* Category Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  className="flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap min-w-[200px]"
+                >
+                  <Filter size={20} />
+                  <span className="flex-1 text-left">{selectedCategory}</span>
+                  <ChevronDown size={20} className={`transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {showCategoryDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full mt-2 right-0 w-64 bg-white rounded-xl border border-gray-200 shadow-2xl z-10 overflow-hidden"
+                    >
+                      <div className="max-h-96 overflow-y-auto">
+                        {categories.map((category) => (
+                          <button
+                            key={category}
+                            onClick={() => {
+                              setSelectedCategory(category);
+                              setShowCategoryDropdown(false);
+                            }}
+                            className={`w-full text-left px-5 py-3 hover:bg-gray-50 transition-colors ${
+                              selectedCategory === category
+                                ? "bg-[#755eb1]/10 text-[#755eb1] font-semibold"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{category}</span>
+                              {selectedCategory === category && (
+                                <Check size={16} className="text-[#755eb1]" />
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    selectedCategory === category
-                      ? "bg-[#755eb1] text-white shadow-md"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+            {/* Active Filters Display */}
+            {(searchQuery || selectedCategory !== "All") && (
+              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                <span className="text-sm text-gray-600 font-semibold">Active filters:</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedCategory !== "All" && (
+                    <span className="px-3 py-1 bg-[#755eb1]/10 text-[#755eb1] text-sm font-semibold rounded-full flex items-center gap-2">
+                      {selectedCategory}
+                      <button
+                        onClick={() => setSelectedCategory("All")}
+                        className="hover:bg-[#755eb1]/20 rounded-full p-0.5 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
+                  )}
+                  {searchQuery && (
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded-full flex items-center gap-2">
+                      "{searchQuery}"
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
-
-      {/* Featured Post */}
-      {featuredPost && !searchQuery && selectedCategory === "All" && (
-        <section className="py-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="text-[#755eb1]" size={24} />
-              <h2 className="text-2xl font-serif text-[#2b2e34]">
-                Featured Article
-              </h2>
-            </div>
-            <Link href={`/blog/${featuredPost.slug}`}>
-              <div className="group relative bg-white rounded-3xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-500">
-                <div className="grid md:grid-cols-2 gap-0">
-                  <div className="relative h-64 md:h-full min-h-[400px]">
-                    {featuredPost.featuredImage ? (
-                      <img
-                        src={featuredPost.featuredImage}
-                        alt={featuredPost.title}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#c1b4df]/20 to-[#c7d6c1]/20" />
-                    )}
-                    <div className="absolute top-6 left-6">
-                      <span className="px-4 py-2 bg-white/90 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
-                        {featuredPost.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-8 md:p-12 flex flex-col justify-center">
-                    <h3 className="text-3xl md:text-4xl font-serif text-[#2b2e34] mb-4 group-hover:text-[#755eb1] transition-colors">
-                      {featuredPost.title}
-                    </h3>
-                    <p className="text-lg text-[#4f475d] mb-6 line-clamp-3">
-                      {featuredPost.excerpt}
-                    </p>
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
-                      <div className="flex items-center gap-2">
-                        <User size={16} />
-                        <span>{featuredPost.author}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar size={16} />
-                        <span>
-                          {formatDate(
-                            featuredPost.publishedAt || featuredPost.createdAt,
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-[#755eb1] font-semibold group-hover:gap-3 transition-all">
-                      <span>Read Full Article</span>
-                      <ChevronRight
-                        size={20}
-                        className="group-hover:translate-x-1 transition-transform"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </section>
-      )}
 
       {/* Blog Posts Grid */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -391,7 +483,8 @@ export default function BlogPage() {
                 : "Latest Articles"}
             </h2>
             <span className="text-sm text-gray-500">
-              {filteredPosts.length} articles
+              {filteredPosts.length} {filteredPosts.length === 1 ? 'article' : 'articles'}
+              {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
             </span>
           </div>
 
@@ -423,98 +516,96 @@ export default function BlogPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {regularPosts.map((post, index) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                >
-                  <Link href={`/blog/${post.slug}`}>
-                    <div className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl hover:border-[#755eb1]/30 transition-all duration-300 h-full flex flex-col">
-                      <div className="relative h-48 bg-gray-100 overflow-hidden">
-                        {post.featuredImage ? (
-                          <img
-                            src={post.featuredImage}
-                            alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/15 to-[#c7d6c1]/15 flex items-center justify-center">
-                            <span className="text-5xl opacity-20">📝</span>
-                          </div>
-                        )}
-                        <div className="absolute top-3 left-3">
-                          <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full">
-                            {post.category}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-xl font-serif text-[#2b2e34] mb-3 line-clamp-2 group-hover:text-[#755eb1] transition-colors">
-                          {post.title}
-                        </h3>
-
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">
-                          {post.excerpt}
-                        </p>
-
-                        <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100">
-                          <div className="flex items-center gap-2">
-                            <User size={14} />
-                            <span className="truncate">{post.author}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Calendar size={14} />
-                            <span>
-                              {formatDate(post.publishedAt || post.createdAt)}
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentPosts.map((post, index) => (
+                  <motion.article
+                    key={post.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    className="h-full"
+                  >
+                    <Link href={`/blog/${post.slug}`} className="block h-full">
+                      <div className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl hover:border-[#755eb1]/30 transition-all duration-300 h-full flex flex-col">
+                        {/* Fixed Height Image Container */}
+                        <div className="relative h-48 bg-gray-100 overflow-hidden flex-shrink-0">
+                          {post.featuredImage ? (
+                            <img
+                              src={post.featuredImage}
+                              alt={post.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/15 to-[#c7d6c1]/15 flex items-center justify-center">
+                              <span className="text-5xl opacity-20">📝</span>
+                            </div>
+                          )}
+                          <div className="absolute top-3 left-3">
+                            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full">
+                              {post.category}
                             </span>
                           </div>
                         </div>
 
-                        {post.tags && post.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-3">
-                            {post.tags.slice(0, 2).map((tag, idx) => (
-                              <span
-                                key={idx}
-                                className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md"
-                              >
-                                {tag}
-                              </span>
-                            ))}
+                        {/* Content Container */}
+                        <div className="p-6 flex-1 flex flex-col">
+                          {/* Title - Fixed 2 lines */}
+                          <h3 className="text-xl font-serif text-[#2b2e34] mb-3 line-clamp-2 group-hover:text-[#755eb1] transition-colors min-h-[3.5rem]">
+                            {post.title}
+                          </h3>
+
+                          {/* Excerpt - Fixed 3 lines */}
+                          <p className="text-sm text-gray-600 mb-4 line-clamp-3 flex-1 min-h-[4.5rem]">
+                            {post.excerpt}
+                          </p>
+
+                          {/* Tags Section */}
+                          <div className="mb-4 min-h-[2rem]">
+                            {post.tags && post.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {post.tags.slice(0, 3).map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        )}
+
+                          {/* Meta Information */}
+                          <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100 mt-auto">
+                            {post.author && post.author.trim() !== "" ? (
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <User size={14} className="flex-shrink-0" />
+                                <span className="truncate">{post.author}</span>
+                              </div>
+                            ) : (
+                              <div className="flex-1"></div>
+                            )}
+                            <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                              <Calendar size={14} />
+                              <span className="whitespace-nowrap">
+                                {formatDate(post.publishedAt || post.createdAt)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                </motion.article>
-              ))}
-            </div>
+                    </Link>
+                  </motion.article>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {renderPagination()}
+            </>
           )}
         </div>
       </section>
-
-      {/* Newsletter CTA Section */}
-      {/* <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#755eb1] to-[#6b54a5]">
-        <div className="max-w-4xl mx-auto text-center">
-          <Mail className="mx-auto mb-6 text-white" size={48} />
-          <h2 className="text-3xl md:text-4xl font-serif text-white mb-4">
-            Never Miss an Update
-          </h2>
-          <p className="text-lg text-white/90 mb-8">
-            Join our community of changemakers and get the latest insights
-            delivered to your inbox.
-          </p>
-          <button
-            onClick={() => setShowNewsletter(true)}
-            className="px-8 py-4 bg-white text-[#755eb1] rounded-xl font-semibold hover:shadow-xl transition-all"
-          >
-            Subscribe to Newsletter
-          </button>
-        </div>
-      </section> */}
 
       <Footer />
     </div>

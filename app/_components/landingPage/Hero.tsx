@@ -65,7 +65,6 @@ export const Hero = memo(() => {
       
       {/* --- BACKGROUND --- */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Image - Using Next.js Image */}
         <div className="absolute inset-0">
           <Image 
             src="/Bridging the gap between research and reality.avif" 
@@ -75,15 +74,11 @@ export const Hero = memo(() => {
             priority
             quality={85}
             sizes="100vw"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
           />
         </div>
         
-        {/* Simple gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#f4f7f5]/95 via-[#f4f7f5]/85 to-[#f4f7f5]/95" />
         
-        {/* Only add heavy effects on desktop */}
         {isDesktop && (
           <>
             <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] bg-[#c7d6c1]/30 rounded-full blur-[100px] mix-blend-multiply will-change-transform" />
@@ -99,20 +94,29 @@ export const Hero = memo(() => {
         style={{ y: isDesktop ? contentY : 0, opacity: isDesktop ? opacity : 1 }}
         className="hidden md:flex relative z-10 w-full max-w-[1600px] px-12 pl-32 items-center justify-center gap-20 will-change-transform"
       >
-        {/* Logo */}
-        <div className="relative z-20 flex-shrink-0 group">
-          <div className="absolute inset-0 -m-8 border border-[#755eb1]/10 rounded-full" />
-          <div className="absolute inset-0 -m-16 border border-[#4f75d]/10 rounded-full" />
-          <div className="relative w-[24vw] h-[24vw] max-w-[380px] max-h-[380px] bg-white/80 backdrop-blur-xl rounded-full shadow-2xl shadow-[#755eb1]/10 flex items-center justify-center p-2 border border-white/50 transition-transform duration-300 hover:scale-105">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#c7d6c1]/40 to-[#c1b4df]/40 opacity-50" />
+        {/* Logo with Organization Name */}
+        <div className="relative z-20 flex-shrink-0 group flex flex-col items-center">
+          {/* Client Req: Organization Name Above Logo with specific color */}
+          <div className="mb-6 text-center">
+            <h2 className="text-[#4f7f5d] text-3xl lg:text-4xl font-extrabold tracking-tight drop-shadow-sm">
+              The Capital P Lab
+            </h2>
+            <div className="mt-2 h-[3px] w-24 mx-auto bg-[#4f7f5d]/30 rounded-full" />
+          </div>
+          
+          <div className="absolute inset-0 -m-8 border border-[#4f7f5d]/10 rounded-full animate-pulse" />
+          
+          {/* Increased Logo Size (w-24vw -> w-28vw) */}
+          <div className="relative w-[28vw] h-[28vw] max-w-[420px] max-h-[420px] bg-white/90 backdrop-blur-xl rounded-full shadow-2xl shadow-[#4f7f5d]/10 flex items-center justify-center p-2 border border-white transition-transform duration-500 hover:scale-105">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#c7d6c1]/20 to-[#4f7f5d]/10 opacity-50" />
             <Image 
               src="/logo.png" 
-              alt="The Capital P Lab" 
+              alt="The Capital P Lab Logo" 
               fill
-              className="object-contain rounded-full relative z-10 drop-shadow-sm p-4"
+              className="object-contain rounded-full relative z-10 drop-shadow-md p-6"
               priority
-              sizes="(min-width: 768px) 24vw, 0px"
-              quality={90}
+              sizes="(min-width: 768px) 28vw, 0px"
+              quality={95}
             />
           </div>
         </div>
@@ -141,35 +145,42 @@ export const Hero = memo(() => {
       </motion.div>
 
 
-      {/* --- MOBILE LAYOUT (below 768px) - ULTRA OPTIMIZED --- */}
-      <div className="md:hidden relative z-10 w-full h-full flex flex-col items-center justify-between py-8 px-6">
+      {/* --- MOBILE LAYOUT --- */}
+      <div className="md:hidden relative z-10 w-full h-full flex flex-col items-center justify-between py-10 px-6">
         
-        {/* Top: Logo - NO backdrop-blur */}
-        <div className="flex-shrink-0 mt-8">
-          <div className="relative w-[120px] h-[120px] bg-white rounded-full shadow-xl flex items-center justify-center p-2 border-2 border-white/80">
+        {/* Top: Organization Name + Logo */}
+        <div className="flex-shrink-0 mt-4 flex flex-col items-center">
+          {/* Client Req: Name above logo with specific color */}
+          <div className="mb-5 text-center">
+            <h2 className="text-[#4f7f5d] text-2xl font-black tracking-tight">
+              The Capital P Lab
+            </h2>
+            <div className="mt-1 h-[2px] w-16 mx-auto bg-[#4f7f5d]/40" />
+          </div>
+          
+          {/* Increased Logo Size (120px -> 160px) */}
+          <div className="relative w-[160px] h-[160px] bg-white rounded-full shadow-2xl flex items-center justify-center p-3 border-4 border-white">
             <Image 
               src="/logo.png" 
               alt="The Capital P Lab" 
               fill
               className="object-contain rounded-full relative z-10 p-2"
               priority
-              sizes="120px"
-              quality={85}
+              sizes="160px"
+              quality={95}
             />
           </div>
         </div>
 
-        {/* Middle: Main Content - NO animations */}
-        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-5 max-w-[360px]">
+        {/* Middle: Main Content */}
+        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 max-w-[360px] mt-8">
           
-          {/* Typewriter - Simple */}
           <div>
             <span className="block text-[#2b2e34] font-serif italic text-xl h-[1.4em]">
               <Typewriter words={typewriterWords} />
             </span>
           </div>
           
-          {/* Headlines - NO animation */}
           <div className="space-y-0">
             <h1 className="text-[#755eb1] text-[14vw] font-black tracking-tighter leading-[0.85] uppercase">
               Empowering
@@ -182,18 +193,17 @@ export const Hero = memo(() => {
             </h1>
           </div>
 
-          {/* Description Card - NO backdrop-blur */}
-          <div className="bg-white/90 rounded-2xl p-5 border border-white shadow-lg">
+          <div className="bg-white/95 rounded-2xl p-6 border border-white shadow-xl">
             <p className="text-[#2b2e34]/80 text-sm font-medium leading-relaxed">
               Turning evidence into reality for{' '}
-              <span className="text-[#755eb1] font-bold">Planet</span>,{' '}
-              <span className="text-[#755eb1] font-bold">People</span> and{' '}
-              <span className="text-[#755eb1] font-bold">Profit</span>.
+              <span className="text-[#4f7f5d] font-bold">Planet</span>,{' '}
+              <span className="text-[#4f7f5d] font-bold">People</span> and{' '}
+              <span className="text-[#4f7f5d] font-bold">Profit</span>.
             </p>
           </div>
 
-          {/* 3 Pillars - NO backdrop-blur */}
-          <div className="flex items-center justify-center gap-3 mt-3">
+          {/* 3 Pillars */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
             <div className="bg-[#e8f1e6] rounded-full px-4 py-2 border border-[#c7d6c1]">
               <span className="text-[#2b2e34] text-xs font-bold">🌍 Planet</span>
             </div>
@@ -206,17 +216,10 @@ export const Hero = memo(() => {
           </div>
         </div>
 
-        {/* Bottom: EST 2025 */}
-        <div className="flex-shrink-0 mb-4">
-          <span className="text-[9px] font-bold tracking-[0.25em] text-[#755eb1]/60"></span>
+        <div className="flex-shrink-0 mt-8">
+           {/* Space for additional footer elements if needed */}
         </div>
       </div>
-
-      {/* --- CORNER TAG (Desktop Only) --- */}
-      <div className="absolute top-6 right-6 hidden md:block z-20">
-       
-      </div>
-
     </section>
   )
 })
