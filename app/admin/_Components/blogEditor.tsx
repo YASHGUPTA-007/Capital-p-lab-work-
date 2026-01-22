@@ -78,6 +78,7 @@ const CustomHeading = Heading.extend({
   },
 });
 
+
 // Helper Functions
 const calculateReadingTime = (content: string): number => {
   const text = content.replace(/<[^>]*>/g, "");

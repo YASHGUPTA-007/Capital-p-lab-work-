@@ -53,8 +53,12 @@ export const Hero = memo(() => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
   
+  // Existing transforms for content
   const opacity = useTransform(scrollY, [0, 300], [1, 0])
   const contentY = useTransform(scrollY, [0, 400], [0, 80])
+  
+  // New transform for background parallax effect
+  const bgScale = useTransform(scrollY, [0, 500], [1, 1.05])
 
   const typewriterWords = useMemo(() => ["Driving", "Accelerating", "Transforming"], [])
 
@@ -63,33 +67,41 @@ export const Hero = memo(() => {
       className="relative w-full min-h-[100dvh] overflow-hidden flex flex-col items-center justify-center bg-[#f4f7f5] selection:bg-[#c7d6c1] selection:text-[#4f75d]"
     >
       
-      {/* --- BACKGROUND --- */}
+      {/* --- ENHANCED BACKGROUND --- */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0">
+        {/* 1. Image Layer with Parallax Scale */}
+        <motion.div style={{ scale: bgScale }} className="absolute inset-0 origin-center">
           <Image 
             src="/Bridging the gap between research and reality.avif" 
             alt="Policy collaboration"
             fill
-            className="object-cover grayscale-[15%]"
+            // Removed grayscale for a more vibrant, premium feel
+            className="object-cover"
             priority
-            quality={85}
+            quality={90}
             sizes="100vw"
           />
-        </div>
+        </motion.div>
         
-        <div className="absolute inset-0 bg-gradient-to-r from-[#f4f7f5]/95 via-[#f4f7f5]/85 to-[#f4f7f5]/95" />
+        {/* 2. Sophisticated Mesh Gradient Overlay & Subtle Blur */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#f4f7f5]/98 via-[#f4f7f5]/85 to-[#c7d6c1]/10" />
+        <div className="absolute inset-0 backdrop-blur-[1px]" />
         
+        {/* 3. Animated Accent Blobs & Noise Texture (Desktop Only to save mobile perf) */}
         {isDesktop && (
           <>
-            <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] bg-[#c7d6c1]/30 rounded-full blur-[100px] mix-blend-multiply will-change-transform" />
-            <div className="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-[#c1b4df]/30 rounded-full blur-[100px] mix-blend-multiply will-change-transform" />
-            <div className="absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            {/* Green blob with slow pulse animation */}
+            <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] bg-[#4f7f5d]/20 rounded-full blur-[120px] mix-blend-multiply will-change-transform animate-[pulse_8s_ease-in-out_infinite]" />
+            {/* Purple blob */}
+            <div className="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-[#755eb1]/20 rounded-full blur-[120px] mix-blend-multiply will-change-transform" />
+            {/* Texture overlay */}
+            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
           </>
         )}
       </div>
 
 
-      {/* --- DESKTOP LAYOUT (768px+) --- */}
+      {/* --- DESKTOP LAYOUT (768px+) - Client Requirements Maintained --- */}
       <motion.div 
         style={{ y: isDesktop ? contentY : 0, opacity: isDesktop ? opacity : 1 }}
         className="hidden md:flex relative z-10 w-full max-w-[1600px] px-12 pl-32 items-center justify-center gap-20 will-change-transform"
@@ -145,7 +157,7 @@ export const Hero = memo(() => {
       </motion.div>
 
 
-      {/* --- MOBILE LAYOUT --- */}
+      {/* --- MOBILE LAYOUT - Client Requirements Maintained --- */}
       <div className="md:hidden relative z-10 w-full h-full flex flex-col items-center justify-between py-10 px-6">
         
         {/* Top: Organization Name + Logo */}
