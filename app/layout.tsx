@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   authors: [{ name: "The Capital P Lab" }],
 
   alternates: {
-    canonical: "/",
+    canonical: "https://www.capitalp.org",
   },
 
   openGraph: {
