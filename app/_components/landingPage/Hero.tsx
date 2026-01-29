@@ -110,7 +110,7 @@ export const Hero = memo(() => {
         <div className="relative z-20 flex-shrink-0 group flex flex-col items-center">
           {/* Client Req: Organization Name Above Logo with specific color */}
           <div className="mb-6 text-center">
-            <h2 className="text-[#4f7f5d] text-4xl lg:text-5xl font-extrabold tracking-tight drop-shadow-sm">
+            <h2 className="text-[#4f7f5d] text-4xl lg:text-6xl font-extrabold tracking-tight drop-shadow-sm">
               The Capital P Lab
             </h2>
             <div className="mt-2 h-[3px] w-24 mx-auto bg-[#4f7f5d]/30 rounded-full" />
@@ -139,10 +139,10 @@ export const Hero = memo(() => {
             <span className="block text-[#2b2e34] font-serif italic text-3xl lg:text-4xl mb-3 h-[1.5em]">
               <Typewriter words={typewriterWords} />
             </span>
-            <h1 className="text-[#755eb1] text-[6.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
+            <h1 className="text-[#755eb1] text-[5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
               Empowering
             </h1>
-            <h1 className="text-[#755eb1] text-[6.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
+            <h1 className="text-[#755eb1] text-[5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
               Policy Action
             </h1>
             <div className="mt-8 relative">
