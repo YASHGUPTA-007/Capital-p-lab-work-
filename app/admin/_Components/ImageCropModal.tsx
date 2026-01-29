@@ -1,10 +1,11 @@
-// components/ImageCropModal.tsx
+// ImageCropModal-FAST.tsx
+// ⚡ High-Performance Image Crop Component
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { X, RotateCw, Maximize2, Check, Crop as CropIcon } from 'lucide-react';
+import { X, RotateCw, Maximize2, Check, Crop as CropIcon, Loader2 } from 'lucide-react';
 
 interface ImageCropModalProps {
   imageUrl: string;
@@ -13,7 +14,6 @@ interface ImageCropModalProps {
   defaultAspectRatio?: number;
 }
 
-// Predefined aspect ratios
 const ASPECT_RATIOS = [
   { label: 'Free', value: null, desc: 'Any size' },
   { label: '16:9', value: 16 / 9, desc: 'Landscape' },
@@ -41,10 +41,14 @@ export default function ImageCropModal({
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<number | null>(
     defaultAspectRatio ?? null
   );
+  
+  // ⚡ Processing state for instant feedback
+  const [isProcessing, setIsProcessing] = useState(false);
+  
   const imgRef = useRef<HTMLImageElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const processingRef = useRef(false); // Prevent double-processing
 
-  // Update crop when aspect ratio changes
   useEffect(() => {
     if (selectedAspectRatio !== null) {
       const newCrop: Crop = {
@@ -68,58 +72,118 @@ export default function ImageCropModal({
     }
   }, [selectedAspectRatio]);
 
+  // ⚡ OPTIMIZED: Non-blocking, fast image processing
   const handleCropComplete = async () => {
+    // Validation
     if (!completedCrop || !imgRef.current || !previewCanvasRef.current) {
       return;
     }
 
-    const image = imgRef.current;
-    const canvas = previewCanvasRef.current;
-    const crop = completedCrop;
-
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return;
-
-    const pixelRatio = window.devicePixelRatio || 1;
-
-    canvas.width = crop.width * pixelRatio * scaleX;
-    canvas.height = crop.height * pixelRatio * scaleY;
-
-    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    ctx.imageSmoothingQuality = 'high';
-
-    if (rotation !== 0) {
-      const centerX = (crop.width * scaleX) / 2;
-      const centerY = (crop.height * scaleY) / 2;
-      ctx.translate(centerX, centerY);
-      ctx.rotate((rotation * Math.PI) / 180);
-      ctx.translate(-centerX, -centerY);
+    // Prevent double-clicks
+    if (processingRef.current) {
+      return;
     }
 
-    ctx.drawImage(
-      image,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
-      0,
-      0,
-      crop.width * scaleX,
-      crop.height * scaleY
-    );
+    // 🚀 INSTANT UI feedback
+    processingRef.current = true;
+    setIsProcessing(true);
 
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const croppedUrl = URL.createObjectURL(blob);
-        onCropComplete(croppedUrl);
-      },
-      'image/jpeg',
-      0.95
-    );
+    // Use requestAnimationFrame to prevent UI blocking
+    requestAnimationFrame(async () => {
+      try {
+        const image = imgRef.current!;
+        const canvas = previewCanvasRef.current!;
+        const crop = completedCrop;
+
+        // Calculate scale factors
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+
+        // ⚡ Performance: Optimized context settings
+        const ctx = canvas.getContext('2d', { 
+          willReadFrequently: false,
+          alpha: false // Faster for JPEG output
+        });
+
+        if (!ctx) {
+          throw new Error('Failed to get canvas context');
+        }
+
+        // ⚡ Performance: Cap pixel ratio at 2 to prevent huge canvases
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+        // Calculate output dimensions
+        const outputWidth = crop.width * scaleX;
+        const outputHeight = crop.height * scaleY;
+
+        // ⚡ Performance: Limit max dimensions to prevent memory issues
+        const MAX_DIMENSION = 3000;
+        let scale = 1;
+        if (outputWidth > MAX_DIMENSION || outputHeight > MAX_DIMENSION) {
+          scale = Math.min(MAX_DIMENSION / outputWidth, MAX_DIMENSION / outputHeight);
+        }
+
+        // Set canvas size
+        canvas.width = outputWidth * pixelRatio * scale;
+        canvas.height = outputHeight * pixelRatio * scale;
+
+        // Configure context for quality
+        ctx.setTransform(pixelRatio * scale, 0, 0, pixelRatio * scale, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        // Handle rotation if needed
+        if (rotation !== 0) {
+          const centerX = outputWidth / 2;
+          const centerY = outputHeight / 2;
+          ctx.translate(centerX, centerY);
+          ctx.rotate((rotation * Math.PI) / 180);
+          ctx.translate(-centerX, -centerY);
+        }
+
+        // Draw the cropped image
+        ctx.drawImage(
+          image,
+          crop.x * scaleX,
+          crop.y * scaleY,
+          outputWidth,
+          outputHeight,
+          0,
+          0,
+          outputWidth,
+          outputHeight
+        );
+
+        // ⚡ Convert to blob with optimized quality
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              console.error('Failed to create blob');
+              setIsProcessing(false);
+              processingRef.current = false;
+              alert('Failed to process image. Please try again.');
+              return;
+            }
+
+            // Create URL and pass to parent
+            const croppedUrl = URL.createObjectURL(blob);
+            
+            // Let parent handle the upload
+            onCropComplete(croppedUrl);
+            
+            // Note: Don't reset processing state here - parent will close modal
+          },
+          'image/jpeg',
+          0.90 // Balanced quality/speed (90% is plenty good for web)
+        );
+
+      } catch (error) {
+        console.error('Error processing crop:', error);
+        alert('Failed to process image. Please try again.');
+        setIsProcessing(false);
+        processingRef.current = false;
+      }
+    });
   };
 
   const handleRotate = () => {
@@ -152,8 +216,28 @@ export default function ImageCropModal({
     setSelectedAspectRatio(ratio);
   };
 
+  const handleCancel = () => {
+    if (!isProcessing) {
+      onCancel();
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-in fade-in duration-200">
+      
+      {/* ⚡ Processing Overlay - Shows immediately */}
+      {isProcessing && (
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[70] pointer-events-none">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm animate-in zoom-in duration-200">
+            <Loader2 className="w-16 h-16 text-[#755eb1] animate-spin" />
+            <div className="text-center">
+              <p className="text-lg font-bold text-gray-900 mb-2">Processing Image...</p>
+              <p className="text-sm text-gray-600">This will only take a moment</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
         
         {/* Header */}
@@ -168,17 +252,19 @@ export default function ImageCropModal({
             </div>
           </div>
           <button
-            onClick={onCancel}
-            className="p-2 hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded-lg transition-colors"
+            onClick={handleCancel}
+            disabled={isProcessing}
+            className="p-2 hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Close"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Main Content - Split Layout */}
+        {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
           
-          {/* Left Side - Image Area */}
+          {/* Image Area */}
           <div className="flex-1 p-6 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 overflow-auto">
             <div className="relative max-w-full max-h-full">
               <ReactCrop
@@ -187,6 +273,7 @@ export default function ImageCropModal({
                 onComplete={(c) => setCompletedCrop(c)}
                 aspect={selectedAspectRatio ?? undefined}
                 className="max-w-full"
+                disabled={isProcessing}
               >
                 <img
                   ref={imgRef}
@@ -195,18 +282,21 @@ export default function ImageCropModal({
                   style={{
                     transform: `rotate(${rotation}deg)`,
                     maxHeight: 'calc(95vh - 200px)',
-                    maxWidth: '100%'
+                    maxWidth: '100%',
+                    opacity: isProcessing ? 0.5 : 1,
+                    pointerEvents: isProcessing ? 'none' : 'auto',
+                    transition: 'opacity 0.2s'
                   }}
-                  className="transition-transform duration-300 rounded-lg shadow-xl"
+                  className="rounded-lg shadow-xl"
                 />
               </ReactCrop>
             </div>
           </div>
 
-          {/* Right Side - Controls */}
+          {/* Controls Panel */}
           <div className="w-80 border-l border-gray-200 bg-white flex flex-col">
             
-            {/* Aspect Ratio Section */}
+            {/* Aspect Ratios */}
             <div className="p-6 border-b border-gray-200 flex-shrink-0">
               <label className="text-sm font-bold text-gray-900 mb-4 block">Aspect Ratio</label>
               <div className="space-y-2">
@@ -214,7 +304,8 @@ export default function ImageCropModal({
                   <button
                     key={ratio.label}
                     onClick={() => handleAspectRatioChange(ratio.value)}
-                    className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-200 border-2 ${
+                    disabled={isProcessing}
+                    className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-200 border-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                       selectedAspectRatio === ratio.value
                         ? 'bg-gray-900 text-white border-gray-900 shadow-md'
                         : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -244,20 +335,22 @@ export default function ImageCropModal({
               </div>
             </div>
 
-            {/* Tools Section */}
+            {/* Tools */}
             <div className="p-6 border-b border-gray-200 flex-shrink-0">
               <label className="text-sm font-bold text-gray-900 mb-4 block">Tools</label>
               <div className="space-y-2">
                 <button
                   onClick={handleRotate}
-                  className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition-all duration-200 flex items-center gap-3 text-sm font-medium"
+                  disabled={isProcessing}
+                  className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition-all duration-200 flex items-center gap-3 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <RotateCw size={18} />
                   <span>Rotate 90°</span>
                 </button>
                 <button
                   onClick={handleFitImage}
-                  className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition-all duration-200 flex items-center gap-3 text-sm font-medium"
+                  disabled={isProcessing}
+                  className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition-all duration-200 flex items-center gap-3 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Maximize2 size={18} />
                   <span>Fit to View</span>
@@ -265,7 +358,7 @@ export default function ImageCropModal({
               </div>
             </div>
 
-            {/* Info Section */}
+            {/* Info */}
             <div className="p-6 flex-1 flex flex-col justify-end">
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between text-sm">
@@ -293,32 +386,40 @@ export default function ImageCropModal({
           </div>
         </div>
 
-        {/* Hidden preview canvas */}
-        <canvas
-          ref={previewCanvasRef}
-          style={{ display: 'none' }}
-        />
+        {/* Hidden Canvas */}
+        <canvas ref={previewCanvasRef} style={{ display: 'none' }} />
 
-        {/* Footer - Action Buttons */}
+        {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between flex-shrink-0">
           <div className="text-xs text-gray-500 space-y-1">
-            <div>💡 Drag to select crop area</div>
-            <div>📐 Use corners to resize</div>
+            <div>💡 Drag to select area</div>
+            <div>📐 Resize with corners</div>
           </div>
           
           <div className="flex items-center gap-3">
             <button
-              onClick={onCancel}
-              className="px-6 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-semibold rounded-xl transition-all duration-200 border border-gray-200"
+              onClick={handleCancel}
+              disabled={isProcessing}
+              className="px-6 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-semibold rounded-xl transition-all duration-200 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               onClick={handleCropComplete}
-              className="px-8 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg"
+              disabled={isProcessing || !completedCrop}
+              className="px-8 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Check size={16} />
-              Apply Crop
+              {isProcessing ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <Check size={16} />
+                  <span>Apply Crop</span>
+                </>
+              )}
             </button>
           </div>
         </div>

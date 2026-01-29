@@ -56,6 +56,41 @@ export default function BlogPostClient({ post, relatedPosts, readingTime }: Blog
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Track view with debouncing (add after other useEffect hooks)
+useEffect(() => {
+  let timeoutId: NodeJS.Timeout;
+  
+  const trackView = async () => {
+    // Check if already viewed in this session
+    const viewedKey = `blog_viewed_${post.id}`;
+    const hasViewed = sessionStorage.getItem(viewedKey);
+    
+    if (!hasViewed) {
+      // Debounce: Wait 3 seconds before tracking
+      // (ensures user actually reads, not just bounces)
+      timeoutId = setTimeout(async () => {
+        try {
+          await fetch('/api/blog/view', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ blogId: post.id }),
+          });
+          
+          sessionStorage.setItem(viewedKey, 'true');
+        } catch (error) {
+          console.error('Failed to track view:', error);
+        }
+      }, 3000); // 3 second debounce
+    }
+  };
+
+  trackView();
+  
+  return () => {
+    if (timeoutId) clearTimeout(timeoutId);
+  };
+}, [post.id]);
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     

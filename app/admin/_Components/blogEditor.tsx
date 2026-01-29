@@ -1,4 +1,4 @@
-// components/admin/BlogEditorModal.tsx
+// app/admin/_Components/blogEditor.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -13,7 +13,7 @@ import {
   doc, updateDoc, addDoc, collection, serverTimestamp, 
   query, where, getDocs 
 } from 'firebase/firestore';
-import { useEditor, EditorContent, mergeAttributes } from '@tiptap/react'; // Added mergeAttributes
+import { useEditor, EditorContent, mergeAttributes } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
@@ -24,7 +24,7 @@ import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Heading from '@tiptap/extension-heading';
 import FontFamily from '@tiptap/extension-font-family';
-import ImageCropModal from './ImageCropModal';
+import ImageSelectionModal from './ImageSelectionModal';
 import { 
   uploadToCloudinary, 
   blobUrlToFile, 
@@ -50,10 +50,8 @@ const FontSize = TextStyle.extend({
 });
 
 // Custom Heading Extension with Tailwind Classes
-// Custom Heading Extension with Tailwind Classes
 const CustomHeading = Heading.extend({
   renderHTML({ node, HTMLAttributes }) {
-    // Access options safely. The levels are set in .configure() inside useEditor
     const hasLevels = this.options.levels && this.options.levels.length > 0;
     const level = hasLevels && this.options.levels.includes(node.attrs.level) 
       ? node.attrs.level 
@@ -65,7 +63,6 @@ const CustomHeading = Heading.extend({
       3: 'text-2xl font-bold mb-4 mt-6 text-gray-900 leading-snug',
     };
 
-    // Fallback if class isn't defined for the level
     const className = classes[level] || classes[3];
 
     return [
@@ -77,7 +74,6 @@ const CustomHeading = Heading.extend({
     ];
   },
 });
-
 
 // Helper Functions
 const calculateReadingTime = (content: string): number => {
@@ -155,8 +151,8 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingFeaturedImage, setUploadingFeaturedImage] = useState(false);
   
-  // Image crop state
-  const [cropModalOpen, setCropModalOpen] = useState(false);
+  // Image selection/crop state
+  const [selectionModalOpen, setSelectionModalOpen] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'featured' | 'editor'>('featured');
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
@@ -175,7 +171,6 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
       }));
     }
 
-    // Track original content images
     if (blog?.content) {
       originalContentImages.current = extractImagesFromHTML(blog.content);
     }
@@ -186,7 +181,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        heading: false, // Disable default heading to use our CustomHeading
+        heading: false,
         bulletList: { HTMLAttributes: { class: 'list-disc pl-6 my-6 space-y-3' } },
         orderedList: { HTMLAttributes: { class: 'list-decimal pl-6 my-6 space-y-3' } },
         listItem: { HTMLAttributes: { class: 'text-gray-900 text-lg leading-relaxed' } },
@@ -209,7 +204,6 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     }
   });
 
-  // Handlers
   const handleTitleChange = (title: string) => {
     setFormData(prev => {
       const newState = { ...prev, title };
@@ -260,7 +254,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     reader.onload = (e) => {
       setImageToCrop(e.target?.result as string);
       setCropType('featured');
-      setCropModalOpen(true);
+      setSelectionModalOpen(true);
     };
     reader.readAsDataURL(file);
   };
@@ -278,46 +272,90 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     reader.onload = (e) => {
       setImageToCrop(e.target?.result as string);
       setCropType('editor');
-      setCropModalOpen(true);
+      setSelectionModalOpen(true);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleCropComplete = async (croppedImageUrl: string) => {
-    setCropModalOpen(false);
+  // ⚡ NEW: Add image directly without cropping
+  const handleAddDirectly = async (imageUrl: string) => {
+    setSelectionModalOpen(false);
+    
+    if (cropType === 'featured') {
+      setUploadingFeaturedImage(true);
+    } else {
+      setUploadingImage(true);
+    }
     
     try {
+      if (!pendingImageFile) {
+        throw new Error('No file selected');
+      }
+
+      const uploadedUrl = await uploadToCloudinary(pendingImageFile);
+      
+      // Track uploaded image
+      uploadedImagesThisSession.current.push(uploadedUrl);
+      
       if (cropType === 'featured') {
-        setUploadingFeaturedImage(true);
-        const croppedFile = await blobUrlToFile(croppedImageUrl, pendingImageFile?.name || 'cropped-image.jpg');
-        const uploadedUrl = await uploadToCloudinary(croppedFile);
-        
-        // Track uploaded image
-        uploadedImagesThisSession.current.push(uploadedUrl);
-        
-        // If replacing existing featured image, mark old one for deletion
         const oldFeaturedImage = formData.featuredImage;
-        
         setFormData(prev => ({ ...prev, featuredImage: uploadedUrl }));
         
-        // Cleanup old featured image immediately if it's not the original
+        // Non-blocking cleanup
         if (oldFeaturedImage && oldFeaturedImage !== originalFeaturedImage.current) {
-          await deleteCloudinaryImage(oldFeaturedImage);
+          deleteCloudinaryImage(oldFeaturedImage).catch(err => 
+            console.error('Background cleanup failed:', err)
+          );
         }
-        
       } else if (cropType === 'editor' && editor) {
-        setUploadingImage(true);
-        const croppedFile = await blobUrlToFile(croppedImageUrl, pendingImageFile?.name || 'cropped-image.jpg');
-        const uploadedUrl = await uploadToCloudinary(croppedFile);
+        editor.chain().focus().setImage({ src: uploadedUrl }).run();
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingFeaturedImage(false);
+      setUploadingImage(false);
+      setImageToCrop(null);
+      setPendingImageFile(null);
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    }
+  };
+
+  // ✅ Handle crop complete (existing optimized function)
+  const handleCropComplete = async (croppedImageUrl: string) => {
+    // 🚀 IMMEDIATELY close selection modal and show loading state
+    setSelectionModalOpen(false);
+    
+    if (cropType === 'featured') {
+      setUploadingFeaturedImage(true);
+    } else {
+      setUploadingImage(true);
+    }
+    
+    try {
+      const croppedFile = await blobUrlToFile(croppedImageUrl, pendingImageFile?.name || 'cropped-image.jpg');
+      const uploadedUrl = await uploadToCloudinary(croppedFile);
+      
+      // Track uploaded image
+      uploadedImagesThisSession.current.push(uploadedUrl);
+      
+      if (cropType === 'featured') {
+        const oldFeaturedImage = formData.featuredImage;
+        setFormData(prev => ({ ...prev, featuredImage: uploadedUrl }));
         
-        // Track uploaded image
-        uploadedImagesThisSession.current.push(uploadedUrl);
-        
+        // 🔥 Non-blocking cleanup - don't wait for this
+        if (oldFeaturedImage && oldFeaturedImage !== originalFeaturedImage.current) {
+          deleteCloudinaryImage(oldFeaturedImage).catch(err => 
+            console.error('Background cleanup failed:', err)
+          );
+        }
+      } else if (cropType === 'editor' && editor) {
         editor.chain().focus().setImage({ src: uploadedUrl }).run();
       }
     } catch (error) {
       console.error('Error uploading cropped image:', error);
-      alert('Failed to upload cropped image');
+      alert('Failed to upload cropped image. Please try again.');
     } finally {
       setUploadingFeaturedImage(false);
       setUploadingImage(false);
@@ -327,8 +365,8 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     }
   };
 
-  const handleCropCancel = async () => {
-    setCropModalOpen(false);
+  const handleSelectionCancel = async () => {
+    setSelectionModalOpen(false);
     setImageToCrop(null);
     setPendingImageFile(null);
   };
@@ -337,22 +375,22 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
     const imageToRemove = formData.featuredImage;
     setFormData(prev => ({ ...prev, featuredImage: '' }));
     
-    // Delete from Cloudinary if it was uploaded this session
+    // Non-blocking cleanup
     if (imageToRemove && uploadedImagesThisSession.current.includes(imageToRemove)) {
-      await deleteCloudinaryImage(imageToRemove);
+      deleteCloudinaryImage(imageToRemove).catch(err => 
+        console.error('Failed to delete image:', err)
+      );
       uploadedImagesThisSession.current = uploadedImagesThisSession.current.filter(url => url !== imageToRemove);
     }
   };
 
   const handleCancel = async () => {
-    // Cleanup any images uploaded during this session that won't be saved
     const imagesToCleanup = uploadedImagesThisSession.current;
     
     if (imagesToCleanup.length > 0) {
-      // Delete images uploaded this session
-      for (const imageUrl of imagesToCleanup) {
-        await deleteCloudinaryImage(imageUrl);
-      }
+      // Fire and forget cleanup
+      Promise.all(imagesToCleanup.map(url => deleteCloudinaryImage(url)))
+        .catch(err => console.error('Cleanup failed:', err));
     }
     
     onClose();
@@ -409,23 +447,25 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
         ...(formData.status === 'published' && !blog?.publishedAt && { publishedAt: serverTimestamp() })
       };
 
-      // If editing existing blog, cleanup unused images
       if (blog) {
-        // Delete old featured image if it changed
+        // Non-blocking cleanup of old images
         if (originalFeaturedImage.current && 
             originalFeaturedImage.current !== formData.featuredImage &&
             formData.featuredImage) {
-          await deleteCloudinaryImage(originalFeaturedImage.current);
+          deleteCloudinaryImage(originalFeaturedImage.current).catch(err => 
+            console.error('Failed to cleanup old featured image:', err)
+          );
         }
 
-        // Find and delete unused content images
         const currentContentImages = extractImagesFromHTML(currentContent);
         const unusedImages = originalContentImages.current.filter(
           img => !currentContentImages.includes(img) && img !== formData.featuredImage
         );
         
-        for (const unusedImage of unusedImages) {
-          await deleteCloudinaryImage(unusedImage);
+        // Fire and forget cleanup
+        if (unusedImages.length > 0) {
+          Promise.all(unusedImages.map(img => deleteCloudinaryImage(img)))
+            .catch(err => console.error('Failed to cleanup unused images:', err));
         }
 
         await updateDoc(doc(db, 'blog-posts', blog.id), blogData);
@@ -436,9 +476,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
         });
       }
 
-      // Clear tracking
       uploadedImagesThisSession.current = [];
-      
       onSave();
     } catch (error) {
       console.error('Error saving blog:', error);
@@ -467,6 +505,19 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
           {/* Scrollable Content */}
           <div className="px-6 py-6 space-y-8 max-h-[calc(100vh-200px)] overflow-y-auto">
             
+            {/* ✅ Loading Overlay for Better UX */}
+            {(uploadingFeaturedImage || uploadingImage) && (
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[100] pointer-events-none">
+                <div className="bg-white rounded-xl p-6 shadow-2xl flex items-center gap-4">
+                  <RefreshCw className="w-8 h-8 animate-spin text-[#755eb1]" />
+                  <div>
+                    <p className="font-bold text-gray-900">Uploading image...</p>
+                    <p className="text-sm text-gray-500">Please wait</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Metadata Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column */}
@@ -598,7 +649,8 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                         />
                         <button
                           onClick={handleRemoveFeaturedImage}
-                          className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                          disabled={uploadingFeaturedImage}
+                          className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
                         >
                           <X size={16} />
                         </button>
@@ -693,7 +745,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                   </select>
                 </div>
 
-                {/* Headings - FIXED */}
+                {/* Headings */}
                 <div className="flex items-center gap-1 px-2 border-r border-gray-300">
                   <button 
                     type="button" 
@@ -737,7 +789,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 {/* Media */}
                 <div className="flex items-center gap-1 px-2 border-r border-gray-300">
                   <button type="button" onClick={addLink} className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive('link') ? 'bg-gray-300' : ''}`} title="Add Link"><LinkIcon size={18} /></button>
-                  <label className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer ${uploadingImage ? 'opacity-50' : ''}`} title="Upload & Crop Image">
+                  <label className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer ${uploadingImage ? 'opacity-50 cursor-not-allowed' : ''}`} title="Upload & Crop Image">
                     <ImageIcon size={18} />
                     <input type="file" accept="image/*" onChange={handleEditorImageUpload} disabled={uploadingImage} className="hidden" />
                   </label>
@@ -786,13 +838,16 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
         </div>
       </div>
 
-      {/* Image Crop Modal */}
-      {cropModalOpen && imageToCrop && (
-        <ImageCropModal
+      {/* Image Selection Modal */}
+      {selectionModalOpen && imageToCrop && pendingImageFile && (
+        <ImageSelectionModal
+          imageFile={pendingImageFile}
           imageUrl={imageToCrop}
+          onAddDirectly={handleAddDirectly}
           onCropComplete={handleCropComplete}
-          onCancel={handleCropCancel}
+          onCancel={handleSelectionCancel}
           defaultAspectRatio={cropType === 'featured' ? 16 / 9 : undefined}
+          type={cropType}
         />
       )}
     </>

@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/blog`,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.9, // Increased slightly since it's a main section
+      priority: 0.9, 
     },
   ]
 
@@ -25,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const q = query(
       collection(db, "blog-posts"), 
       where("status", "==", "published"),
-      orderBy("publishedAt", "desc") // Add ordering for consistency
+      orderBy("publishedAt", "desc") 
     );
     
     const querySnapshot = await getDocs(q);
@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           url: `${baseUrl}/blog/${data.slug}`,
           lastModified: data.publishedAt?.toDate?.() || data.createdAt?.toDate?.() || new Date(),
           changeFrequency: 'weekly',
-          priority: 0.8, // Slightly higher priority for individual posts
+          priority: 0.8, 
         });
       }
     });
@@ -46,10 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [...staticRoutes, ...blogRoutes];
   } catch (error) {
     console.error("Error generating sitemap:", error);
-    // Return static routes even if blog fetch fails
     return staticRoutes;
   }
 }
 
-// Enable caching for sitemap (Next.js 14+)
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600; 
