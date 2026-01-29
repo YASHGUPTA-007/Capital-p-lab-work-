@@ -110,7 +110,7 @@ export const Hero = memo(() => {
         <div className="relative z-20 flex-shrink-0 group flex flex-col items-center">
           {/* Client Req: Organization Name Above Logo with specific color */}
           <div className="mb-6 text-center">
-            <h2 className="text-[#4f7f5d] text-3xl lg:text-4xl font-extrabold tracking-tight drop-shadow-sm">
+            <h2 className="text-[#4f7f5d] text-4xl lg:text-5xl font-extrabold tracking-tight drop-shadow-sm">
               The Capital P Lab
             </h2>
             <div className="mt-2 h-[3px] w-24 mx-auto bg-[#4f7f5d]/30 rounded-full" />
@@ -139,10 +139,10 @@ export const Hero = memo(() => {
             <span className="block text-[#2b2e34] font-serif italic text-3xl lg:text-4xl mb-3 h-[1.5em]">
               <Typewriter words={typewriterWords} />
             </span>
-            <h1 className="text-[#755eb1] text-[7.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
+            <h1 className="text-[#755eb1] text-[6.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
               Empowering
             </h1>
-            <h1 className="text-[#755eb1] text-[7.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
+            <h1 className="text-[#755eb1] text-[6.5vw] font-black tracking-tighter leading-[0.9] uppercase drop-shadow-sm">
               Policy Action
             </h1>
             <div className="mt-8 relative">
@@ -158,13 +158,13 @@ export const Hero = memo(() => {
 
 
       {/* --- MOBILE LAYOUT - Client Requirements Maintained --- */}
-      <div className="md:hidden relative z-10 w-full h-full flex flex-col items-center justify-between py-10 px-6">
+<div className="md:hidden relative z-10 w-full h-full flex flex-col items-center justify-between pt-20 pb-10 px-6">
         
         {/* Top: Organization Name + Logo */}
         <div className="flex-shrink-0 mt-4 flex flex-col items-center">
           {/* Client Req: Name above logo with specific color */}
           <div className="mb-5 text-center">
-            <h2 className="text-[#4f7f5d] text-2xl font-black tracking-tight">
+            <h2 className="text-[#4f7f5d] text-3xl font-black tracking-tight">
               The Capital P Lab
             </h2>
             <div className="mt-1 h-[2px] w-16 mx-auto bg-[#4f7f5d]/40" />
@@ -194,13 +194,13 @@ export const Hero = memo(() => {
           </div>
           
           <div className="space-y-0">
-            <h1 className="text-[#755eb1] text-[14vw] font-black tracking-tighter leading-[0.85] uppercase">
+            <h1 className="text-[#755eb1] text-[10vw] font-black tracking-tighter leading-[0.85] uppercase">
               Empowering
             </h1>
-            <h1 className="text-[#755eb1] text-[14vw] font-black tracking-tighter leading-[0.85] uppercase">
+            <h1 className="text-[#755eb1] text-[10vw] font-black tracking-tighter leading-[0.85] uppercase">
               Policy
             </h1>
-            <h1 className="text-[#755eb1] text-[14vw] font-black tracking-tighter leading-[0.85] uppercase">
+            <h1 className="text-[#755eb1] text-[10vw] font-black tracking-tighter leading-[0.85] uppercase">
               Action
             </h1>
           </div>
