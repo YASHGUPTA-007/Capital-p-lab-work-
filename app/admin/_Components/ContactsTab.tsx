@@ -419,8 +419,8 @@ export default function ContactsTab({
       <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
         {/* Header */}
         <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Contact Inquiries</h1>
-          <p className="text-sm md:text-base text-gray-600">Manage and respond to customer inquiries efficiently</p>
+          <h1 className="text-2xl md:text-2xl font-bold text-gray-900 mb-2">Contact Inquiries</h1>
+
         </div>
 {/* Stats */}
 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
