@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo, memo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 
-// --- TYPEWRITER COMPONENT ---
 const Typewriter = memo(({ words }: { words: string[] }) => {
   const [index, setIndex] = useState(0)
   const [subIndex, setSubIndex] = useState(0)
