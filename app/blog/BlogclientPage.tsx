@@ -1,7 +1,7 @@
 // app/blog/BlogClientPage.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -19,6 +19,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Navbar } from "../_components/landingPage/Navbar";
 import { Footer } from "../_components/landingPage/Footer";
+import Lenis from "lenis";
 
 interface BlogPost {
   id: string;
@@ -55,6 +56,79 @@ export default function BlogClientPage({ initialPosts, initialCategories }: Blog
   >("idle");
   const [newsletterMessage, setNewsletterMessage] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+    const lenisRef = useRef<Lenis | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const isDesktop = window.innerWidth >= 768;
+    if (!isDesktop) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      infinite: false,
+    });
+
+    lenisRef.current = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      rafRef.current = requestAnimationFrame(raf);
+    }
+
+    rafRef.current = requestAnimationFrame(raf);
+
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const nowDesktop = window.innerWidth >= 768;
+        if (!nowDesktop && lenisRef.current) {
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+          lenisRef.current.destroy();
+          lenisRef.current = null;
+        } else if (nowDesktop && !lenisRef.current) {
+          const newLenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 1,
+            touchMultiplier: 2,
+            infinite: false,
+          });
+          lenisRef.current = newLenis;
+          
+          function newRaf(time: number) {
+            newLenis.raf(time);
+            rafRef.current = requestAnimationFrame(newRaf);
+          }
+          rafRef.current = requestAnimationFrame(newRaf);
+        }
+      }, 150);
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Show newsletter popup after 8 seconds if not shown before

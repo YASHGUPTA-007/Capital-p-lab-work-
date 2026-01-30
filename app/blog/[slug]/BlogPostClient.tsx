@@ -1,7 +1,7 @@
 // app/blog/[slug]/BlogPostClient.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Tag, ArrowLeft, Twitter, Facebook, Linkedin, Clock, Share2, Bookmark, ChevronRight, TrendingUp, Mail, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { Navbar } from '@/app/_components/landingPage/Navbar';
 import { Footer } from '@/app/_components/landingPage/Footer';
 import '../blog-content.css';
+import Lenis from 'lenis';
 
 interface BlogPost {
   id: string;
@@ -42,6 +43,80 @@ export default function BlogPostClient({ post, relatedPosts, readingTime }: Blog
   });
   const [newsletterStatus, setNewsletterStatus] = useState('idle');
   const [newsletterMessage, setNewsletterMessage] = useState('');
+
+   const lenisRef = useRef<Lenis | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+    useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const isDesktop = window.innerWidth >= 768;
+    if (!isDesktop) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      infinite: false,
+    });
+
+    lenisRef.current = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      rafRef.current = requestAnimationFrame(raf);
+    }
+
+    rafRef.current = requestAnimationFrame(raf);
+
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const nowDesktop = window.innerWidth >= 768;
+        if (!nowDesktop && lenisRef.current) {
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+          lenisRef.current.destroy();
+          lenisRef.current = null;
+        } else if (nowDesktop && !lenisRef.current) {
+          const newLenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 1,
+            touchMultiplier: 2,
+            infinite: false,
+          });
+          lenisRef.current = newLenis;
+          
+          function newRaf(time: number) {
+            newLenis.raf(time);
+            rafRef.current = requestAnimationFrame(newRaf);
+          }
+          rafRef.current = requestAnimationFrame(newRaf);
+        }
+      }, 150);
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
+    };
+  }, []);
+  
 
   useEffect(() => {
     const handleScroll = () => {
