@@ -83,8 +83,8 @@ export const ContactForm = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#2b2e34] mb-1">Email Us</p>
-                  <a href="mailto:contact@thecapitalplab.com" className="text-sm text-[#4f75d] hover:text-[#755eb1] transition-colors">
-                    contact@capitalplab.com
+                  <a href="mailto:contact@capitalp.org" className="text-sm text-[#4f75d] hover:text-[#755eb1] transition-colors">
+                   contact@capitalp.org
                   </a>
                 </div>
               </div>

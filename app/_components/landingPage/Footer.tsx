@@ -24,11 +24,11 @@ export const Footer = () => {
                   
                  
                   <a 
-                    href="mailto:contact@thecapitalplab.com" 
+                    href="mailto:contact@capitalp.org" 
                     className="group inline-flex items-center gap-4 text-2xl md:text-3xl font-serif text-white hover:text-[#c7d6c1] transition-colors"
                   >
                      <span className="border-b-2 border-[#c7d6c1] pb-1 group-hover:border-white">
-                        contact@thecapitalplab.com
+                       contact@capitalp.org
                      </span>
                      <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
@@ -66,7 +66,7 @@ export const Footer = () => {
                            <ul className="space-y-4 text-sm text-white/80 font-medium">
                                {/* <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
                                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li> */}
-                               <li><a href="mailto:contact@thecapitalplab.com" className="hover:text-white transition-colors">Email</a></li>
+                               <li><a href="mailto:contact@capitalp.org" className="hover:text-white transition-colors">Email</a></li>
                            </ul>
                        </div>
                    </div>
