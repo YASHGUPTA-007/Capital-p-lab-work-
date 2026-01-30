@@ -33,7 +33,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   overscroll-behavior: none;
   overflow-x: hidden;
-  overflow-y: auto; /* ADD THIS LINE */
+  overflow-y: auto;  /* ← CRITICAL: Enables scroll on all devices */
   min-height: 100vh;
 }
 
@@ -72,11 +72,6 @@ iframe {
   html {
     scroll-behavior: smooth;
   }
-  
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
 }
 
 /* Prevent scrollbar from causing layout shift */
@@ -85,4 +80,3 @@ iframe {
     overflow-y: scroll; /* Always show scrollbar space */
   }
 }
-
