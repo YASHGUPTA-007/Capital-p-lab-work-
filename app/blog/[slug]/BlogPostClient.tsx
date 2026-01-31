@@ -47,75 +47,77 @@ export default function BlogPostClient({ post, relatedPosts, readingTime }: Blog
    const lenisRef = useRef<Lenis | null>(null);
   const rafRef = useRef<number | null>(null);
 
-    useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const isDesktop = window.innerWidth >= 768;
-    if (!isDesktop) return;
+useEffect(() => {
+  if (typeof window === 'undefined') return;
+  
+  const isDesktop = window.innerWidth >= 768;
+  if (!isDesktop) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-      infinite: false,
-    });
+  const lenis = new Lenis({
+    duration: 0.8,              // ✅ Reduced from 1.2 - faster, less jitter
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 0.8,       // ✅ Reduced from 1 - smoother scroll
+    touchMultiplier: 1.5,       // ✅ Reduced from 2 - better mobile
+    infinite: false,
+    syncTouch: true,            // ✅ NEW - improves touch performance
+  });
 
-    lenisRef.current = lenis;
+  lenisRef.current = lenis;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      rafRef.current = requestAnimationFrame(raf);
-    }
-
+  function raf(time: number) {
+    lenis.raf(time);
     rafRef.current = requestAnimationFrame(raf);
+  }
 
-    let resizeTimer: NodeJS.Timeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const nowDesktop = window.innerWidth >= 768;
-        if (!nowDesktop && lenisRef.current) {
-          if (rafRef.current) cancelAnimationFrame(rafRef.current);
-          lenisRef.current.destroy();
-          lenisRef.current = null;
-        } else if (nowDesktop && !lenisRef.current) {
-          const newLenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-            infinite: false,
-          });
-          lenisRef.current = newLenis;
-          
-          function newRaf(time: number) {
-            newLenis.raf(time);
-            rafRef.current = requestAnimationFrame(newRaf);
-          }
-          rafRef.current = requestAnimationFrame(newRaf);
-        }
-      }, 150);
-    };
+  rafRef.current = requestAnimationFrame(raf);
 
-    window.addEventListener('resize', handleResize, { passive: true });
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimer);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (lenisRef.current) {
+  let resizeTimer: NodeJS.Timeout;
+  const handleResize = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const nowDesktop = window.innerWidth >= 768;
+      if (!nowDesktop && lenisRef.current) {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
         lenisRef.current.destroy();
         lenisRef.current = null;
+      } else if (nowDesktop && !lenisRef.current) {
+        const newLenis = new Lenis({
+          duration: 0.8,          // ✅ Match optimized config
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          orientation: 'vertical',
+          gestureOrientation: 'vertical',
+          smoothWheel: true,
+          wheelMultiplier: 0.8,   // ✅ Match optimized config
+          touchMultiplier: 1.5,   // ✅ Match optimized config
+          infinite: false,
+          syncTouch: true,        // ✅ Match optimized config
+        });
+        lenisRef.current = newLenis;
+        
+        function newRaf(time: number) {
+          newLenis.raf(time);
+          rafRef.current = requestAnimationFrame(newRaf);
+        }
+        rafRef.current = requestAnimationFrame(newRaf);
       }
-    };
-  }, []);
+    }, 150);
+  };
+
+  window.addEventListener('resize', handleResize, { passive: true });
+
+  return () => {
+    window.removeEventListener('resize', handleResize);
+    clearTimeout(resizeTimer);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (lenisRef.current) {
+      lenisRef.current.destroy();
+      lenisRef.current = null;
+    }
+  };
+}, []);
   
 
   useEffect(() => {
@@ -298,18 +300,7 @@ useEffect(() => {
       />
 
       <div className="fixed right-6 bottom-6 flex flex-col gap-3 z-40">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${
-            isBookmarked 
-              ? 'bg-[#755eb1] text-white' 
-              : 'bg-white text-[#755eb1] hover:bg-[#755eb1] hover:text-white'
-          }`}
-        >
-          <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} />
-        </motion.button>
+     
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}

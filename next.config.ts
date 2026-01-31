@@ -14,6 +14,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',  // ✅ Your blog images
+        port: '',
+        pathname: '/**',
+      },
     ],
     // Image optimization settings
     formats: ['image/avif', 'image/webp'],
@@ -23,8 +29,6 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Add quality configuration
-    qualities: [75, 85],
   },
   
   // Enable compression
@@ -33,14 +37,14 @@ const nextConfig = {
   // Reduce bundle size
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', '@tiptap/react', '@tiptap/starter-kit'],
   },
   
   // Production optimizations
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
   
-  // React strict mode for better performance detection
+  // React strict mode
   reactStrictMode: true,
 }
 

@@ -159,4 +159,4 @@ export default async function BlogPage() {
 }
 
 // Enable ISR (Incremental Static Regeneration)
-export const revalidate = 60; // Revalidate every hour
+export const revalidate = 60;  
