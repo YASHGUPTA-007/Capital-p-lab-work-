@@ -1,4 +1,7 @@
-/* Override Tailwind prose defaults to respect inline styles */
+/* ========================================
+   INLINE STYLE OVERRIDES
+   ======================================== */
+
 .blog-content [style*="font-size"] {
   font-size: revert !important;
 }
@@ -11,20 +14,78 @@
   color: revert !important;
 }
 
-/* Support all common font sizes (px and pt) */
+.blog-content [style*="background-color"] {
+  background-color: revert !important;
+}
+
+/* ========================================
+   FONT SIZES (PX AND PT)
+   ======================================== */
+
 .blog-content [style*="font-size: 11pt"],
 .blog-content [style*="font-size: 12pt"],
 .blog-content [style*="font-size: 14pt"],
 .blog-content [style*="font-size: 16pt"],
+.blog-content [style*="font-size: 18pt"],
 .blog-content [style*="font-size: 14px"],
 .blog-content [style*="font-size: 16px"],
 .blog-content [style*="font-size: 18px"],
 .blog-content [style*="font-size: 20px"],
-.blog-content [style*="font-size: 24px"] {
+.blog-content [style*="font-size: 24px"],
+.blog-content [style*="font-size: 28px"],
+.blog-content [style*="font-size: 32px"] {
   font-size: inherit !important;
 }
 
-/* Preserve spacing */
+/* ========================================
+   FONT FAMILIES
+   ======================================== */
+
+.blog-content [style*="font-family: Georgia"],
+.blog-content [style*="font-family: 'Georgia'"] { 
+  font-family: Georgia, serif !important; 
+}
+
+.blog-content [style*="font-family: Inter"],
+.blog-content [style*="font-family: 'Inter'"] { 
+  font-family: Inter, sans-serif !important; 
+}
+
+.blog-content [style*="font-family: Merriweather"],
+.blog-content [style*="font-family: 'Merriweather'"] { 
+  font-family: Merriweather, serif !important; 
+}
+
+.blog-content [style*="font-family: Arial"],
+.blog-content [style*="font-family: 'Arial'"] { 
+  font-family: Arial, sans-serif !important; 
+}
+
+.blog-content [style*="font-family: Roboto"],
+.blog-content [style*="font-family: 'Roboto'"] { 
+  font-family: Roboto, sans-serif !important; 
+}
+
+/* ========================================
+   COLORS & HIGHLIGHTS
+   ======================================== */
+
+.blog-content [style*="color: rgb"],
+.blog-content [style*="color: #"] {
+  color: revert !important;
+}
+
+.blog-content [style*="background-color: rgb"],
+.blog-content [style*="background-color: #"] {
+  background-color: revert !important;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+/* ========================================
+   PRESERVE EMPTY PARAGRAPHS
+   ======================================== */
+
 .blog-content p:empty {
   min-height: 1.5em;
   display: block;
@@ -33,4 +94,105 @@
 .blog-content p:empty::before {
   content: "\00a0";
   display: inline-block;
+}
+
+/* ========================================
+   HEADINGS
+   ======================================== */
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3 {
+  font-family: serif !important;
+  font-weight: bold !important;
+  color: #2b2e34 !important;
+  line-height: 1.2 !important;
+}
+
+.blog-content h1 {
+  font-size: 2.25rem !important;
+}
+
+.blog-content h2 {
+  font-size: 1.875rem !important;
+}
+
+.blog-content h3 {
+  font-size: 1.5rem !important;
+}
+
+/* ========================================
+   TEXT FORMATTING
+   ======================================== */
+
+.blog-content strong {
+  font-weight: 700 !important;
+}
+
+.blog-content em {
+  font-style: italic !important;
+}
+
+.blog-content u {
+  text-decoration: underline !important;
+}
+
+/* ========================================
+   LINKS
+   ======================================== */
+
+.blog-content a {
+  color: #755eb1 !important;
+  text-decoration: underline !important;
+}
+
+.blog-content a:hover {
+  color: #6b54a5 !important;
+}
+
+/* ========================================
+   LISTS
+   ======================================== */
+
+.blog-content ul {
+  list-style-type: disc !important;
+}
+
+.blog-content ol {
+  list-style-type: decimal !important;
+}
+
+.blog-content li::marker {
+  color: #755eb1 !important;
+}
+
+/* ========================================
+   TEXT ALIGNMENT
+   ======================================== */
+
+.blog-content [style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.blog-content [style*="text-align: right"] {
+  text-align: right !important;
+}
+
+.blog-content [style*="text-align: left"] {
+  text-align: left !important;
+}
+
+.blog-content [style*="text-align: justify"] {
+  text-align: justify !important;
+}
+
+/* ========================================
+   IMAGES
+   ======================================== */
+
+.blog-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 }
