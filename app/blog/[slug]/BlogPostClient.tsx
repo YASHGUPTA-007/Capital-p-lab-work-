@@ -44,80 +44,19 @@ export default function BlogPostClient({ post, relatedPosts, readingTime }: Blog
   const [newsletterStatus, setNewsletterStatus] = useState('idle');
   const [newsletterMessage, setNewsletterMessage] = useState('');
 
-   const lenisRef = useRef<Lenis | null>(null);
-  const rafRef = useRef<number | null>(null);
-
+  // Add this useEffect to FORCE scroll to work
 useEffect(() => {
-  if (typeof window === 'undefined') return;
+  // Force body scroll on mount
+  document.body.style.overflow = 'scroll';
+  document.body.style.height = 'auto';
+  document.documentElement.style.overflow = 'visible';
   
-  const isDesktop = window.innerWidth >= 768;
-  if (!isDesktop) return;
-
-  const lenis = new Lenis({
-    duration: 0.8,              // ✅ Reduced from 1.2 - faster, less jitter
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: 'vertical',
-    gestureOrientation: 'vertical',
-    smoothWheel: true,
-    wheelMultiplier: 0.8,       // ✅ Reduced from 1 - smoother scroll
-    touchMultiplier: 1.5,       // ✅ Reduced from 2 - better mobile
-    infinite: false,
-    syncTouch: true,            // ✅ NEW - improves touch performance
-  });
-
-  lenisRef.current = lenis;
-
-  function raf(time: number) {
-    lenis.raf(time);
-    rafRef.current = requestAnimationFrame(raf);
-  }
-
-  rafRef.current = requestAnimationFrame(raf);
-
-  let resizeTimer: NodeJS.Timeout;
-  const handleResize = () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const nowDesktop = window.innerWidth >= 768;
-      if (!nowDesktop && lenisRef.current) {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        lenisRef.current.destroy();
-        lenisRef.current = null;
-      } else if (nowDesktop && !lenisRef.current) {
-        const newLenis = new Lenis({
-          duration: 0.8,          // ✅ Match optimized config
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          orientation: 'vertical',
-          gestureOrientation: 'vertical',
-          smoothWheel: true,
-          wheelMultiplier: 0.8,   // ✅ Match optimized config
-          touchMultiplier: 1.5,   // ✅ Match optimized config
-          infinite: false,
-          syncTouch: true,        // ✅ Match optimized config
-        });
-        lenisRef.current = newLenis;
-        
-        function newRaf(time: number) {
-          newLenis.raf(time);
-          rafRef.current = requestAnimationFrame(newRaf);
-        }
-        rafRef.current = requestAnimationFrame(newRaf);
-      }
-    }, 150);
-  };
-
-  window.addEventListener('resize', handleResize, { passive: true });
-
   return () => {
-    window.removeEventListener('resize', handleResize);
-    clearTimeout(resizeTimer);
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    if (lenisRef.current) {
-      lenisRef.current.destroy();
-      lenisRef.current = null;
-    }
+    // Don't reset - let it stay scrollable
   };
 }, []);
+
+
   
 
   useEffect(() => {

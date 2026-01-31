@@ -57,89 +57,9 @@ const WhatsAppFloat = dynamic(() => import("./WhatsAppFloat"), { ssr: false });
 const VisitTracker = dynamic(() => import("./_components/VisitTracker"), { ssr: false });
 
 export default function TheCapitalPLab() {
-  const lenisRef = useRef<Lenis | null>(null);
-  const rafRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    // Check if we're on client side and desktop
-    if (typeof window === 'undefined') return;
-    
-    const isDesktop = window.innerWidth >= 768;
-    
-    if (!isDesktop) {
-      return;
-    }
 
-    // Initialize Lenis for smooth scrolling on desktop
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-      infinite: false,
-    });
 
-    lenisRef.current = lenis;
-
-    // Optimized RAF loop with passive flag
-    function raf(time: number) {
-      lenis.raf(time);
-      rafRef.current = requestAnimationFrame(raf);
-    }
-
-    rafRef.current = requestAnimationFrame(raf);
-
-    // Debounced resize handler
-    let resizeTimer: NodeJS.Timeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const nowDesktop = window.innerWidth >= 768;
-        if (!nowDesktop && lenisRef.current) {
-          if (rafRef.current) {
-            cancelAnimationFrame(rafRef.current);
-          }
-          lenisRef.current.destroy();
-          lenisRef.current = null;
-        } else if (nowDesktop && !lenisRef.current) {
-          const newLenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-            infinite: false,
-          });
-          lenisRef.current = newLenis;
-          
-          function newRaf(time: number) {
-            newLenis.raf(time);
-            rafRef.current = requestAnimationFrame(newRaf);
-          }
-          rafRef.current = requestAnimationFrame(newRaf);
-        }
-      }, 150);
-    };
-
-    window.addEventListener('resize', handleResize, { passive: true });
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimer);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      if (lenisRef.current) {
-        lenisRef.current.destroy();
-        lenisRef.current = null;
-      }
-    };
-  }, []);
 
   return (
     <div className="bg-white min-h-screen text-zinc-900 selection:bg-[#c7d6c1] selection:text-[#4f75d] font-sans">
