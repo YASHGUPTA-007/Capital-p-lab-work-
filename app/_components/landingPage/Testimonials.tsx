@@ -106,9 +106,9 @@ export const TestimonialSection = () => {
                 {/* Author Section */}
                 <div className="mt-6 sm:mt-8 md:mt-10 pt-5 sm:pt-6 md:pt-8 border-t border-[#2b2e34]/5 w-full flex flex-col items-center">
                   <div className="text-center">
-                    <h4 className="text-[#2b2e34] font-bold text-xs sm:text-sm md:text-base tracking-wide uppercase">
+                <p className="text-[#2b2e34] font-bold text-xs sm:text-sm md:text-base tracking-wide uppercase">
                       Ar. Aditi Chellapilla Kumar
-                    </h4>
+                   </p>
                     <p className="text-[#2b2e34] text-[11px] sm:text-xs md:text-sm font-medium mt-1">
                       Accessibility and Inclusive Urban Development Professional
                     </p>

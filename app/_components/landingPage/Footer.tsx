@@ -86,23 +86,23 @@ export const Footer = () => {
                      />
                   </div>
                   <div>
-                   <span className="text-2xl md:text-3xl font-serif text-white block drop-shadow-lg">
+                   <span className="text-2xl md:text-3xl font-serif text-white block" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
                         The Capital P Lab
                      </span>
-                    <span className="text-xs text-white/90 uppercase tracking-widest">
+                   <span className="text-xs text-white uppercase tracking-widest" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
                         Planet · People · Profit
                      </span>
                   </div>
                </div>
                
-               <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white/90">
+             <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
                   <span>© 2026</span>
                   <span className="mx-2 text-[#c7d6c1]">·</span>
                   <span className="text-[#c7d6c1]">Planet</span>
                   <span className="mx-2">·</span>
-                  <span className="text-[#c1b4df]">People</span>
+                <span className="text-[#e8e0f5]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>People</span>
                   <span className="mx-2 text-[#c7d6c1]">·</span>
-                  <span className="text-white">Profit</span>
+                <span className="text-white" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>Profit</span>
                </div>
             </div>
          </div>

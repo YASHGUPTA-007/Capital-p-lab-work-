@@ -76,7 +76,7 @@ const InsightCard = memo(({ item, index }: { item: any; index: number }) => {
                             </span>
                         </div>
                         
-                        <h3 className="text-xl sm:text-2xl font-serif leading-tight text-white group-hover:text-[#c1b4df] transition-colors mb-3">
+                   <h3 className="text-xl sm:text-2xl font-serif leading-tight text-white group-hover:text-[#d4cbea] transition-colors mb-3">
                             {item.title}
                         </h3>
                     </div>
