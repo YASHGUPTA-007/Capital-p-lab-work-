@@ -128,7 +128,7 @@ export const AboutSection = () => {
                   style={{ borderColor: `${item.color}30` }}
                 >
                   <item.icon size={isMobile ? 18 : 20} color={item.color} className="mb-2 sm:mb-2.5 md:mb-3 opacity-80" />
-                  <h4 className="font-bold text-sm sm:text-base md:text-lg leading-tight mb-1 font-sans" style={{ color: item.color }}>{item.title}</h4>
+                 <p className="font-bold text-sm sm:text-base md:text-lg leading-tight mb-1 font-sans" style={{ color: item.color }}>{item.title}</p>
                   <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: item.color }}>{item.sub}</span>
                 </div>
               ))}

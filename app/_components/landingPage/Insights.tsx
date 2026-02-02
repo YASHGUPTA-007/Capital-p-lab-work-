@@ -161,7 +161,7 @@ const NewsletterForm = memo(() => {
                     <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                         <CheckCircle size={32} className="text-green-600" />
                     </div>
-                    <h4 className="text-lg font-serif text-[#755eb1] mb-2">Successfully Subscribed!</h4>
+                   <p className="text-lg font-bold font-serif text-[#755eb1] mb-2">Successfully Subscribed!</p>
                     <p className="text-sm text-[#4f75d]">
                         Thank you for joining our newsletter. Check your inbox soon!
                     </p>
