@@ -32,6 +32,7 @@ import {
   extractImagesFromHTML
 } from '@/lib/cloudinary-utils';
 
+
 // Custom FontSize Extension
 const FontSize = TextStyle.extend({
   addAttributes() {
@@ -132,17 +133,20 @@ const categories = ["Technology", "Sustainability", "Policy", "Research", "ESG",
 
 export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorModalProps) {
   // State
-  const [formData, setFormData] = useState({
-    title: blog?.title || '',
-    slug: blog?.slug || '',
-    excerpt: blog?.excerpt || '',
-    author: blog?.author || '',
-    category: blog?.category || 'Technology',
-    customCategory: '',
-    tags: blog?.tags?.join(', ') || '',
-    featuredImage: blog?.featuredImage || '',
-    status: (blog?.status || 'draft') as 'draft' | 'published'
-  });
+const [formData, setFormData] = useState({
+  title: blog?.title || '',
+  slug: blog?.slug || '',
+  excerpt: blog?.excerpt || '',
+  author: blog?.author || '',
+  category: blog?.category || 'Technology',
+  customCategory: '',
+  featuredImage: blog?.featuredImage || '',
+  status: (blog?.status || 'draft') as 'draft' | 'published'
+});
+
+// Separate state for tags
+const [tags, setTags] = useState<string[]>(blog?.tags || []);
+const [tagInput, setTagInput] = useState('');
 
   const [useCustomSlug, setUseCustomSlug] = useState(false);
   const [isSlugUnique, setIsSlugUnique] = useState(true);
@@ -213,6 +217,27 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
       return newState;
     });
   };
+
+  // Tag management functions
+const handleAddTag = () => {
+  const trimmedTag = tagInput.trim();
+  if (trimmedTag && !tags.includes(trimmedTag)) {
+    setTags([...tags, trimmedTag]);
+    setTagInput('');
+  }
+};
+
+const handleRemoveTag = (tagToRemove: string) => {
+  setTags(tags.filter(tag => tag !== tagToRemove));
+};
+
+const handleTagInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleAddTag();
+  }
+};
+
 
   const checkSlugUniqueness = async (slugToCheck: string) => {
     if (!slugToCheck) return;
@@ -427,7 +452,7 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
 
     setSaving(true);
     try {
-      const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    const tagsArray = tags;
       const finalCategory = formData.category === 'Custom' ? formData.customCategory : formData.category;
       const readTime = calculateReadingTime(editor.getText());
       const currentContent = editor.getHTML();
@@ -622,16 +647,54 @@ export default function BlogEditorModal({ blog, onClose, onSave }: BlogEditorMod
                 </div>
 
                 {/* Tags */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
-                  <input
-                    type="text"
-                    value={formData.tags}
-                    onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 text-gray-900"
-                    placeholder="tech, news, update (comma separated)"
-                  />
-                </div>
+             {/* Tags */}
+<div>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+  
+  {/* Tag Input */}
+  <div className="flex gap-2 mb-3">
+    <input
+      type="text"
+      value={tagInput}
+      onChange={(e) => setTagInput(e.target.value)}
+      onKeyPress={handleTagInputKeyPress}
+      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 text-gray-900"
+      placeholder="Type a tag and press Enter"
+    />
+    <button
+      type="button"
+      onClick={handleAddTag}
+      className="px-4 py-2 bg-[#755eb1] hover:bg-[#6b54a5] text-white font-medium rounded-lg transition-colors"
+    >
+      Add
+    </button>
+  </div>
+  
+  {/* Display Tags */}
+  {tags.length > 0 && (
+    <div className="flex flex-wrap gap-2">
+      {tags.map((tag, index) => (
+        <div
+          key={index}
+          className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-[#c7d6c1]/30 to-[#c1b4df]/30 text-[#2b2e34] text-sm font-medium rounded-full border border-gray-200"
+        >
+          <span>#{tag}</span>
+          <button
+            type="button"
+            onClick={() => handleRemoveTag(tag)}
+            className="hover:text-red-600 transition-colors"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+  
+  <p className="text-xs text-gray-500 mt-2">
+    {tags.length === 0 ? 'No tags added yet' : `${tags.length} tag${tags.length !== 1 ? 's' : ''} added`}
+  </p>
+</div>
               </div>
 
               {/* Right Column */}
