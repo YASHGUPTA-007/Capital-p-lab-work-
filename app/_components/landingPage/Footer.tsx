@@ -46,7 +46,7 @@ export const Footer = () => {
                >
                    <div className="grid grid-cols-3 gap-12 md:gap-24 text-left">
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-[#c7d6c1] mb-6">Company</h4>
+                          <h3 className="font-bold text-xs uppercase tracking-widest text-[#c7d6c1] mb-6">Company</h3>
                            <ul className="space-y-4 text-sm text-white/80 font-medium">
                                <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
                                <li><a href="#team" className="hover:text-white transition-colors">Team</a></li>
@@ -54,7 +54,7 @@ export const Footer = () => {
                            </ul>
                        </div>
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-[#c1b4df] mb-6">Focus</h4>
+                           <h3 className="font-bold text-xs uppercase tracking-widest text-[#c1b4df] mb-6">Focus</h3>
                            <ul className="space-y-4 text-sm text-white/80 font-medium">
                                <li><a href="#focus" className="hover:text-white transition-colors">Inclusion</a></li>
                                <li><a href="#focus" className="hover:text-white transition-colors">Climate Emotion</a></li>
@@ -62,7 +62,7 @@ export const Footer = () => {
                            </ul>
                        </div>
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-[#c7d6c1] mb-6">Social</h4>
+                           <h3 className="font-bold text-xs uppercase tracking-widest text-[#c7d6c1] mb-6">Social</h3>
                            <ul className="space-y-4 text-sm text-white/80 font-medium">
                                {/* <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
                                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li> */}
@@ -86,7 +86,7 @@ export const Footer = () => {
                      />
                   </div>
                   <div>
-                     <span className="text-2xl md:text-3xl font-serif text-white block">
+                   <span className="text-2xl md:text-3xl font-serif text-white block drop-shadow-lg">
                         The Capital P Lab
                      </span>
                     <span className="text-xs text-white/90 uppercase tracking-widest">
