@@ -83,7 +83,7 @@ const InsightCard = memo(({ item, index }: { item: any; index: number }) => {
                     
                     {/* Bottom Section */}
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-widest text-white/70">
+                      <span className="text-xs font-bold uppercase tracking-widest text-white/90">
                             {item.date}
                         </span>
                         <div className={cn(
@@ -232,32 +232,28 @@ export const InsightsSection = memo(() => {
     const insightItems = [
         { 
             type: "Reports", 
-            title: "", 
-            date: "", 
+    
             color: "purple",
             image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop",
             icon: FileText
         },
         { 
             type: "Opinions", 
-            title: "", 
-            date: "", 
+  
             color: "green",
             image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop",
             icon: MessageSquare
         },
         { 
             type: "Events", 
-            title: "", 
-            date: "", 
+  
             color: "purple",
             image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2670&auto=format&fit=crop",
             icon: Calendar
         },
         { 
             type: "Blogs", 
-            title: "", 
-            date: "", 
+
             color: "green",
             image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2670&auto=format&fit=crop",
             icon: PenTool

@@ -23,6 +23,7 @@ export default function WhatsAppFloat() {
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
 
   return (
+    <aside aria-label="Contact support">
     <a
       href={whatsappUrl}
       target="_blank"                                                                                                                                                                                         
@@ -55,5 +56,6 @@ export default function WhatsAppFloat() {
         </div>
       </div>
     </a>
+    </aside>
   )
 }

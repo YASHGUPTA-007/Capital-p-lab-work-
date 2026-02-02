@@ -89,13 +89,13 @@ export const Footer = () => {
                      <span className="text-2xl md:text-3xl font-serif text-white block">
                         The Capital P Lab
                      </span>
-                     <span className="text-xs text-white/70 uppercase tracking-widest">
+                    <span className="text-xs text-white/90 uppercase tracking-widest">
                         Planet · People · Profit
                      </span>
                   </div>
                </div>
                
-               <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white/70">
+               <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white/90">
                   <span>© 2026</span>
                   <span className="mx-2 text-[#c7d6c1]">·</span>
                   <span className="text-[#c7d6c1]">Planet</span>
