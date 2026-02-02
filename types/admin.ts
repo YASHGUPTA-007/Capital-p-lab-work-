@@ -37,4 +37,5 @@ export interface BlogPost {
   updatedAt: any;
   publishedAt?: any;
    views?: number;
+    likes?: number; 
 }

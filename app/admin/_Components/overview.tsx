@@ -1,5 +1,5 @@
 // components/admin/OverviewTab.tsx
-import { Mail, Eye, TrendingUp, Users, FileText, ArrowRight } from 'lucide-react';
+import { Mail, Eye, TrendingUp, Users, FileText, ArrowRight, Heart } from 'lucide-react';
 import { formatViewCount } from '@/lib/formatters';
 
 interface Contact {
@@ -12,15 +12,29 @@ interface Contact {
   createdAt: any;
 }
 
+interface BlogPost {
+  id: string;
+  title: string;
+  category: string;
+  views?: number;
+  likes?: number;
+  status: string;
+  createdAt: any;
+  featuredImage?: string;
+}
+
 interface OverviewTabProps {
   contactsCount: number;
   newContactsCount: number;
   subscribersCount: number;
   publishedBlogsCount: number;
   totalVisits: number;
+  totalLikes: number;
   recentContacts: Contact[];
+  recentBlogs: BlogPost[];
   formatDate: (timestamp: any) => string;
   onNavigateToInquiries?: () => void;
+  onNavigateToBlogs?: () => void;
 }
 
 export default function OverviewTab({
@@ -29,14 +43,21 @@ export default function OverviewTab({
   subscribersCount,
   publishedBlogsCount,
   totalVisits,
+  totalLikes,
   recentContacts,
+  recentBlogs,
   formatDate,
-  onNavigateToInquiries
+  onNavigateToInquiries,
+  onNavigateToBlogs
 }: OverviewTabProps) {
   
   // Only show latest 5 messages
   const displayedContacts = recentContacts.slice(0, 5);
   const hasMoreContacts = recentContacts.length > 5;
+
+  // Only show latest 5 blog posts
+  const displayedBlogs = recentBlogs.slice(0, 5);
+  const hasMoreBlogs = recentBlogs.length > 5;
 
   const stats = [
     { 
@@ -83,6 +104,15 @@ export default function OverviewTab({
       gradient: 'from-pink-50 to-white',
       iconBg: 'bg-pink-100',
       iconColor: 'text-pink-600'
+    },
+    { 
+      label: 'Total Likes', 
+      value: totalLikes, 
+      subtext: 'All Blogs', 
+      icon: Heart, 
+      gradient: 'from-red-50 to-white',
+      iconBg: 'bg-red-100',
+      iconColor: 'text-red-600'
     }
   ];
 
@@ -95,7 +125,7 @@ export default function OverviewTab({
       </div>
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         {stats.map((stat, i) => {
           const { formatted, full } = formatViewCount(stat.value, 'intl');
           
@@ -130,88 +160,187 @@ export default function OverviewTab({
         })}
       </div>
 
-      {/* Recent Inquiries */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-gray-900">Recent Inquiries</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Latest customer messages</p>
-          </div>
-          {hasMoreContacts && onNavigateToInquiries && (
-            <button
-              onClick={onNavigateToInquiries}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              View All
-              <ArrowRight size={16} />
-            </button>
-          )}
-        </div>
-
-        <div className="divide-y divide-gray-200">
-          {displayedContacts.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail size={32} className="text-gray-400" />
-              </div>
-              <p className="text-base font-semibold text-gray-900 mb-1">No inquiries yet</p>
-              <p className="text-sm text-gray-500">Customer messages will appear here</p>
+      {/* Two Column Layout for Recent Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Recent Inquiries */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">Recent Inquiries</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Latest customer messages</p>
             </div>
-          ) : (
-            displayedContacts.map((contact, index) => (
-              <div 
-                key={contact.id} 
-                className="px-6 py-4 hover:bg-gray-50 transition-colors"
+            {hasMoreContacts && onNavigateToInquiries && (
+              <button
+                onClick={onNavigateToInquiries}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
               >
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-sm font-bold text-gray-700 flex-shrink-0 shadow-sm">
-                      {contact.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
-                          {contact.name}
-                        </p>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
-                          contact.status === 'new' 
-                            ? 'bg-blue-100 text-blue-700 border border-blue-200' 
-                            : 'bg-gray-100 text-gray-700 border border-gray-200'
-                        }`}>
-                          {contact.status === 'new' ? '● New' : '● Read'}
-                        </span>
+                View All
+                <ArrowRight size={16} />
+              </button>
+            )}
+          </div>
+
+          <div className="divide-y divide-gray-200">
+            {displayedContacts.length === 0 ? (
+              <div className="px-6 py-12 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail size={32} className="text-gray-400" />
+                </div>
+                <p className="text-base font-semibold text-gray-900 mb-1">No inquiries yet</p>
+                <p className="text-sm text-gray-500">Customer messages will appear here</p>
+              </div>
+            ) : (
+              displayedContacts.map((contact) => (
+                <div 
+                  key={contact.id} 
+                  className="px-6 py-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-sm font-bold text-gray-700 flex-shrink-0 shadow-sm">
+                        {contact.name.charAt(0).toUpperCase()}
                       </div>
-                      <p className="text-sm text-gray-600 truncate">{contact.subject}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {contact.name}
+                          </p>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                            contact.status === 'new' 
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                              : 'bg-gray-100 text-gray-700 border border-gray-200'
+                          }`}>
+                            {contact.status === 'new' ? '● New' : '● Read'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 truncate">{contact.subject}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-xs text-gray-500 flex-shrink-0">
-                    {formatDate(contact.createdAt)}
+                    <div className="text-xs text-gray-500 flex-shrink-0">
+                      {formatDate(contact.createdAt)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
+            )}
+          </div>
+
+          {/* Footer with count info */}
+          {displayedContacts.length > 0 && (
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+              <p className="text-xs text-gray-600">
+                Showing {displayedContacts.length} of {recentContacts.length} total inquiries
+                {hasMoreContacts && onNavigateToInquiries && (
+                  <>
+                    {' · '}
+                    <button
+                      onClick={onNavigateToInquiries}
+                      className="text-gray-900 font-medium hover:underline"
+                    >
+                      View all messages
+                    </button>
+                  </>
+                )}
+              </p>
+            </div>
           )}
         </div>
 
-        {/* Footer with count info */}
-        {displayedContacts.length > 0 && (
-          <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-            <p className="text-xs text-gray-600">
-              Showing {displayedContacts.length} of {recentContacts.length} total inquiries
-              {hasMoreContacts && onNavigateToInquiries && (
-                <>
-                  {' · '}
-                  <button
-                    onClick={onNavigateToInquiries}
-                    className="text-gray-900 font-medium hover:underline"
-                  >
-                    View all messages
-                  </button>
-                </>
-              )}
-            </p>
+        {/* Recent Blog Posts */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">Recent Blog Posts</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Latest published articles</p>
+            </div>
+            {hasMoreBlogs && onNavigateToBlogs && (
+              <button
+                onClick={onNavigateToBlogs}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                View All
+                <ArrowRight size={16} />
+              </button>
+            )}
           </div>
-        )}
+
+          <div className="divide-y divide-gray-200">
+            {displayedBlogs.length === 0 ? (
+              <div className="px-6 py-12 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FileText size={32} className="text-gray-400" />
+                </div>
+                <p className="text-base font-semibold text-gray-900 mb-1">No blog posts yet</p>
+                <p className="text-sm text-gray-500">Published articles will appear here</p>
+              </div>
+            ) : (
+              displayedBlogs.map((blog) => {
+                const { formatted: viewsFormatted, full: viewsFull } = formatViewCount(blog.views, 'intl');
+                const { formatted: likesFormatted, full: likesFull } = formatViewCount(blog.likes, 'intl');
+                
+                return (
+                  <div 
+                    key={blog.id} 
+                    className="px-6 py-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      {blog.featuredImage && (
+                        <img 
+                          src={blog.featuredImage} 
+                          alt={blog.title}
+                          className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-semibold text-gray-900 truncate flex-1">
+                            {blog.title}
+                          </p>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 flex-shrink-0">
+                            {blog.category}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                          <span className="flex items-center gap-1" title={viewsFull}>
+                            <Eye size={14} className="text-gray-400" />
+                            {viewsFormatted}
+                          </span>
+                          <span className="flex items-center gap-1" title={likesFull}>
+                            <Heart size={14} className="text-red-500" />
+                            {likesFormatted}
+                          </span>
+                          <span>{formatDate(blog.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer with count info */}
+          {displayedBlogs.length > 0 && (
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+              <p className="text-xs text-gray-600">
+                Showing {displayedBlogs.length} of {recentBlogs.length} total posts
+                {hasMoreBlogs && onNavigateToBlogs && (
+                  <>
+                    {' · '}
+                    <button
+                      onClick={onNavigateToBlogs}
+                      className="text-gray-900 font-medium hover:underline"
+                    >
+                      View all posts
+                    </button>
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

@@ -32,8 +32,9 @@ interface BlogPost {
   tags: string[];
   featuredImage?: string;
   status: string;
-  createdAt: string; // ISO string
-  publishedAt?: string; // ISO string
+  createdAt: string;
+  publishedAt?: string;
+  likes?: number; // Add this
 }
 
 interface BlogClientPageProps {

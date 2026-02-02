@@ -281,17 +281,21 @@ export default function AdminDashboard() {
 
         <main className="flex-1 overflow-auto">
           <div className="h-full">
-            {activeTab === 'overview' && (
-              <OverviewTab
-                contactsCount={contacts.length}
-                newContactsCount={contacts.filter(c => c.status === 'new').length}
-                subscribersCount={subscribers.length}
-                publishedBlogsCount={blogPosts.filter(b => b.status === 'published').length}
-                totalVisits={totalVisits}
-                recentContacts={contacts.slice(0, 5)}
-                formatDate={formatDate}
-              />
-            )}
+          {activeTab === 'overview' && (
+  <OverviewTab
+    contactsCount={contacts.length}
+    newContactsCount={contacts.filter(c => c.status === 'new').length}
+    subscribersCount={subscribers.length}
+    publishedBlogsCount={blogPosts.filter(b => b.status === 'published').length}
+    totalVisits={totalVisits}
+    totalLikes={blogPosts.reduce((sum, post) => sum + (post.likes || 0), 0)}
+    recentContacts={contacts.slice(0, 5)}
+    recentBlogs={blogPosts.filter(b => b.status === 'published').slice(0, 5)}
+    formatDate={formatDate}
+    onNavigateToInquiries={() => setActiveTab('contacts')}
+    onNavigateToBlogs={() => setActiveTab('blogs')}
+  />
+)}
 
             {activeTab === 'contacts' && (
               <ContactsTab

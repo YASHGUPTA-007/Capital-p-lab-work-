@@ -210,3 +210,143 @@
   transform: translateZ(0);
   will-change: opacity;
 }
+
+
+
+/* ========================================
+   TABLES - FRONTEND DISPLAY
+   ======================================== */
+
+.blog-content table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 2rem 0 !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.blog-content th {
+  background: linear-gradient(135deg, #755eb1 0%, #6b54a5 100%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  padding: 1rem !important;
+  text-align: left !important;
+  border: 1px solid #000000 !important;
+}
+
+.blog-content td {
+  padding: 1rem !important;
+  border: 1px solid #000000 !important;
+  color: #2b2e34 !important;
+  background-color: white !important;
+}
+
+.blog-content tbody tr:nth-child(even) td {
+  background-color: #f9fafb !important;
+}
+
+.blog-content tbody tr:hover td {
+  background-color: #f3f4f6 !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .blog-content table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Preserve inline table styles */
+.blog-content table[style*="width"] {
+  width: revert !important;
+}
+
+.blog-content th[style*="background"],
+.blog-content td[style*="background"] {
+  background-color: revert !important;
+}
+
+.blog-content th[style*="text-align"],
+.blog-content td[style*="text-align"] {
+  text-align: revert !important;
+}
+
+.blog-content th[style*="color"],
+.blog-content td[style*="color"] {
+  color: revert !important;
+}
+
+/* ========================================
+   TABLES - EDITOR (ProseMirror)
+   ======================================== */
+
+.ProseMirror {
+  outline: none !important;
+}
+
+.ProseMirror table {
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  width: 100% !important;
+  margin: 1rem 0 !important;
+  border: 2px solid #000000 !important;
+  background-color: white !important;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  min-width: 100px !important;
+  border: 1px solid #000000 !important;
+  padding: 12px !important;
+  vertical-align: top !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  background-color: white !important;
+}
+
+.ProseMirror th {
+  font-weight: bold !important;
+  text-align: left !important;
+  background-color: #755eb1 !important;
+  color: white !important;
+}
+
+.ProseMirror .selectedCell:after {
+  z-index: 2 !important;
+  position: absolute !important;
+  content: "" !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  background: rgba(117, 94, 177, 0.2) !important;
+  pointer-events: none !important;
+}
+
+.ProseMirror .column-resize-handle {
+  position: absolute !important;
+  right: -2px !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 4px !important;
+  background-color: #755eb1 !important;
+  pointer-events: none !important;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: ew-resize !important;
+  cursor: col-resize !important;
+}
+
+/* Empty cells visibility */
+.ProseMirror td p,
+.ProseMirror th p {
+  margin: 0 !important;
+}
+
+.ProseMirror td:empty::after,
+.ProseMirror th:empty::after {
+  content: '\00a0' !important;
+}

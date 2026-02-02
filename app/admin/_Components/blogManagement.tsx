@@ -1,6 +1,6 @@
 // components/admin/BlogsTab.tsx
 import { useState } from 'react';
-import { Search, FileText, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, X } from 'lucide-react';
+import { Search, FileText, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, X, Heart } from 'lucide-react';
 import { BlogPost } from '@/types/admin';
 import { formatViewCount } from '@/lib/formatters';
 
@@ -124,6 +124,8 @@ export default function BlogsTab({
   // Calculate total views
   const totalViews = blogPosts.reduce((sum, post) => sum + (post.views || 0), 0);
   const { formatted: totalViewsFormatted } = formatViewCount(totalViews, 'intl');
+  const totalLikes = blogPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
+const { formatted: totalLikesFormatted } = formatViewCount(totalLikes, 'intl');
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -167,7 +169,7 @@ export default function BlogsTab({
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+   <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
           <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -216,6 +218,17 @@ export default function BlogsTab({
               </div>
             </div>
           </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+      <Heart size={20} className="text-red-600" />
+    </div>
+    <div>
+      <p className="text-xs md:text-sm font-medium text-gray-600">Total Likes</p>
+      <p className="text-xl md:text-2xl font-semibold text-gray-900">{totalLikesFormatted}</p>
+    </div>
+  </div>
+</div>
         </div>
 
         {/* Search and Filter */}
@@ -271,192 +284,213 @@ export default function BlogsTab({
             <div className="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Title
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Views
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {filteredBlogs.map((blog) => {
-                      const { formatted: viewsFormatted, full: viewsFull } = formatViewCount(blog.views, 'intl');
-                      
-                      return (
-                        <tr key={blog.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              {blog.featuredImage && (
-                                <img 
-                                  src={blog.featuredImage} 
-                                  alt={blog.title}
-                                  className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
-                                />
-                              )}
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">{blog.title}</p>
-                                {blog.excerpt && (
-                                  <p className="text-xs text-gray-500 truncate">{blog.excerpt}</p>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                              {blog.category}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <p className="text-sm text-gray-500">{formatDate(blog.createdAt)}</p>
-                          </td>
-                         <td className="px-6 py-4 whitespace-nowrap">
-  <span 
-    className="text-sm font-semibold text-gray-900 cursor-help"
-    title={`${viewsFull} total views`}
-  >
-    {viewsFormatted}
-  </span>
-</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                              blog.status === 'published' 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-yellow-100 text-yellow-700'
-                            }`}>
-                              {blog.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => onEditBlog(blog)}
-                                disabled={deletingId === blog.id}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                                title="Edit post"
-                              >
-                                <Edit size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteClick(blog)}
-                                disabled={deletingId === blog.id}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                                title="Delete post and all images"
-                              >
-                                {deletingId === blog.id ? (
-                                  <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <Trash2 size={16} />
-                                )}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
+               <thead className="bg-gray-50 border-b border-gray-200">
+  <tr>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      Title
+    </th>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      Category
+    </th>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      Views
+    </th>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      Likes
+    </th>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      Status
+    </th>
+    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+      Actions
+    </th>
+  </tr>
+</thead>
+              <tbody className="divide-y divide-gray-200">
+  {filteredBlogs.map((blog) => {
+    const { formatted: viewsFormatted, full: viewsFull } = formatViewCount(blog.views, 'intl');
+    const { formatted: likesFormatted, full: likesFull } = formatViewCount(blog.likes, 'intl');
+    
+    return (
+      <tr key={blog.id} className="hover:bg-gray-50 transition-colors">
+        <td className="px-6 py-4">
+          <div className="flex items-center gap-3">
+            {blog.featuredImage && (
+              <img 
+                src={blog.featuredImage} 
+                alt={blog.title}
+                className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+              />
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{blog.title}</p>
+              <p className="text-xs text-gray-500">{formatDate(blog.createdAt)}</p>
+            </div>
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+            {blog.category}
+          </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span 
+            className="text-sm font-semibold text-gray-900 cursor-help"
+            title={`${viewsFull} total views`}
+          >
+            {viewsFormatted}
+          </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div 
+            className="flex items-center gap-2 cursor-help" 
+            title={`${likesFull} total likes`}
+          >
+            <Heart size={16} className="text-red-500" />
+            <span className="text-sm font-semibold text-gray-900">
+              {likesFormatted}
+            </span>
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+            blog.status === 'published' 
+              ? 'bg-green-100 text-green-700' 
+              : 'bg-yellow-100 text-yellow-700'
+          }`}>
+            {blog.status}
+          </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-right">
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={() => onEditBlog(blog)}
+              disabled={deletingId === blog.id}
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+              title="Edit post"
+            >
+              <Edit size={16} />
+            </button>
+            <button
+              onClick={() => handleDeleteClick(blog)}
+              disabled={deletingId === blog.id}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+              title="Delete post and all images"
+            >
+              {deletingId === blog.id ? (
+                <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Trash2 size={16} />
+              )}
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
                 </table>
               </div>
             </div>
 
             {/* Mobile Card View */}
-            <div className="md:hidden space-y-3">
-              {filteredBlogs.map((blog) => {
-                const { formatted: viewsFormatted, full: viewsFull } = formatViewCount(blog.views, 'intl');
-                
-                return (
-                  <div 
-                    key={blog.id} 
-                    className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm transition-shadow"
-                  >
-                    {blog.featuredImage && (
-                      <img 
-                        src={blog.featuredImage} 
-                        alt={blog.title}
-                        className="w-full h-40 object-cover"
-                      />
-                    )}
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="text-sm font-medium text-gray-900 flex-1 line-clamp-2">
-                          {blog.title}
-                        </h3>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                          blog.status === 'published' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {blog.status}
-                        </span>
-                      </div>
-                      
-                      {blog.excerpt && (
-                        <p className="text-xs text-gray-500 mb-3 line-clamp-2">{blog.excerpt}</p>
-                      )}
-                      
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                          {blog.category}
-                        </span>
-                        <p className="text-xs text-gray-500">{formatDate(blog.createdAt)}</p>
-                      </div>
-
-                      <div 
-                        className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100"
-                        title={`${viewsFull} total views`}
-                      >
-                        <Eye size={14} className="text-gray-400" />
-                        <span className="text-sm text-gray-600 font-medium">
-                          {viewsFormatted} views
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => onEditBlog(blog)}
-                          disabled={deletingId === blog.id}
-                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
-                        >
-                          <Edit size={16} />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(blog)}
-                          disabled={deletingId === blog.id}
-                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
-                        >
-                          {deletingId === blog.id ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                              Deleting...
-                            </>
-                          ) : (
-                            <>
-                              <Trash2 size={16} />
-                              Delete
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+           <div className="md:hidden space-y-3">
+  {filteredBlogs.map((blog) => {
+    const { formatted: viewsFormatted, full: viewsFull } = formatViewCount(blog.views, 'intl');
+    const { formatted: likesFormatted, full: likesFull } = formatViewCount(blog.likes, 'intl');
+    
+    return (
+      <div 
+        key={blog.id} 
+        className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm transition-shadow"
+      >
+        {blog.featuredImage && (
+          <img 
+            src={blog.featuredImage} 
+            alt={blog.title}
+            className="w-full h-40 object-cover"
+          />
+        )}
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
+                {blog.title}
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">{formatDate(blog.createdAt)}</p>
             </div>
+            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+              blog.status === 'published' 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-yellow-100 text-yellow-700'
+            }`}>
+              {blog.status}
+            </span>
+          </div>
+          
+          {blog.excerpt && (
+            <p className="text-xs text-gray-500 mb-3 line-clamp-2">{blog.excerpt}</p>
+          )}
+          
+          <div className="flex items-center justify-between mb-3">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+              {blog.category}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 mb-3 pb-3 border-b border-gray-100">
+            <div 
+              className="flex items-center gap-2"
+              title={`${viewsFull} total views`}
+            >
+              <Eye size={14} className="text-gray-400" />
+              <span className="text-sm text-gray-600 font-medium">
+                {viewsFormatted}
+              </span>
+            </div>
+            <div 
+              className="flex items-center gap-2"
+              title={`${likesFull} total likes`}
+            >
+              <Heart size={14} className="text-red-500" />
+              <span className="text-sm text-gray-600 font-medium">
+                {likesFormatted}
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onEditBlog(blog)}
+              disabled={deletingId === blog.id}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
+            >
+              <Edit size={16} />
+              Edit
+            </button>
+            <button
+              onClick={() => handleDeleteClick(blog)}
+              disabled={deletingId === blog.id}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
+            >
+              {deletingId === blog.id ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 size={16} />
+                  Delete
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</div>
           </>
         )}
       </div>

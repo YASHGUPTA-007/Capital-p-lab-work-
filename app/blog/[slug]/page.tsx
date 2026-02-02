@@ -17,8 +17,9 @@ interface BlogPost {
   tags: string[];
   featuredImage?: string;
   status: string;
-  createdAt: string; // Changed to string for serialization
-  publishedAt?: string; // Changed to string for serialization
+  createdAt: string;
+  publishedAt?: string;
+  likes?: number; // Add this
 }
 
 // Generate static params for all blog posts (SSG)
@@ -59,20 +60,21 @@ async function getPost(slug: string): Promise<BlogPost | null> {
     const data = querySnapshot.docs[0].data();
     
     // Serialize Firestore Timestamps to ISO strings
-    return {
-      id: querySnapshot.docs[0].id,
-      title: data.title || '',
-      slug: data.slug || '',
-      excerpt: data.excerpt || '',
-      content: data.content || '',
-      author: data.author || '',
-      category: data.category || '',
-      tags: data.tags || [],
-      featuredImage: data.featuredImage || '',
-      status: data.status || 'published',
-      createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-      publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    };
+ return {
+  id: querySnapshot.docs[0].id,
+  title: data.title || '',
+  slug: data.slug || '',
+  excerpt: data.excerpt || '',
+  content: data.content || '',
+  author: data.author || '',
+  category: data.category || '',
+  tags: data.tags || [],
+  featuredImage: data.featuredImage || '',
+  status: data.status || 'published',
+  likes: data.likes || 0, // ✅ ADD THIS LINE
+  createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+  publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+};
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
@@ -96,20 +98,21 @@ async function getRelatedPosts(category: string, currentPostId: string): Promise
         const data = doc.data();
         
         // Serialize Firestore Timestamps to ISO strings
-        posts.push({
-          id: doc.id,
-          title: data.title || '',
-          slug: data.slug || '',
-          excerpt: data.excerpt || '',
-          content: data.content || '',
-          author: data.author || '',
-          category: data.category || '',
-          tags: data.tags || [],
-          featuredImage: data.featuredImage || '',
-          status: data.status || 'published',
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-          publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-        });
+   posts.push({
+  id: doc.id,
+  title: data.title || '',
+  slug: data.slug || '',
+  excerpt: data.excerpt || '',
+  content: data.content || '',
+  author: data.author || '',
+  category: data.category || '',
+  tags: data.tags || [],
+  featuredImage: data.featuredImage || '',
+  status: data.status || 'published',
+  likes: data.likes || 0, // ✅ ADD THIS LINE
+  createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+  publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+});
       }
     });
     

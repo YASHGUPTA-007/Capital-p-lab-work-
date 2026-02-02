@@ -16,8 +16,9 @@ interface BlogPost {
   tags: string[];
   featuredImage?: string;
   status: string;
-  createdAt: string; // Changed to string for serialization
-  publishedAt?: string; // Changed to string for serialization
+  createdAt: string;
+  publishedAt?: string;
+  likes?: number; // Add this
 }
 
 // Generate metadata for SEO
