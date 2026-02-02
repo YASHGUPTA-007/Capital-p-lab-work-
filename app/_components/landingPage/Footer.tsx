@@ -8,11 +8,11 @@ import { ArrowUpRight, Globe } from 'lucide-react'
 export const Footer = () => {
     return (
      <footer id="contact" className="bg-gradient-to-br from-[#2b2e34] via-[#755eb1] to-[#4f7f5d] pt-40 pb-12 px-6 lg:px-12 relative overflow-hidden">
-        {/* STRONGER Dark overlay - increased to 60% */}
-        <div className="absolute inset-0 bg-black/60 z-0" />
+        {/* MAXIMUM Dark overlay - 70% black */}
+        <div className="absolute inset-0 bg-black/70 z-0" />
         
-         {/* Decorative elements */}
-         <div className="absolute inset-0 opacity-20 z-0">
+         {/* Decorative elements - reduced opacity */}
+         <div className="absolute inset-0 opacity-10 z-0">
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#c1b4df] rounded-full blur-3xl transform-gpu" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#c7d6c1] rounded-full blur-3xl transform-gpu" />
          </div>
@@ -27,14 +27,13 @@ export const Footer = () => {
                   <a 
                     href="mailto:contact@capitalp.org" 
                     className="group inline-flex items-center gap-4 text-2xl md:text-3xl font-serif text-white hover:text-[#c7d6c1] transition-colors"
-                    style={{ textShadow: '0 3px 10px rgba(0,0,0,1)' }}
                   >
                      <span className="border-b-2 border-[#c7d6c1] pb-1 group-hover:border-white">
                        contact@capitalp.org
                      </span>
                      <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
-                  <p className="mt-12 text-white flex items-center gap-2 text-lg" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>
+                  <p className="mt-12 text-white flex items-center gap-2 text-lg">
                     <Globe size={18} className="text-[#c7d6c1]" /> 
                     <span>Based in India · USA</span>
                   </p>
@@ -48,24 +47,24 @@ export const Footer = () => {
                >
                    <div className="grid grid-cols-3 gap-12 md:gap-24 text-left">
                        <div>
-                          <h3 className="font-bold text-xs uppercase tracking-widest text-white mb-6" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>Company</h3>
-                           <ul className="space-y-4 text-sm text-white font-medium" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>
+                          <h3 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Company</h3>
+                           <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="#about" className="hover:text-[#c7d6c1] transition-colors">About</a></li>
                                <li><a href="#team" className="hover:text-[#c7d6c1] transition-colors">Team</a></li>
                                <li><a href="#" className="hover:text-[#c7d6c1] transition-colors">Careers</a></li>
                            </ul>
                        </div>
                        <div>
-                           <h3 className="font-bold text-xs uppercase tracking-widest text-white mb-6" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>Focus</h3>
-                           <ul className="space-y-4 text-sm text-white font-medium" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>
+                           <h3 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Focus</h3>
+                           <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="#focus" className="hover:text-[#c7d6c1] transition-colors">Inclusion</a></li>
                                <li><a href="#focus" className="hover:text-[#c7d6c1] transition-colors">Climate Emotion</a></li>
                                <li><a href="#focus" className="hover:text-[#c7d6c1] transition-colors">ESG</a></li>
                            </ul>
                        </div>
                        <div>
-                           <h3 className="font-bold text-xs uppercase tracking-widest text-white mb-6" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>Social</h3>
-                           <ul className="space-y-4 text-sm text-white font-medium" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.9)' }}>
+                           <h3 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Social</h3>
+                           <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="mailto:contact@capitalp.org" className="hover:text-[#c7d6c1] transition-colors">Email</a></li>
                            </ul>
                        </div>
@@ -86,17 +85,17 @@ export const Footer = () => {
                      />
                   </div>
                   <div>
-                     <span className="text-2xl md:text-3xl font-serif text-white block" style={{ textShadow: '0 3px 12px rgba(0,0,0,1)' }}>
+                     <span className="text-2xl md:text-3xl font-serif text-white block">
                         The Capital P Lab
                      </span>
-                     <span className="text-xs text-white uppercase tracking-widest" style={{ textShadow: '0 2px 8px rgba(0,0,0,1)' }}>
+                     <span className="text-xs text-white uppercase tracking-widest">
                         Planet · People · Profit
                      </span>
                   </div>
                </div>
                
-               {/* Copyright - ALL WHITE TEXT with strong shadows */}
-               <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white" style={{ textShadow: '0 2px 8px rgba(0,0,0,1)' }}>
+               {/* Copyright - simplified, all white */}
+               <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white">
                   <span>© 2026</span>
                   <span className="mx-2">·</span>
                   <span>Planet</span>
