@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import Script from "next/script";
+import "./globals.css";
 import LenisProvider from "./admin/_Components/LenisProvider";
 
 const geistSans = Geist({
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Organization schema for Google
+// Organization schema (JSON-LD)
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -47,9 +47,10 @@ const organizationSchema = {
   alternateName: "Capital P Lab",
   url: "https://www.capitalp.org",
   logo: "https://www.capitalp.org/logo.png",
-  description: "We help turn evidence into impact for people, the planet, and profit. Research and consulting services for sustainable development.",
+  description:
+    "We help turn evidence into impact for people, the planet, and profit. Research and consulting services for sustainable development.",
   sameAs: [
-    // Add your social media profiles here if you have them
+    // Add social profiles if available
     // "https://www.linkedin.com/company/capitalp",
     // "https://twitter.com/capitalp",
   ],
@@ -57,27 +58,52 @@ const organizationSchema = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
+        {/* Organization Schema */}
         <Script
           id="organization-schema"
           type="application/ld+json"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema),
           }}
-          strategy="beforeInteractive"
+        />
+
+        {/* Google Tag Manager */}
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-PWQPCDVJ');
+            `,
+          }}
         />
       </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LenisProvider>
-          {children}
-        </LenisProvider>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PWQPCDVJ"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+
+        <LenisProvider>{children}</LenisProvider>
       </body>
     </html>
   );
