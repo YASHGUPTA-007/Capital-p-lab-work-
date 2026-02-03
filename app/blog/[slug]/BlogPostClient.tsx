@@ -38,6 +38,8 @@ interface BlogPost {
   category: string;
   tags: string[];
   featuredImage?: string;
+  featuredImageAlt?: string;      // ✅ ADD THIS
+  featuredImageName?: string;     // ✅ ADD THIS
   status: string;
   createdAt: string;
   publishedAt?: string;
@@ -297,10 +299,11 @@ export default function BlogPostClient({
         style={{ scaleX: readingProgress / 100 }}
         initial={{ scaleX: 0 }}
         role="progressbar"
-        aria-valuenow={readingProgress}
+        aria-valuenow={Math.round(readingProgress)}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label="Reading progress"
+        aria-live="polite"
       />
 
       <div className="fixed right-6 bottom-6 flex flex-col gap-3 z-40">
@@ -336,7 +339,10 @@ export default function BlogPostClient({
                 <span>Back to Blog</span>
               </Link>
 
-              <div className="flex items-center gap-3" aria-label="Site branding">
+              <div
+                className="flex items-center gap-3"
+                aria-label="Site branding"
+              >
                 <Image
                   src="/logo.png"
                   alt="The Capital P Lab Logo"
@@ -359,17 +365,27 @@ export default function BlogPostClient({
               transition={{ duration: 0.6, delay: 0.1 }}
               className="flex flex-wrap items-center gap-4 mb-6"
             >
-              <span className="px-4 py-2 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white text-sm font-bold uppercase tracking-wider rounded-full shadow-lg">
+              <span
+                className="px-4 py-2 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white text-sm font-bold uppercase tracking-wider rounded-full shadow-lg"
+                aria-label={`Category: ${post.category}`}
+              >
                 {post.category}
               </span>
               <div className="flex items-center gap-4 text-sm text-[#4f475d]">
                 <div className="flex items-center gap-1.5">
                   <Clock size={16} aria-hidden="true" />
-                  <span>{readingTime} min read</span>
+                  <span
+                    aria-label={`Estimated reading time: ${readingTime} minutes`}
+                  >
+                    {readingTime} min read
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Calendar size={16} aria-hidden="true" />
-                  <time dateTime={post.publishedAt || post.createdAt}>
+                  <time
+                    dateTime={post.publishedAt || post.createdAt}
+                    aria-label={`Published on ${formatDate(post.publishedAt || post.createdAt)}`}
+                  >
                     {formatDate(post.publishedAt || post.createdAt)}
                   </time>
                 </div>
@@ -400,10 +416,17 @@ export default function BlogPostClient({
               transition={{ duration: 0.6, delay: 0.4 }}
               className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-gray-200"
             >
-              <div className="flex items-center gap-4">
+              <div
+                className="flex items-center gap-4"
+                role="region"
+                aria-label="Author information"
+              >
                 {hasAuthor ? (
                   <>
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg" aria-hidden="true">
+                    <div
+                      className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                      aria-hidden="true"
+                    >
                       {post.author.charAt(0)}
                     </div>
                     <div>
@@ -417,7 +440,10 @@ export default function BlogPostClient({
                   </>
                 ) : (
                   <>
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg" aria-hidden="true">
+                    <div
+                      className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                      aria-hidden="true"
+                    >
                       <span className="text-2xl">📝</span>
                     </div>
                     <div>
@@ -431,120 +457,122 @@ export default function BlogPostClient({
                   </>
                 )}
               </div>
-
-              <div className="flex items-center gap-2" role="group" aria-label="Share article">
-                <span className="text-sm font-semibold text-[#2b2e34] mr-2">
-                  Share:
-                </span>
-                <button
-                  onClick={() => sharePost("twitter")}
-                  className="w-10 h-10 rounded-full bg-[#1DA1F2] text-white hover:bg-[#1a8cd8] transition-all flex items-center justify-center shadow-md"
-                  aria-label="Share on Twitter"
+              <nav aria-label="Share article">
+                <div
+                  className="flex items-center gap-2"
+                  role="group"
                 >
-                  <Twitter size={18} />
-                </button>
-                <button
-                  onClick={() => sharePost("linkedin")}
-                  className="w-10 h-10 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-all flex items-center justify-center shadow-md"
-                  aria-label="Share on LinkedIn"
-                >
-                  <Linkedin size={18} />
-                </button>
-                <button
-                  onClick={() => sharePost("facebook")}
-                  className="w-10 h-10 rounded-full bg-[#1877F2] text-white hover:bg-[#0c63d4] transition-all flex items-center justify-center shadow-md"
-                  aria-label="Share on Facebook"
-                >
-                  <Facebook size={18} />
-                </button>
-                <button
-                  onClick={copyLink}
-                  className="w-10 h-10 rounded-full bg-[#2b2e34] text-white hover:bg-[#1a1c20] transition-all flex items-center justify-center shadow-md"
-                  aria-label="Copy link to clipboard"
-                >
-                  <Share2 size={18} />
-                </button>
-                <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+                  <span className="text-sm font-semibold text-[#2b2e34] mr-2">
+                    Share:
+                  </span>
                   <button
-                    onClick={handleLike}
-                    disabled={hasLiked || isLiking}
-                    className={`group flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all shadow-md ${
-                      hasLiked
-                        ? "bg-red-500 text-white cursor-default"
-                        : "bg-red-50 text-red-700 hover:bg-red-500 hover:text-white"
-                    }`}
-                    aria-label={
-                      hasLiked
-                        ? `You've liked this post. ${formatViewCount(likes, "intl").full} total likes`
-                        : `Like this post. ${formatViewCount(likes, "intl").full} total likes`
-                    }
+                    onClick={() => sharePost("twitter")}
+                    className="w-10 h-10 rounded-full bg-[#1DA1F2] text-white hover:bg-[#1a8cd8] transition-all flex items-center justify-center shadow-md"
+                    aria-label="Share on Twitter"
                   >
-                    <Heart
-                      size={18}
-                      className={
-                        hasLiked ? "fill-current" : "group-hover:fill-current"
-                      }
-                      aria-hidden="true"
-                    />
-                    <span className="text-sm">
-                      {formatViewCount(likes, "intl").formatted}
-                    </span>
+                    <Twitter size={18} />
                   </button>
+                  <button
+                    onClick={() => sharePost("linkedin")}
+                    className="w-10 h-10 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-all flex items-center justify-center shadow-md"
+                    aria-label="Share on LinkedIn"
+                  >
+                    <Linkedin size={18} />
+                  </button>
+                  <button
+                    onClick={() => sharePost("facebook")}
+                    className="w-10 h-10 rounded-full bg-[#1877F2] text-white hover:bg-[#0c63d4] transition-all flex items-center justify-center shadow-md"
+                    aria-label="Share on Facebook"
+                  >
+                    <Facebook size={18} />
+                  </button>
+                  <button
+                    onClick={copyLink}
+                    className="w-10 h-10 rounded-full bg-[#2b2e34] text-white hover:bg-[#1a1c20] transition-all flex items-center justify-center shadow-md"
+                    aria-label="Copy link to clipboard"
+                  >
+                    <Share2 size={18} />
+                  </button>
+                  <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+                    <button
+                      onClick={handleLike}
+                      disabled={hasLiked || isLiking}
+                      className={`group flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all shadow-md ${
+                        hasLiked
+                          ? "bg-red-500 text-white cursor-default"
+                          : "bg-red-50 text-red-700 hover:bg-red-500 hover:text-white"
+                      }`}
+                      aria-label={
+                        hasLiked
+                          ? `You've liked this post. ${formatViewCount(likes, "intl").full} total likes`
+                          : `Like this post. ${formatViewCount(likes, "intl").full} total likes`
+                      }
+                    >
+                      <Heart
+                        size={18}
+                        className={
+                          hasLiked ? "fill-current" : "group-hover:fill-current"
+                        }
+                        aria-hidden="true"
+                      />
+                      <span className="text-sm">
+                        {formatViewCount(likes, "intl").formatted}
+                      </span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </nav>
             </motion.div>
 
-            {post.tags && post.tags.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.45 }}
-                className="flex items-center gap-2 flex-wrap mt-6"
-                role="list"
-                aria-label="Article topics"
-              >
-                <span className="text-sm font-semibold text-gray-700">Topics:</span>
-                {post.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors border border-gray-200"
-                    role="listitem"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </motion.div>
-            )}
+           {post.tags && post.tags.length > 0 && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay: 0.45 }}
+    className="mt-6"
+  >
+    <span className="text-sm font-semibold text-gray-700 mb-2 block">Topics:</span>
+    <ul className="flex items-center gap-2 flex-wrap list-none" aria-label="Article topics">
+      {post.tags.map((tag, index) => (
+        <li key={index}>
+          <span className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors border border-gray-200">
+            {tag}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </motion.div>
+)}
           </div>
         </header>
 
         {post.featuredImage && (
           <motion.figure
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative w-full bg-gray-50"
-          >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white">
-                <img
-                  src={post.featuredImage}
-                  alt={`Featured image for: ${post.title}`}
-                  className="w-full h-auto object-contain"
-                  style={{
-                    maxHeight: "80vh",
-                    display: "block",
-                    margin: "0 auto",
-                  }}
-                />
-                <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
-                  <p className="text-white/90 text-sm">
-                    Featured image for: {post.title}
-                  </p>
-                </figcaption>
-              </div>
-            </div>
-          </motion.figure>
+    initial={{ opacity: 0, scale: 0.98 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.8, delay: 0.3 }}
+    className="relative w-full bg-gray-50"
+  >
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white">
+        <img
+          src={post.featuredImage}
+          alt={post.featuredImageAlt || `Featured image for: ${post.title}`}
+          className="w-full h-auto object-contain"
+          style={{
+            maxHeight: "80vh",
+            display: "block",
+            margin: "0 auto",
+          }}
+        />
+        <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+          <p className="text-white/90 text-sm">
+            {post.featuredImageName || post.title}
+          </p>
+        </figcaption>
+      </div>
+    </div>
+  </motion.figure>
         )}
 
         <div className="relative bg-white">
@@ -591,11 +619,17 @@ export default function BlogPostClient({
                   aria-labelledby="cta-heading"
                 >
                   <div className="flex flex-col md:flex-row items-center gap-6">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center flex-shrink-0 shadow-xl" aria-hidden="true">
+                    <div
+                      className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center flex-shrink-0 shadow-xl"
+                      aria-hidden="true"
+                    >
                       <Mail size={36} className="text-white" />
                     </div>
                     <div className="flex-1 text-center md:text-left">
-                      <h2 id="cta-heading" className="text-2xl md:text-3xl font-serif text-[#2b2e34] mb-2">
+                      <h2
+                        id="cta-heading"
+                        className="text-2xl md:text-3xl font-serif text-[#2b2e34] mb-2"
+                      >
                         Enjoyed this article?
                       </h2>
                       <p className="text-[#4f475d] text-lg">
@@ -633,7 +667,12 @@ export default function BlogPostClient({
                         aria-hidden="true"
                       />
                       <div>
-                        <h2 id="insights-hub-heading" className="font-bold text-lg">Insights Hub</h2>
+                        <h2
+                          id="insights-hub-heading"
+                          className="font-bold text-lg"
+                        >
+                          Insights Hub
+                        </h2>
                         <p className="text-white/80 text-sm">
                           Research & Analysis
                         </p>
@@ -666,19 +705,35 @@ export default function BlogPostClient({
                     aria-labelledby="newsletter-heading"
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center" aria-hidden="true">
+                      <div
+                        className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center"
+                        aria-hidden="true"
+                      >
                         <Mail className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 id="newsletter-heading" className="font-bold text-lg">Stay Updated</h2>
+                        <h2
+                          id="newsletter-heading"
+                          className="font-bold text-lg"
+                        >
+                          Stay Updated
+                        </h2>
                         <p className="text-white/80 text-sm">
                           Get insights in your inbox
                         </p>
                       </div>
                     </div>
 
-                    <form onSubmit={(e) => { e.preventDefault(); handleNewsletterSubmit(); }} className="space-y-3 mb-4">
-                      <label htmlFor="newsletter-name" className="sr-only">Your name</label>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleNewsletterSubmit();
+                      }}
+                      className="space-y-3 mb-4"
+                    >
+                      <label htmlFor="newsletter-name" className="sr-only">
+                        Your name
+                      </label>
                       <input
                         id="newsletter-name"
                         type="text"
@@ -692,7 +747,9 @@ export default function BlogPostClient({
                         required
                       />
 
-                      <label htmlFor="newsletter-email" className="sr-only">Your email address</label>
+                      <label htmlFor="newsletter-email" className="sr-only">
+                        Your email address
+                      </label>
                       <input
                         id="newsletter-email"
                         type="email"
@@ -706,15 +763,18 @@ export default function BlogPostClient({
                         required
                       />
 
-                    <button
-  type="submit"
-  disabled={newsletterStatus === "loading"}
-  className="w-full px-4 py-3 bg-white hover:bg-gray-50 text-[#2b2e34] font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-  aria-label="Subscribe to newsletter"
->
+                      <button
+                        type="submit"
+                        disabled={newsletterStatus === "loading"}
+                        className="w-full px-4 py-3 bg-white hover:bg-gray-50 text-[#2b2e34] font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                        aria-label="Subscribe to newsletter"
+                      >
                         {newsletterStatus === "loading" ? (
                           <>
-                            <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                            <Loader2
+                              className="w-5 h-5 animate-spin"
+                              aria-hidden="true"
+                            />
                             Subscribing...
                           </>
                         ) : (
@@ -734,9 +794,15 @@ export default function BlogPostClient({
                         aria-live="polite"
                       >
                         {newsletterStatus === "success" ? (
-                          <CheckCircle className="w-5 h-5 text-green-200 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                          <CheckCircle
+                            className="w-5 h-5 text-green-200 mt-0.5 flex-shrink-0"
+                            aria-hidden="true"
+                          />
                         ) : (
-                          <AlertCircle className="w-5 h-5 text-red-200 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                          <AlertCircle
+                            className="w-5 h-5 text-red-200 mt-0.5 flex-shrink-0"
+                            aria-hidden="true"
+                          />
                         )}
                         <p
                           className={`text-sm ${
@@ -756,83 +822,100 @@ export default function BlogPostClient({
           </div>
         </div>
 
-      {relatedPosts.length > 0 && (
-  <section className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100" aria-labelledby="related-posts-heading">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <motion.header
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-12"
-      >
-        <div className="inline-flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg" aria-hidden="true">
-            <TrendingUp className="text-white" size={24} />
-          </div>
-          <h2 id="related-posts-heading" className="text-4xl md:text-5xl font-serif text-[#2b2e34]">
-            Continue Reading
-          </h2>
-        </div>
-        <p className="text-lg text-[#4f475d]">
-          More articles you might enjoy
-        </p>
-      </motion.header>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {relatedPosts.map((relatedPost, index) => (
-          <motion.article
-            key={relatedPost.id}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+        {relatedPosts.length > 0 && (
+          <section
+            className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100"
+            aria-labelledby="related-posts-heading"
           >
-            <Link href={`/blog/${relatedPost.slug}`} aria-label={`Read article: ${relatedPost.title}`}>
-              <div className="group bg-white rounded-3xl overflow-hidden border-2 border-gray-100 hover:border-[#755eb1]/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-                  {relatedPost.featuredImage ? (
-                    <img
-                      src={relatedPost.featuredImage}
-                      alt={`Featured image for ${relatedPost.title}`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/20 to-[#c7d6c1]/20 flex items-center justify-center">
-                      <span className="text-7xl opacity-20" aria-hidden="true">📝</span>
-                    </div>
-                  )}
-                  <div className="absolute top-4 left-4">
-                    <span className="px-4 py-2 bg-white/95 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
-                      {relatedPost.category}
-                    </span>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <motion.header
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-12"
+              >
+                <div className="inline-flex items-center gap-3 mb-4">
+                  <div
+                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg"
+                    aria-hidden="true"
+                  >
+                    <TrendingUp className="text-white" size={24} />
                   </div>
+                  <h2
+                    id="related-posts-heading"
+                    className="text-4xl md:text-5xl font-serif text-[#2b2e34]"
+                  >
+                    Continue Reading
+                  </h2>
                 </div>
+                <p className="text-lg text-[#4f475d]">
+                  More articles you might enjoy
+                </p>
+              </motion.header>
 
-                <div className="p-8 flex-1 flex flex-col">
-                  <h3 className="text-2xl font-serif text-[#2b2e34] mb-4 line-clamp-2 group-hover:text-[#755eb1] transition-colors leading-tight">
-                    {relatedPost.title}
-                  </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {relatedPosts.map((relatedPost, index) => (
+                  <motion.article
+                    key={relatedPost.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+                  >
+                    <Link
+                      href={`/blog/${relatedPost.slug}`}
+                      aria-label={`Read article: ${relatedPost.title}`}
+                    >
+                      <div className="group bg-white rounded-3xl overflow-hidden border-2 border-gray-100 hover:border-[#755eb1]/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+                        <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+                          {relatedPost.featuredImage ? (
+                            <img
+                              src={relatedPost.featuredImage}
+                              alt={`Featured image for ${relatedPost.title}`}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/20 to-[#c7d6c1]/20 flex items-center justify-center">
+                              <span
+                                className="text-7xl opacity-20"
+                                aria-hidden="true"
+                              >
+                                📝
+                              </span>
+                            </div>
+                          )}
+                          <div className="absolute top-4 left-4">
+                            <span className="px-4 py-2 bg-white/95 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
+                              {relatedPost.category}
+                            </span>
+                          </div>
+                        </div>
 
-                  <p className="text-base text-[#4f475d] mb-6 line-clamp-3 flex-1 leading-relaxed">
-                    {relatedPost.excerpt}
-                  </p>
+                        <div className="p-8 flex-1 flex flex-col">
+                          <h3 className="text-2xl font-serif text-[#2b2e34] mb-4 line-clamp-2 group-hover:text-[#755eb1] transition-colors leading-tight">
+                            {relatedPost.title}
+                          </h3>
 
-                  <div className="flex items-center gap-3 text-[#755eb1] font-bold text-sm group-hover:gap-4 transition-all">
-                    <span>Read More</span>
-                    <ChevronRight
-                      size={18}
-                      className="group-hover:translate-x-1 transition-transform"
-                      aria-hidden="true"
-                    />
-                  </div>
-                </div>
+                          <p className="text-base text-[#4f475d] mb-6 line-clamp-3 flex-1 leading-relaxed">
+                            {relatedPost.excerpt}
+                          </p>
+
+                          <div className="flex items-center gap-3 text-[#755eb1] font-bold text-sm group-hover:gap-4 transition-all">
+                            <span>Read More</span>
+                            <ChevronRight
+                              size={18}
+                              className="group-hover:translate-x-1 transition-transform"
+                              aria-hidden="true"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.article>
+                ))}
               </div>
-            </Link>
-          </motion.article>
-        ))}
-      </div>
-    </div>
-  </section>
-)}
+            </div>
+          </section>
+        )}
       </article>
 
       <Footer />

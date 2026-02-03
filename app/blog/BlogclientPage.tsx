@@ -31,10 +31,12 @@ interface BlogPost {
   category: string;
   tags: string[];
   featuredImage?: string;
+  featuredImageAlt?: string;      // ✅ ADD THIS
+  featuredImageName?: string;     // ✅ ADD THIS
   status: string;
   createdAt: string;
   publishedAt?: string;
-  likes?: number; // Add this
+  likes?: number;
 }
 
 interface BlogClientPageProps {
