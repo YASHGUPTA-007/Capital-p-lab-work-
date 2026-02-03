@@ -45,7 +45,7 @@ export const Footer = () => {
                >
                    <nav className="grid grid-cols-3 gap-12 md:gap-24 text-left" aria-label="Footer navigation">
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-[#c1b4df] mb-6">Company</h4>
+                         <h2 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Company</h2>
                            <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="#about" className="hover:text-[#c1b4df] transition-colors">About</a></li>
                                <li><a href="#team" className="hover:text-[#c1b4df] transition-colors">Team</a></li>
@@ -53,7 +53,7 @@ export const Footer = () => {
                            </ul>
                        </div>
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-[#c1b4df] mb-6">Focus</h4>
+                         <h4 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Focus</h4>
                            <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="#focus" className="hover:text-[#c1b4df] transition-colors">Inclusion</a></li>
                                <li><a href="#focus" className="hover:text-[#c1b4df] transition-colors">Climate Emotion</a></li>
@@ -61,7 +61,7 @@ export const Footer = () => {
                            </ul>
                        </div>
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-[#c1b4df] mb-6">Social</h4>
+                           <h4 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Social</h4>
                            <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="mailto:contact@capitalp.org" className="hover:text-[#c1b4df] transition-colors">Email</a></li>
                            </ul>
