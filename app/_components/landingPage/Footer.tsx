@@ -53,7 +53,7 @@ export const Footer = () => {
                            </ul>
                        </div>
                        <div>
-                         <h4 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Focus</h4>
+                         <h2 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Focus</h2>
                            <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="#focus" className="hover:text-[#c1b4df] transition-colors">Inclusion</a></li>
                                <li><a href="#focus" className="hover:text-[#c1b4df] transition-colors">Climate Emotion</a></li>
@@ -61,7 +61,7 @@ export const Footer = () => {
                            </ul>
                        </div>
                        <div>
-                           <h4 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Social</h4>
+                           <h2 className="font-bold text-xs uppercase tracking-widest text-white mb-6">Social</h2>
                            <ul className="space-y-4 text-sm text-white font-medium">
                                <li><a href="mailto:contact@capitalp.org" className="hover:text-[#c1b4df] transition-colors">Email</a></li>
                            </ul>
