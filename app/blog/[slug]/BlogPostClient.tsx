@@ -1,4 +1,3 @@
-// app/blog/[slug]/BlogPostClient.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -42,7 +41,7 @@ interface BlogPost {
   status: string;
   createdAt: string;
   publishedAt?: string;
-  likes?: number; // Add this
+  likes?: number;
 }
 
 interface BlogPostClientProps {
@@ -70,16 +69,12 @@ export default function BlogPostClient({
   const [hasLiked, setHasLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
-  // Add this useEffect to FORCE scroll to work
   useEffect(() => {
-    // Force body scroll on mount
     document.body.style.overflow = "scroll";
     document.body.style.height = "auto";
     document.documentElement.style.overflow = "visible";
 
-    return () => {
-      // Don't reset - let it stay scrollable
-    };
+    return () => {};
   }, []);
 
   useEffect(() => {
@@ -95,18 +90,14 @@ export default function BlogPostClient({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Track view with debouncing (add after other useEffect hooks)
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
     const trackView = async () => {
-      // Check if already viewed in this session
       const viewedKey = `blog_viewed_${post.id}`;
       const hasViewed = sessionStorage.getItem(viewedKey);
 
       if (!hasViewed) {
-        // Debounce: Wait 3 seconds before tracking
-        // (ensures user actually reads, not just bounces)
         timeoutId = setTimeout(async () => {
           try {
             await fetch("/api/blog/view", {
@@ -119,7 +110,7 @@ export default function BlogPostClient({
           } catch (error) {
             console.error("Failed to track view:", error);
           }
-        }, 3000); // 3 second debounce
+        }, 3000);
       }
     };
 
@@ -130,7 +121,6 @@ export default function BlogPostClient({
     };
   }, [post.id]);
 
-  // Check if user has already liked this post
   useEffect(() => {
     const likedKey = `blog_liked_${post.id}`;
     const hasLikedBefore = localStorage.getItem(likedKey);
@@ -145,7 +135,6 @@ export default function BlogPostClient({
     try {
       const date = new Date(dateString);
 
-      // Check if date is valid
       if (isNaN(date.getTime())) {
         return "";
       }
@@ -166,7 +155,6 @@ export default function BlogPostClient({
 
     setIsLiking(true);
 
-    // Optimistic update
     setLikes((prev) => prev + 1);
     setHasLiked(true);
 
@@ -181,14 +169,11 @@ export default function BlogPostClient({
 
       const data = await response.json();
 
-      // Update with actual count from server
       setLikes(data.likes);
 
-      // Store in localStorage
       localStorage.setItem(`blog_liked_${post.id}`, "true");
     } catch (error) {
       console.error("Error liking post:", error);
-      // Revert optimistic update on error
       setLikes((prev) => prev - 1);
       setHasLiked(false);
     } finally {
@@ -311,6 +296,11 @@ export default function BlogPostClient({
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
         style={{ scaleX: readingProgress / 100 }}
         initial={{ scaleX: 0 }}
+        role="progressbar"
+        aria-valuenow={readingProgress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Reading progress"
       />
 
       <div className="fixed right-6 bottom-6 flex flex-col gap-3 z-40">
@@ -319,23 +309,26 @@ export default function BlogPostClient({
           whileTap={{ scale: 0.95 }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className="w-14 h-14 bg-white text-[#755eb1] rounded-full shadow-2xl flex items-center justify-center hover:bg-[#755eb1] hover:text-white transition-all"
+          aria-label="Scroll to top"
         >
           <ArrowLeft size={22} className="rotate-90" />
         </motion.button>
       </div>
 
       <article className="relative">
-        <div className="relative bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5">
+        <header className="relative bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
-            <motion.div
+            <motion.nav
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="flex items-center justify-between mb-8"
+              aria-label="Breadcrumb and site info"
             >
               <Link
                 href="/blog"
                 className="group inline-flex items-center gap-2 text-[#755eb1] hover:text-[#6b54a5] font-semibold transition-all"
+                aria-label="Back to Blog"
               >
                 <div className="w-8 h-8 rounded-full bg-[#755eb1]/10 flex items-center justify-center group-hover:bg-[#755eb1]/20 transition-all">
                   <ArrowLeft size={16} />
@@ -343,10 +336,10 @@ export default function BlogPostClient({
                 <span>Back to Blog</span>
               </Link>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3" aria-label="Site branding">
                 <Image
                   src="/logo.png"
-                  alt="Company Logo"
+                  alt="The Capital P Lab Logo"
                   width={40}
                   height={40}
                   className="rounded-lg"
@@ -358,7 +351,7 @@ export default function BlogPostClient({
                   <p className="text-xs text-[#4f475d]">Research & Analysis</p>
                 </div>
               </div>
-            </motion.div>
+            </motion.nav>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -371,12 +364,14 @@ export default function BlogPostClient({
               </span>
               <div className="flex items-center gap-4 text-sm text-[#4f475d]">
                 <div className="flex items-center gap-1.5">
-                  <Clock size={16} />
+                  <Clock size={16} aria-hidden="true" />
                   <span>{readingTime} min read</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Calendar size={16} />
-                  <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                  <Calendar size={16} aria-hidden="true" />
+                  <time dateTime={post.publishedAt || post.createdAt}>
+                    {formatDate(post.publishedAt || post.createdAt)}
+                  </time>
                 </div>
               </div>
             </motion.div>
@@ -399,67 +394,73 @@ export default function BlogPostClient({
               {post.excerpt}
             </motion.p>
 
-          <motion.div
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
               className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-gray-200"
             >
-              {hasAuthor ? (
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                    {post.author.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-bold text-[#2b2e34] text-lg">
-                      {post.author}
-                    </p>
-                    <p className="text-sm text-[#4f475d]">
-                      Contributing Writer
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                    <span className="text-2xl">📝</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-[#2b2e34] text-lg">
-                      Editorial Team
-                    </p>
-                    <p className="text-sm text-[#4f475d]">
-                      Research & Analysis
-                    </p>
-                  </div>
-                </div>
-              )}
+              <div className="flex items-center gap-4">
+                {hasAuthor ? (
+                  <>
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg" aria-hidden="true">
+                      {post.author.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-bold text-[#2b2e34] text-lg">
+                        {post.author}
+                      </p>
+                      <p className="text-sm text-[#4f475d]">
+                        Contributing Writer
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center text-white font-bold text-xl shadow-lg" aria-hidden="true">
+                      <span className="text-2xl">📝</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-[#2b2e34] text-lg">
+                        Editorial Team
+                      </p>
+                      <p className="text-sm text-[#4f475d]">
+                        Research & Analysis
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-[#4f475d] mr-2">
+              <div className="flex items-center gap-2" role="group" aria-label="Share article">
+                <span className="text-sm font-semibold text-[#2b2e34] mr-2">
                   Share:
                 </span>
                 <button
                   onClick={() => sharePost("twitter")}
-                  className="w-10 h-10 rounded-full bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-[#1DA1F2] text-white hover:bg-[#1a8cd8] transition-all flex items-center justify-center shadow-md"
+                  aria-label="Share on Twitter"
                 >
                   <Twitter size={18} />
                 </button>
                 <button
                   onClick={() => sharePost("linkedin")}
-                  className="w-10 h-10 rounded-full bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2] hover:text-white transition-all flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-all flex items-center justify-center shadow-md"
+                  aria-label="Share on LinkedIn"
                 >
                   <Linkedin size={18} />
                 </button>
                 <button
                   onClick={() => sharePost("facebook")}
-                  className="w-10 h-10 rounded-full bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-[#1877F2] text-white hover:bg-[#0c63d4] transition-all flex items-center justify-center shadow-md"
+                  aria-label="Share on Facebook"
                 >
                   <Facebook size={18} />
                 </button>
                 <button
                   onClick={copyLink}
-                  className="w-10 h-10 rounded-full bg-[#755eb1]/10 text-[#755eb1] hover:bg-[#755eb1] hover:text-white transition-all flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-[#2b2e34] text-white hover:bg-[#1a1c20] transition-all flex items-center justify-center shadow-md"
+                  aria-label="Copy link to clipboard"
                 >
                   <Share2 size={18} />
                 </button>
@@ -467,15 +468,15 @@ export default function BlogPostClient({
                   <button
                     onClick={handleLike}
                     disabled={hasLiked || isLiking}
-                    className={`group flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all ${
+                    className={`group flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all shadow-md ${
                       hasLiked
                         ? "bg-red-500 text-white cursor-default"
-                        : "bg-red-50 text-red-600 hover:bg-red-500 hover:text-white"
+                        : "bg-red-50 text-red-700 hover:bg-red-500 hover:text-white"
                     }`}
-                    title={
+                    aria-label={
                       hasLiked
-                        ? `You've liked this post • ${formatViewCount(likes, "intl").full} total likes`
-                        : `Like this post • ${formatViewCount(likes, "intl").full} total likes`
+                        ? `You've liked this post. ${formatViewCount(likes, "intl").full} total likes`
+                        : `Like this post. ${formatViewCount(likes, "intl").full} total likes`
                     }
                   >
                     <Heart
@@ -483,6 +484,7 @@ export default function BlogPostClient({
                       className={
                         hasLiked ? "fill-current" : "group-hover:fill-current"
                       }
+                      aria-hidden="true"
                     />
                     <span className="text-sm">
                       {formatViewCount(likes, "intl").formatted}
@@ -492,31 +494,32 @@ export default function BlogPostClient({
               </div>
             </motion.div>
 
-            {/* Tags Section - Below Author */}
-       {post.tags && post.tags.length > 0 && (
+            {post.tags && post.tags.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.45 }}
                 className="flex items-center gap-2 flex-wrap mt-6"
+                role="list"
+                aria-label="Article topics"
               >
                 <span className="text-sm font-semibold text-gray-700">Topics:</span>
                 {post.tags.map((tag, index) => (
                   <span
                     key={index}
                     className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors border border-gray-200"
+                    role="listitem"
                   >
                     {tag}
                   </span>
                 ))}
               </motion.div>
             )}
-
           </div>
-        </div>
+        </header>
 
         {post.featuredImage && (
-          <motion.div
+          <motion.figure
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -526,7 +529,7 @@ export default function BlogPostClient({
               <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white">
                 <img
                   src={post.featuredImage}
-                  alt={post.title}
+                  alt={`Featured image for: ${post.title}`}
                   className="w-full h-auto object-contain"
                   style={{
                     maxHeight: "80vh",
@@ -534,14 +537,14 @@ export default function BlogPostClient({
                     margin: "0 auto",
                   }}
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
                   <p className="text-white/90 text-sm">
                     Featured image for: {post.title}
                   </p>
-                </div>
+                </figcaption>
               </div>
             </div>
-          </motion.div>
+          </motion.figure>
         )}
 
         <div className="relative bg-white">
@@ -580,22 +583,21 @@ export default function BlogPostClient({
                   />
                 </motion.div>
 
-          
-
-                <motion.div
+                <motion.section
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
                   className="mt-16 bg-gradient-to-br from-[#755eb1]/5 via-[#c7d6c1]/5 to-[#755eb1]/5 rounded-3xl p-8 md:p-10 border-2 border-[#755eb1]/20"
+                  aria-labelledby="cta-heading"
                 >
                   <div className="flex flex-col md:flex-row items-center gap-6">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center flex-shrink-0 shadow-xl">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center flex-shrink-0 shadow-xl" aria-hidden="true">
                       <Mail size={36} className="text-white" />
                     </div>
                     <div className="flex-1 text-center md:text-left">
-                      <h3 className="text-2xl md:text-3xl font-serif text-[#2b2e34] mb-2">
+                      <h2 id="cta-heading" className="text-2xl md:text-3xl font-serif text-[#2b2e34] mb-2">
                         Enjoyed this article?
-                      </h3>
+                      </h2>
                       <p className="text-[#4f475d] text-lg">
                         Subscribe to get our latest insights delivered to your
                         inbox.
@@ -604,31 +606,34 @@ export default function BlogPostClient({
                     <button
                       onClick={scrollToSubscribe}
                       className="px-8 py-4 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white rounded-xl font-bold hover:shadow-2xl transition-all transform hover:scale-105 whitespace-nowrap"
+                      aria-label="Subscribe to newsletter"
                     >
                       Subscribe Now
                     </button>
                   </div>
-                </motion.div>
+                </motion.section>
               </main>
 
-              <aside className="lg:col-span-4">
+              <aside className="lg:col-span-4" aria-label="Sidebar">
                 <div className="lg:sticky lg:top-24 space-y-6">
-                  <motion.div
+                  <motion.section
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
                     className="bg-gradient-to-br from-[#755eb1] to-[#6b54a5] rounded-2xl p-6 text-white shadow-xl"
+                    aria-labelledby="insights-hub-heading"
                   >
                     <div className="flex items-center gap-3 mb-4">
                       <Image
                         src="/logo.png"
-                        alt="Company Logo"
+                        alt=""
                         width={50}
                         height={50}
                         className="rounded-xl bg-white p-1"
+                        aria-hidden="true"
                       />
                       <div>
-                        <h3 className="font-bold text-lg">Insights Hub</h3>
+                        <h2 id="insights-hub-heading" className="font-bold text-lg">Insights Hub</h2>
                         <p className="text-white/80 text-sm">
                           Research & Analysis
                         </p>
@@ -641,36 +646,41 @@ export default function BlogPostClient({
                     <Link
                       href="/blog"
                       className="inline-flex items-center gap-2 text-white font-semibold text-sm hover:gap-3 transition-all group"
+                      aria-label="Explore all articles"
                     >
                       <span>Explore All Articles</span>
                       <ChevronRight
                         size={16}
                         className="group-hover:translate-x-1 transition-transform"
+                        aria-hidden="true"
                       />
                     </Link>
-                  </motion.div>
+                  </motion.section>
 
-                  <motion.div
+                  <motion.section
                     id="newsletter-subscribe"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.6 }}
                     className="bg-gradient-to-br from-[#755eb1] to-[#6b54a5] rounded-2xl p-6 text-white shadow-xl"
+                    aria-labelledby="newsletter-heading"
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                      <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center" aria-hidden="true">
                         <Mail className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg">Stay Updated</h3>
+                        <h2 id="newsletter-heading" className="font-bold text-lg">Stay Updated</h2>
                         <p className="text-white/80 text-sm">
                           Get insights in your inbox
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-3 mb-4">
+                    <form onSubmit={(e) => { e.preventDefault(); handleNewsletterSubmit(); }} className="space-y-3 mb-4">
+                      <label htmlFor="newsletter-name" className="sr-only">Your name</label>
                       <input
+                        id="newsletter-name"
                         type="text"
                         name="name"
                         placeholder="Your name"
@@ -679,9 +689,12 @@ export default function BlogPostClient({
                         onKeyPress={handleNewsletterKeyPress}
                         disabled={newsletterStatus === "loading"}
                         className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        required
                       />
 
+                      <label htmlFor="newsletter-email" className="sr-only">Your email address</label>
                       <input
+                        id="newsletter-email"
                         type="email"
                         name="email"
                         placeholder="your.email@example.com"
@@ -690,23 +703,25 @@ export default function BlogPostClient({
                         onKeyPress={handleNewsletterKeyPress}
                         disabled={newsletterStatus === "loading"}
                         className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        required
                       />
 
                       <button
-                        onClick={handleNewsletterSubmit}
+                        type="submit"
                         disabled={newsletterStatus === "loading"}
                         className="w-full px-4 py-3 bg-white hover:bg-white/90 text-[#755eb1] font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                        aria-label="Subscribe to newsletter"
                       >
                         {newsletterStatus === "loading" ? (
                           <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
                             Subscribing...
                           </>
                         ) : (
                           "Subscribe Now"
                         )}
                       </button>
-                    </div>
+                    </form>
 
                     {newsletterMessage && (
                       <div
@@ -715,11 +730,13 @@ export default function BlogPostClient({
                             ? "bg-green-500/20 border border-green-400/30"
                             : "bg-red-500/20 border border-red-400/30"
                         }`}
+                        role="alert"
+                        aria-live="polite"
                       >
                         {newsletterStatus === "success" ? (
-                          <CheckCircle className="w-5 h-5 text-green-200 mt-0.5 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-green-200 mt-0.5 flex-shrink-0" aria-hidden="true" />
                         ) : (
-                          <AlertCircle className="w-5 h-5 text-red-200 mt-0.5 flex-shrink-0" />
+                          <AlertCircle className="w-5 h-5 text-red-200 mt-0.5 flex-shrink-0" aria-hidden="true" />
                         )}
                         <p
                           className={`text-sm ${
@@ -732,7 +749,7 @@ export default function BlogPostClient({
                         </p>
                       </div>
                     )}
-                  </motion.div>
+                  </motion.section>
                 </div>
               </aside>
             </div>
@@ -740,26 +757,26 @@ export default function BlogPostClient({
         </div>
 
         {relatedPosts.length > 0 && (
-          <section className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100">
+          <section className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100" aria-labelledby="related-posts-heading">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.div
+              <motion.header
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 className="text-center mb-12"
               >
                 <div className="inline-flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg" aria-hidden="true">
                     <TrendingUp className="text-white" size={24} />
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-serif text-[#2b2e34]">
+                  <h2 id="related-posts-heading" className="text-4xl md:text-5xl font-serif text-[#2b2e34]">
                     Continue Reading
                   </h2>
                 </div>
                 <p className="text-lg text-[#4f475d]">
                   More articles you might enjoy
                 </p>
-              </motion.div>
+              </motion.header>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {relatedPosts.map((relatedPost, index) => (
@@ -769,18 +786,18 @@ export default function BlogPostClient({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
                   >
-                    <Link href={`/blog/${relatedPost.slug}`}>
+                    <Link href={`/blog/${relatedPost.slug}`} aria-label={`Read article: ${relatedPost.title}`}>
                       <div className="group bg-white rounded-3xl overflow-hidden border-2 border-gray-100 hover:border-[#755eb1]/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
                         <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
                           {relatedPost.featuredImage ? (
                             <img
                               src={relatedPost.featuredImage}
-                              alt={relatedPost.title}
+                              alt=""
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/20 to-[#c7d6c1]/20 flex items-center justify-center">
-                              <span className="text-7xl opacity-20">📝</span>
+                              <span className="text-7xl opacity-20" aria-hidden="true">📝</span>
                             </div>
                           )}
                           <div className="absolute top-4 left-4">
@@ -804,6 +821,7 @@ export default function BlogPostClient({
                             <ChevronRight
                               size={18}
                               className="group-hover:translate-x-1 transition-transform"
+                              aria-hidden="true"
                             />
                           </div>
                         </div>
