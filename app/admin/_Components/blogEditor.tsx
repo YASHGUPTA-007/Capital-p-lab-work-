@@ -1275,10 +1275,10 @@ const editor = useEditor({
                 </div>
               </div>
 
-              {/* Editor Input */}
-              <div className="border border-t-0 border-gray-300 rounded-b-lg bg-white min-h-[400px]">
-                <EditorContent editor={editor} />
-              </div>
+           {/* Editor Input */}
+<div className="border border-t-0 border-gray-300 rounded-b-lg bg-white min-h-[400px] overflow-x-auto">
+  <EditorContent editor={editor} />
+</div>
             </div>
           </div>
 
