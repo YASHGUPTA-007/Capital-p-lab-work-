@@ -51,7 +51,8 @@ import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { TableCell } from "@tiptap/extension-table-cell";
-import ImageSelectionModal from "./ImageSelectionModal";
+import ImageSelectionModal, { ImageMetadata } from "./ImageSelectionModal";
+import ImageEditModal from "./ImageEditModal";
 import {
   uploadToCloudinary,
   blobUrlToFile,
@@ -134,10 +135,12 @@ interface BlogPost {
   category: string;
   tags: string[];
   featuredImage?: string;
+  featuredImageAlt?: string;
+  featuredImageName?: string;
   status: string;
   createdAt: string;
   publishedAt?: string;
-  likes?: number; // Add this
+  likes?: number;
 }
 
 interface BlogEditorModalProps {
@@ -185,10 +188,11 @@ export default function BlogEditorModal({
     category: blog?.category || "Technology",
     customCategory: "",
     featuredImage: blog?.featuredImage || "",
+    featuredImageAlt: blog?.featuredImageAlt || "",
+    featuredImageName: blog?.featuredImageName || "",
     status: (blog?.status || "draft") as "draft" | "published",
   });
 
-  // Separate state for tags
   const [tags, setTags] = useState<string[]>(blog?.tags || []);
   const [tagInput, setTagInput] = useState("");
 
@@ -204,6 +208,13 @@ export default function BlogEditorModal({
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [cropType, setCropType] = useState<"featured" | "editor">("featured");
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+
+  // Image edit state
+  const [editingImage, setEditingImage] = useState<{
+    src: string;
+    alt: string;
+    title: string;
+  } | null>(null);
 
   // Track images for cleanup
   const originalFeaturedImage = useRef<string>(blog?.featuredImage || "");
@@ -228,91 +239,104 @@ export default function BlogEditorModal({
   }, [blog]);
 
   // Tiptap Editor
-// Tiptap Editor
-const editor = useEditor({
-  immediatelyRender: false,
-  extensions: [
-    StarterKit.configure({
-      heading: false,
-      bulletList: {
-        HTMLAttributes: { class: "list-disc pl-6 my-6 space-y-3" },
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        bulletList: {
+          HTMLAttributes: { class: "list-disc pl-6 my-6 space-y-3" },
+        },
+        orderedList: {
+          HTMLAttributes: { class: "list-decimal pl-6 my-6 space-y-3" },
+        },
+        listItem: {
+          HTMLAttributes: { class: "text-gray-900 text-lg leading-relaxed" },
+        },
+      }),
+      CustomHeading.configure({ levels: [1, 2, 3] }),
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: "border-collapse w-full my-8",
+          style: "border: 2px solid #000000;",
+        },
+      }),
+      TableRow.configure({
+        HTMLAttributes: {
+          style: "border: 2px solid #000000;",
+        },
+      }),
+      TableHeader.configure({
+        HTMLAttributes: {
+          style:
+            "border: 2px solid #000000; padding: 12px; background-color: #755eb1; color: white; font-weight: bold;",
+        },
+      }),
+      TableCell.configure({
+        HTMLAttributes: {
+          style: "border: 2px solid #000000; padding: 12px; min-width: 100px;",
+        },
+      }),
+      Image.configure({
+        HTMLAttributes: {
+          class: "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
+          loading: 'lazy',
+        },
+        inline: false,
+        allowBase64: false,
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: "text-[#755eb1] underline hover:text-[#6b54a5] font-medium",
+        },
+      }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Underline,
+      FontSize,
+      Color,
+      Highlight.configure({ multicolor: true }),
+      FontFamily.configure({ types: ["textStyle"] }),
+    ],
+    content: blog?.content || "<p>Start writing your blog post...</p>",
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900",
       },
-      orderedList: {
-        HTMLAttributes: { class: "list-decimal pl-6 my-6 space-y-3" },
-      },
-      listItem: {
-        HTMLAttributes: { class: "text-gray-900 text-lg leading-relaxed" },
-      },
-    }),
-    CustomHeading.configure({ levels: [1, 2, 3] }),
-    Table.configure({
-      resizable: true,
-      HTMLAttributes: {
-        class: "border-collapse w-full my-8",
-        style: "border: 2px solid #000000;",
-      },
-    }),
-    TableRow.configure({
-      HTMLAttributes: {
-        style: "border: 2px solid #000000;",
-      },
-    }),
-    TableHeader.configure({
-      HTMLAttributes: {
-        style:
-          "border: 2px solid #000000; padding: 12px; background-color: #755eb1; color: white; font-weight: bold;",
-      },
-    }),
-    TableCell.configure({
-      HTMLAttributes: {
-        style: "border: 2px solid #000000; padding: 12px; min-width: 100px;",
-      },
-    }),
-    Image.configure({
-      HTMLAttributes: {
-        class: "max-w-full h-auto rounded-lg my-8 shadow-md",
-      },
-    }),
-    Link.configure({
-      openOnClick: false,
-      HTMLAttributes: {
-        class: "text-[#755eb1] underline hover:text-[#6b54a5] font-medium",
-      },
-    }),
-    TextAlign.configure({ types: ["heading", "paragraph"] }),
-    Underline,
-    FontSize,
-    Color,
-    Highlight.configure({ multicolor: true }),
-    FontFamily.configure({ types: ["textStyle"] }),
-  ],
-  content: blog?.content || "<p>Start writing your blog post...</p>",
-  editorProps: {
-    attributes: {
-      class:
-        "prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900",
-    },
-    handleKeyDown: (view, event) => {
-      // Delete table on Backspace when cursor is in empty cell
-      if (event.key === 'Backspace') {
-        const { state } = view;
-        const { selection } = state;
-        const { $from } = selection;
-        
-        // Check if cursor is in a table
-        if ($from.node(-1)?.type.name === 'table') {
-          // If the cell is empty, delete the entire table
-          const cell = $from.node(0);
-          if (cell && cell.textContent === '') {
-            editor?.chain().focus().deleteTable().run();
-            return true; // Prevent default backspace behavior
+      handleKeyDown: (view, event) => {
+        if (event.key === 'Backspace') {
+          const { state } = view;
+          const { selection } = state;
+          const { $from } = selection;
+          
+          if ($from.node(-1)?.type.name === 'table') {
+            const cell = $from.node(0);
+            if (cell && cell.textContent === '') {
+              editor?.chain().focus().deleteTable().run();
+              return true;
+            }
           }
         }
-      }
-      return false; // Allow default behavior
+        return false;
+      },
+      // ✅ Handle image clicks for editing
+      handleClickOn: (view, pos, node, nodePos, event) => {
+        if (node.type.name === 'image') {
+          event.preventDefault();
+          const attrs = node.attrs;
+          setEditingImage({
+            src: attrs.src || '',
+            alt: attrs.alt || '',
+            title: attrs.title || '',
+          });
+          return true;
+        }
+        return false;
+      },
     },
-  },
-});
+  });
 
   const insertTable = () => {
     setShowTablePicker(true);
@@ -329,7 +353,7 @@ const editor = useEditor({
       })
       .run();
     setShowTablePicker(false);
-    setTableSize({ rows: 3, cols: 3 }); // Reset to default
+    setTableSize({ rows: 3, cols: 3 });
   };
 
   const addColumnBefore = () => editor?.chain().focus().addColumnBefore().run();
@@ -351,7 +375,6 @@ const editor = useEditor({
     });
   };
 
-  // Tag management functions
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
     if (trimmedTag && !tags.includes(trimmedTag)) {
@@ -439,8 +462,7 @@ const editor = useEditor({
     reader.readAsDataURL(file);
   };
 
-  // ⚡ NEW: Add image directly without cropping
-  const handleAddDirectly = async (imageUrl: string) => {
+  const handleAddDirectly = async (imageUrl: string, metadata: ImageMetadata) => {
     setSelectionModalOpen(false);
 
     if (cropType === "featured") {
@@ -455,25 +477,29 @@ const editor = useEditor({
       }
 
       const uploadedUrl = await uploadToCloudinary(pendingImageFile);
-
-      // Track uploaded image
       uploadedImagesThisSession.current.push(uploadedUrl);
 
       if (cropType === "featured") {
         const oldFeaturedImage = formData.featuredImage;
-        setFormData((prev) => ({ ...prev, featuredImage: uploadedUrl }));
+        setFormData((prev) => ({ 
+          ...prev, 
+          featuredImage: uploadedUrl,
+          featuredImageAlt: metadata.altText,
+          featuredImageName: metadata.name
+        }));
 
-        // Non-blocking cleanup
-        if (
-          oldFeaturedImage &&
-          oldFeaturedImage !== originalFeaturedImage.current
-        ) {
+        if (oldFeaturedImage && oldFeaturedImage !== originalFeaturedImage.current) {
           deleteCloudinaryImage(oldFeaturedImage).catch((err) =>
             console.error("Background cleanup failed:", err),
           );
         }
       } else if (cropType === "editor" && editor) {
-        editor.chain().focus().setImage({ src: uploadedUrl }).run();
+        editor.chain().focus().setImage({ 
+          src: uploadedUrl,
+          alt: metadata.altText,
+          title: metadata.name || metadata.altText,
+        
+        }).run();
       }
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -487,9 +513,7 @@ const editor = useEditor({
     }
   };
 
-  // ✅ Handle crop complete (existing optimized function)
-  const handleCropComplete = async (croppedImageUrl: string) => {
-    // 🚀 IMMEDIATELY close selection modal and show loading state
+  const handleCropComplete = async (croppedImageUrl: string, metadata: ImageMetadata) => {
     setSelectionModalOpen(false);
 
     if (cropType === "featured") {
@@ -504,25 +528,29 @@ const editor = useEditor({
         pendingImageFile?.name || "cropped-image.jpg",
       );
       const uploadedUrl = await uploadToCloudinary(croppedFile);
-
-      // Track uploaded image
       uploadedImagesThisSession.current.push(uploadedUrl);
 
       if (cropType === "featured") {
         const oldFeaturedImage = formData.featuredImage;
-        setFormData((prev) => ({ ...prev, featuredImage: uploadedUrl }));
+        setFormData((prev) => ({ 
+          ...prev, 
+          featuredImage: uploadedUrl,
+          featuredImageAlt: metadata.altText,
+          featuredImageName: metadata.name
+        }));
 
-        // 🔥 Non-blocking cleanup - don't wait for this
-        if (
-          oldFeaturedImage &&
-          oldFeaturedImage !== originalFeaturedImage.current
-        ) {
+        if (oldFeaturedImage && oldFeaturedImage !== originalFeaturedImage.current) {
           deleteCloudinaryImage(oldFeaturedImage).catch((err) =>
             console.error("Background cleanup failed:", err),
           );
         }
       } else if (cropType === "editor" && editor) {
-        editor.chain().focus().setImage({ src: uploadedUrl }).run();
+        editor.chain().focus().setImage({ 
+          src: uploadedUrl,
+          alt: metadata.altText,
+          title: metadata.name || metadata.altText,
+       
+        }).run();
       }
     } catch (error) {
       console.error("Error uploading cropped image:", error);
@@ -542,15 +570,48 @@ const editor = useEditor({
     setPendingImageFile(null);
   };
 
+  // ✅ NEW: Handle image edit save
+  const handleImageEditSave = (metadata: { altText: string; title: string }) => {
+    if (!editor || !editingImage) return;
+
+    // Find and update the image in the editor
+    const { state } = editor;
+    const { doc } = state;
+    
+    let imagePos: number | null = null;
+    
+    doc.descendants((node, pos) => {
+      if (node.type.name === 'image' && node.attrs.src === editingImage.src) {
+        imagePos = pos;
+        return false;
+      }
+    });
+
+    if (imagePos !== null) {
+      editor
+        .chain()
+        .focus()
+        .setNodeSelection(imagePos)
+        .updateAttributes('image', {
+          alt: metadata.altText,
+          title: metadata.title || metadata.altText,
+        })
+        .run();
+    }
+
+    setEditingImage(null);
+  };
+
   const handleRemoveFeaturedImage = async () => {
     const imageToRemove = formData.featuredImage;
-    setFormData((prev) => ({ ...prev, featuredImage: "" }));
+    setFormData((prev) => ({ 
+      ...prev, 
+      featuredImage: "",
+      featuredImageAlt: "",
+      featuredImageName: ""
+    }));
 
-    // Non-blocking cleanup
-    if (
-      imageToRemove &&
-      uploadedImagesThisSession.current.includes(imageToRemove)
-    ) {
+    if (imageToRemove && uploadedImagesThisSession.current.includes(imageToRemove)) {
       deleteCloudinaryImage(imageToRemove).catch((err) =>
         console.error("Failed to delete image:", err),
       );
@@ -565,7 +626,6 @@ const editor = useEditor({
     const imagesToCleanup = uploadedImagesThisSession.current;
 
     if (imagesToCleanup.length > 0) {
-      // Fire and forget cleanup
       Promise.all(
         imagesToCleanup.map((url) => deleteCloudinaryImage(url)),
       ).catch((err) => console.error("Cleanup failed:", err));
@@ -604,6 +664,34 @@ const editor = useEditor({
       return;
     }
 
+    // ✅ Validate featured image has alt text
+    if (formData.featuredImage && !formData.featuredImageAlt) {
+      alert("⚠️ Featured image is missing alt text. Please provide it for accessibility.");
+      return;
+    }
+
+    // ✅ Validate all content images have alt text
+    const currentContent = editor.getHTML();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = currentContent;
+    const contentImages = tempDiv.querySelectorAll('img');
+    
+    const imagesWithoutAlt: string[] = [];
+    contentImages.forEach((img) => {
+      const alt = img.getAttribute('alt');
+      const src = img.getAttribute('src');
+      if (!alt || alt.trim() === '') {
+        // Get a preview of the image URL for the alert
+        const urlPreview = src ? new URL(src).pathname.split('/').pop()?.substring(0, 30) : 'Unknown';
+        imagesWithoutAlt.push(urlPreview || 'Unknown image');
+      }
+    });
+
+    if (imagesWithoutAlt.length > 0) {
+      alert(`⚠️ ${imagesWithoutAlt.length} image(s) in content are missing alt text:\n\n${imagesWithoutAlt.join('\n')}\n\nAll images must have alt text for accessibility.\n\nClick on images in the editor to add alt text.`);
+      return;
+    }
+
     setSaving(true);
     try {
       const tagsArray = tags;
@@ -612,7 +700,6 @@ const editor = useEditor({
           ? formData.customCategory
           : formData.category;
       const readTime = calculateReadingTime(editor.getText());
-      const currentContent = editor.getHTML();
 
       const blogData = {
         title: formData.title,
@@ -622,6 +709,8 @@ const editor = useEditor({
         category: finalCategory,
         tags: tagsArray,
         featuredImage: formData.featuredImage,
+        featuredImageAlt: formData.featuredImageAlt,
+        featuredImageName: formData.featuredImageName,
         status: formData.status,
         content: currentContent,
         readTime: readTime,
@@ -631,7 +720,6 @@ const editor = useEditor({
       };
 
       if (blog) {
-        // Non-blocking cleanup of old images
         if (
           originalFeaturedImage.current &&
           originalFeaturedImage.current !== formData.featuredImage &&
@@ -649,7 +737,6 @@ const editor = useEditor({
             img !== formData.featuredImage,
         );
 
-        // Fire and forget cleanup
         if (unusedImages.length > 0) {
           Promise.all(
             unusedImages.map((img) => deleteCloudinaryImage(img)),
@@ -690,6 +777,7 @@ const editor = useEditor({
             <button
               onClick={handleCancel}
               className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
+              aria-label="Close editor"
             >
               <X size={24} />
             </button>
@@ -697,7 +785,7 @@ const editor = useEditor({
 
           {/* Scrollable Content */}
           <div className="px-6 py-6 space-y-8 max-h-[calc(100vh-200px)] overflow-y-auto">
-            {/* ✅ Loading Overlay for Better UX */}
+            {/* Loading Overlay */}
             {(uploadingFeaturedImage || uploadingImage) && (
               <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[100] pointer-events-none">
                 <div className="bg-white rounded-xl p-6 shadow-2xl flex items-center gap-4">
@@ -859,13 +947,11 @@ const editor = useEditor({
                 </div>
 
                 {/* Tags */}
-                {/* Tags */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Tags
                   </label>
 
-                  {/* Tag Input */}
                   <div className="flex gap-2 mb-3">
                     <input
                       type="text"
@@ -884,7 +970,6 @@ const editor = useEditor({
                     </button>
                   </div>
 
-                  {/* Display Tags */}
                   {tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag, index) => (
@@ -922,19 +1007,29 @@ const editor = useEditor({
                   </label>
                   <div className="space-y-3">
                     {formData.featuredImage ? (
-                      <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
-                        <img
-                          src={formData.featuredImage}
-                          alt="Featured"
-                          className="w-full h-56 object-cover"
-                        />
-                        <button
-                          onClick={handleRemoveFeaturedImage}
-                          disabled={uploadingFeaturedImage}
-                          className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                        >
-                          <X size={16} />
-                        </button>
+                      <div className="space-y-2">
+                        <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-sm group">
+                          <img
+                            src={formData.featuredImage}
+                            alt={formData.featuredImageAlt || "Featured"}
+                            className="w-full h-56 object-cover"
+                          />
+                          <button
+                            onClick={handleRemoveFeaturedImage}
+                            disabled={uploadingFeaturedImage}
+                            className="absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                            aria-label="Remove featured image"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                        {/* Display Alt Text */}
+                        {formData.featuredImageAlt && (
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <p className="text-xs font-bold text-green-900 mb-1">✅ Alt Text:</p>
+                            <p className="text-xs text-green-800">{formData.featuredImageAlt}</p>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <label className="flex flex-col items-center justify-center gap-2 w-full h-56 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-500 hover:bg-gray-50 cursor-pointer transition-all">
@@ -945,7 +1040,7 @@ const editor = useEditor({
                           <span className="text-sm font-medium text-gray-700 block">
                             {uploadingFeaturedImage
                               ? "Uploading..."
-                              : "Click to upload & crop"}
+                              : "Click to upload & add alt text"}
                           </span>
                           <span className="text-xs text-gray-500">
                             SVG, PNG, JPG or GIF (max. 5MB)
@@ -992,9 +1087,16 @@ const editor = useEditor({
 
             {/* Editor Area */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Content *
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Content *
+                </label>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5">
+                  <p className="text-xs font-medium text-blue-900">
+                    💡 Click images to edit alt text
+                  </p>
+                </div>
+              </div>
 
               {/* Editor Toolbar */}
               <div className="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap items-center gap-1 sticky top-0 z-10">
@@ -1172,6 +1274,8 @@ const editor = useEditor({
                     <ListOrdered size={18} />
                   </button>
                 </div>
+
+                {/* Tables */}
                 <div className="flex items-center gap-1 px-2 border-r border-gray-300">
                   <button
                     type="button"
@@ -1239,7 +1343,7 @@ const editor = useEditor({
                   </button>
                   <label
                     className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer ${uploadingImage ? "opacity-50 cursor-not-allowed" : ""}`}
-                    title="Upload & Crop Image"
+                    title="Upload Image with Alt Text"
                   >
                     <ImageIcon size={18} />
                     <input
@@ -1275,10 +1379,10 @@ const editor = useEditor({
                 </div>
               </div>
 
-           {/* Editor Input */}
-<div className="border border-t-0 border-gray-300 rounded-b-lg bg-white min-h-[400px] overflow-x-auto">
-  <EditorContent editor={editor} />
-</div>
+              {/* Editor Input */}
+              <div className="border border-t-0 border-gray-300 rounded-b-lg bg-white min-h-[400px] overflow-x-auto">
+                <EditorContent editor={editor} />
+              </div>
             </div>
           </div>
 
@@ -1311,6 +1415,7 @@ const editor = useEditor({
           </div>
         </div>
       </div>
+
       {/* Table Size Picker Modal */}
       {showTablePicker && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
@@ -1394,6 +1499,17 @@ const editor = useEditor({
           onCancel={handleSelectionCancel}
           defaultAspectRatio={cropType === "featured" ? 16 / 9 : undefined}
           type={cropType}
+        />
+      )}
+
+      {/* Image Edit Modal */}
+      {editingImage && (
+        <ImageEditModal
+          imageUrl={editingImage.src}
+          currentAlt={editingImage.alt}
+          currentTitle={editingImage.title}
+          onSave={handleImageEditSave}
+          onCancel={() => setEditingImage(null)}
         />
       )}
     </>

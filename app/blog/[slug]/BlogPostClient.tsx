@@ -706,12 +706,12 @@ export default function BlogPostClient({
                         required
                       />
 
-                      <button
-                        type="submit"
-                        disabled={newsletterStatus === "loading"}
-                        className="w-full px-4 py-3 bg-white hover:bg-white/90 text-[#755eb1] font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-                        aria-label="Subscribe to newsletter"
-                      >
+                    <button
+  type="submit"
+  disabled={newsletterStatus === "loading"}
+  className="w-full px-4 py-3 bg-white hover:bg-gray-50 text-[#2b2e34] font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+  aria-label="Subscribe to newsletter"
+>
                         {newsletterStatus === "loading" ? (
                           <>
                             <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
@@ -756,83 +756,83 @@ export default function BlogPostClient({
           </div>
         </div>
 
-        {relatedPosts.length > 0 && (
-          <section className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100" aria-labelledby="related-posts-heading">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.header
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-12"
-              >
-                <div className="inline-flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg" aria-hidden="true">
-                    <TrendingUp className="text-white" size={24} />
+      {relatedPosts.length > 0 && (
+  <section className="relative py-20 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 border-t-2 border-gray-100" aria-labelledby="related-posts-heading">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.header
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-12"
+      >
+        <div className="inline-flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg" aria-hidden="true">
+            <TrendingUp className="text-white" size={24} />
+          </div>
+          <h2 id="related-posts-heading" className="text-4xl md:text-5xl font-serif text-[#2b2e34]">
+            Continue Reading
+          </h2>
+        </div>
+        <p className="text-lg text-[#4f475d]">
+          More articles you might enjoy
+        </p>
+      </motion.header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {relatedPosts.map((relatedPost, index) => (
+          <motion.article
+            key={relatedPost.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+          >
+            <Link href={`/blog/${relatedPost.slug}`} aria-label={`Read article: ${relatedPost.title}`}>
+              <div className="group bg-white rounded-3xl overflow-hidden border-2 border-gray-100 hover:border-[#755eb1]/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+                <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+                  {relatedPost.featuredImage ? (
+                    <img
+                      src={relatedPost.featuredImage}
+                      alt={`Featured image for ${relatedPost.title}`}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/20 to-[#c7d6c1]/20 flex items-center justify-center">
+                      <span className="text-7xl opacity-20" aria-hidden="true">📝</span>
+                    </div>
+                  )}
+                  <div className="absolute top-4 left-4">
+                    <span className="px-4 py-2 bg-white/95 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
+                      {relatedPost.category}
+                    </span>
                   </div>
-                  <h2 id="related-posts-heading" className="text-4xl md:text-5xl font-serif text-[#2b2e34]">
-                    Continue Reading
-                  </h2>
                 </div>
-                <p className="text-lg text-[#4f475d]">
-                  More articles you might enjoy
-                </p>
-              </motion.header>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {relatedPosts.map((relatedPost, index) => (
-                  <motion.article
-                    key={relatedPost.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                  >
-                    <Link href={`/blog/${relatedPost.slug}`} aria-label={`Read article: ${relatedPost.title}`}>
-                      <div className="group bg-white rounded-3xl overflow-hidden border-2 border-gray-100 hover:border-[#755eb1]/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                        <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-                          {relatedPost.featuredImage ? (
-                            <img
-                              src={relatedPost.featuredImage}
-                              alt=""
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/20 to-[#c7d6c1]/20 flex items-center justify-center">
-                              <span className="text-7xl opacity-20" aria-hidden="true">📝</span>
-                            </div>
-                          )}
-                          <div className="absolute top-4 left-4">
-                            <span className="px-4 py-2 bg-white/95 backdrop-blur-sm text-[#755eb1] text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
-                              {relatedPost.category}
-                            </span>
-                          </div>
-                        </div>
+                <div className="p-8 flex-1 flex flex-col">
+                  <h3 className="text-2xl font-serif text-[#2b2e34] mb-4 line-clamp-2 group-hover:text-[#755eb1] transition-colors leading-tight">
+                    {relatedPost.title}
+                  </h3>
 
-                        <div className="p-8 flex-1 flex flex-col">
-                          <h3 className="text-2xl font-serif text-[#2b2e34] mb-4 line-clamp-2 group-hover:text-[#755eb1] transition-colors leading-tight">
-                            {relatedPost.title}
-                          </h3>
+                  <p className="text-base text-[#4f475d] mb-6 line-clamp-3 flex-1 leading-relaxed">
+                    {relatedPost.excerpt}
+                  </p>
 
-                          <p className="text-base text-[#4f475d] mb-6 line-clamp-3 flex-1 leading-relaxed">
-                            {relatedPost.excerpt}
-                          </p>
-
-                          <div className="flex items-center gap-3 text-[#755eb1] font-bold text-sm group-hover:gap-4 transition-all">
-                            <span>Read More</span>
-                            <ChevronRight
-                              size={18}
-                              className="group-hover:translate-x-1 transition-transform"
-                              aria-hidden="true"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.article>
-                ))}
+                  <div className="flex items-center gap-3 text-[#755eb1] font-bold text-sm group-hover:gap-4 transition-all">
+                    <span>Read More</span>
+                    <ChevronRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </section>
-        )}
+            </Link>
+          </motion.article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
       </article>
 
       <Footer />
