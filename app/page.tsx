@@ -9,6 +9,8 @@ import { Navbar } from "./_components/landingPage/Navbar";
 import { Hero } from "./_components/landingPage/Hero";
 import { CustomCursor, NoiseOverlay } from "./_components/BackgroundElements";
 
+
+
 // Non-critical components - lazy loaded with optimizations
 const AboutSection = dynamic(
   () => import("./_components/landingPage/About").then(mod => ({ default: mod.AboutSection })),
@@ -58,6 +60,16 @@ const VisitTracker = dynamic(() => import("./_components/VisitTracker"), { ssr: 
 
 export default function TheCapitalPLab() {
 
+  useEffect(() => {
+  // Force body scroll on mount
+  document.body.style.overflow = 'scroll';
+  document.body.style.height = 'auto';
+  document.documentElement.style.overflow = 'visible';
+  
+  return () => {
+    // Don't reset - let it stay scrollable
+  };
+}, []);
 
 
 
