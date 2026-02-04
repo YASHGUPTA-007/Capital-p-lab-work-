@@ -38,8 +38,8 @@ interface BlogPost {
   category: string;
   tags: string[];
   featuredImage?: string;
-  featuredImageAlt?: string; // ✅ ADD THIS
-  featuredImageName?: string; // ✅ ADD THIS
+  featuredImageAlt?: string;
+  featuredImageName?: string;
   status: string;
   createdAt: string;
   publishedAt?: string;
@@ -294,55 +294,42 @@ export default function BlogPostClient({
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <motion.div
+      <div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
-        style={{ scaleX: readingProgress / 100 }}
-        initial={{ scaleX: 0 }}
+        style={{ transform: `scaleX(${readingProgress / 100})` }}
         role="progressbar"
         aria-valuenow={Math.round(readingProgress)}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Reading progress"
-        aria-live="polite"
+        aria-label={`Reading progress: ${Math.round(readingProgress)}%`}
       />
 
-      <div className="fixed right-6 bottom-6 flex flex-col gap-3 z-40">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="w-14 h-14 bg-white text-[#755eb1] rounded-full shadow-2xl flex items-center justify-center hover:bg-[#755eb1] hover:text-white transition-all"
-          aria-label="Scroll to top"
-        >
-          <ArrowLeft size={22} className="rotate-90" />
-        </motion.button>
-      </div>
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="fixed right-6 bottom-6 w-14 h-14 bg-white text-[#755eb1] rounded-full shadow-2xl flex items-center justify-center hover:bg-[#755eb1] hover:text-white transition-all z-40 hover:scale-110"
+        aria-label="Scroll to top"
+      >
+        <ArrowLeft size={22} className="rotate-90" aria-hidden="true" />
+      </button>
 
-      <article className="relative">
+      <article>
         <header className="relative bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
-            <motion.nav
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+            <nav
+              aria-label="Breadcrumb"
               className="flex items-center justify-between mb-8"
-              aria-label="Breadcrumb and site info"
             >
               <Link
                 href="/blog"
                 className="group inline-flex items-center gap-2 text-[#755eb1] hover:text-[#6b54a5] font-semibold transition-all"
-                aria-label="Back to Blog"
               >
-                <div className="w-8 h-8 rounded-full bg-[#755eb1]/10 flex items-center justify-center group-hover:bg-[#755eb1]/20 transition-all">
+                <div className="w-8 h-8 rounded-full bg-[#755eb1]/10 flex items-center justify-center group-hover:bg-[#755eb1]/20 transition-all" aria-hidden="true">
                   <ArrowLeft size={16} />
                 </div>
                 <span>Back to Blog</span>
               </Link>
 
-              <div
-                className="flex items-center gap-3"
-                aria-label="Site branding"
-              >
+              <div className="flex items-center gap-3">
                 <Image
                   src="/logo.png"
                   alt="The Capital P Lab Logo"
@@ -357,70 +344,36 @@ export default function BlogPostClient({
                   <p className="text-xs text-[#4f475d]">Research & Analysis</p>
                 </div>
               </div>
-            </motion.nav>
+            </nav>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="flex flex-wrap items-center gap-4 mb-6"
-            >
-              <span
-                className="px-4 py-2 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white text-sm font-bold uppercase tracking-wider rounded-full shadow-lg"
-                aria-label={`Category: ${post.category}`}
-              >
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+              <span className="px-4 py-2 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white text-sm font-bold uppercase tracking-wider rounded-full shadow-lg">
                 {post.category}
               </span>
               <div className="flex items-center gap-4 text-sm text-[#4f475d]">
                 <div className="flex items-center gap-1.5">
                   <Clock size={16} aria-hidden="true" />
-                  <span
-                    aria-label={`Estimated reading time: ${readingTime} minutes`}
-                  >
-                    {readingTime} min read
-                  </span>
+                  <span>{readingTime} min read</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Calendar size={16} aria-hidden="true" />
-                  <time
-                    dateTime={post.publishedAt || post.createdAt}
-                    aria-label={`Published on ${formatDate(post.publishedAt || post.createdAt)}`}
-                  >
+                  <time dateTime={post.publishedAt || post.createdAt}>
                     {formatDate(post.publishedAt || post.createdAt)}
                   </time>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#2b2e34] mb-6 leading-[1.1] max-w-5xl"
-            >
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-[#2b2e34] mb-6 leading-[1.1] max-w-5xl">
               {post.title}
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-xl md:text-2xl text-[#4f475d] leading-relaxed max-w-4xl mb-8"
-            >
+            <p className="text-xl md:text-2xl text-[#4f475d] leading-relaxed max-w-4xl mb-8">
               {post.excerpt}
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-gray-200"
-            >
-              <div
-                className="flex items-center gap-4"
-                role="region"
-                aria-label="Author information"
-              >
+            <div className="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-gray-200">
+              <div className="flex items-center gap-4">
                 {hasAuthor ? (
                   <>
                     <div
@@ -458,7 +411,7 @@ export default function BlogPostClient({
                 )}
               </div>
               <nav aria-label="Share article">
-                <div className="flex items-center gap-2" role="group">
+                <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-[#2b2e34] mr-2">
                     Share:
                   </span>
@@ -467,28 +420,28 @@ export default function BlogPostClient({
                     className="w-10 h-10 rounded-full bg-[#1DA1F2] text-white hover:bg-[#1a8cd8] transition-all flex items-center justify-center shadow-md"
                     aria-label="Share on Twitter"
                   >
-                    <Twitter size={18} />
+                    <Twitter size={18} aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => sharePost("linkedin")}
                     className="w-10 h-10 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-all flex items-center justify-center shadow-md"
                     aria-label="Share on LinkedIn"
                   >
-                    <Linkedin size={18} />
+                    <Linkedin size={18} aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => sharePost("facebook")}
                     className="w-10 h-10 rounded-full bg-[#1877F2] text-white hover:bg-[#0c63d4] transition-all flex items-center justify-center shadow-md"
                     aria-label="Share on Facebook"
                   >
-                    <Facebook size={18} />
+                    <Facebook size={18} aria-hidden="true" />
                   </button>
                   <button
                     onClick={copyLink}
                     className="w-10 h-10 rounded-full bg-[#2b2e34] text-white hover:bg-[#1a1c20] transition-all flex items-center justify-center shadow-md"
                     aria-label="Copy link to clipboard"
                   >
-                    <Share2 size={18} />
+                    <Share2 size={18} aria-hidden="true" />
                   </button>
                   <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
                     <button
@@ -519,22 +472,14 @@ export default function BlogPostClient({
                   </div>
                 </div>
               </nav>
-            </motion.div>
+            </div>
 
             {post.tags && post.tags.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.45 }}
-                className="mt-6"
-              >
+              <div className="mt-6">
                 <span className="text-sm font-semibold text-gray-700 mb-2 block">
                   Topics:
                 </span>
-                <ul
-                  className="flex items-center gap-2 flex-wrap list-none"
-                  aria-label="Article topics"
-                >
+                <ul className="flex items-center gap-2 flex-wrap" aria-label="Article topics">
                   {post.tags.map((tag, index) => (
                     <li key={index}>
                       <span className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors border border-gray-200">
@@ -543,18 +488,13 @@ export default function BlogPostClient({
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </div>
             )}
           </div>
         </header>
 
         {post.featuredImage && (
-          <motion.figure
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative w-full bg-gray-50"
-          >
+          <figure className="relative w-full bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white">
                 <img
@@ -569,56 +509,49 @@ export default function BlogPostClient({
                     margin: "0 auto",
                   }}
                 />
-                <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
-                  <p className="text-white/90 text-sm">
-                    {post.featuredImageName || post.title}
-                  </p>
-                </figcaption>
+                {(post.featuredImageName || post.title) && (
+                  <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                    <p className="text-white/90 text-sm">
+                      {post.featuredImageName || post.title}
+                    </p>
+                  </figcaption>
+                )}
               </div>
             </div>
-          </motion.figure>
+          </figure>
         )}
 
         <div className="relative bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
               <main className="lg:col-span-8">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  <div
-                    className="blog-content prose prose-lg max-w-none text-[#2b2e34]
-                      prose-headings:text-[#2b2e34] prose-headings:font-serif prose-headings:font-bold
-                      prose-h1:text-5xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
-                      prose-h2:text-4xl prose-h2:mb-6 prose-h2:mt-10 prose-h2:leading-tight
-                      prose-h3:text-3xl prose-h3:mb-5 prose-h3:mt-8
-                      
-                      prose-a:text-[#755eb1] prose-a:no-underline prose-a:font-semibold prose-a:underline-offset-2 hover:prose-a:underline hover:prose-a:text-[#6b54a5]
-                      prose-strong:text-[#2b2e34] prose-strong:font-bold
-                      prose-em:text-[#2b2e34] prose-em:italic
-                      prose-ul:my-8 prose-ul:list-disc prose-ul:pl-8 prose-ul:space-y-4
-                      prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-8 prose-ol:space-y-4
-                      prose-li:text-[#2b2e34] prose-li:text-lg prose-li:leading-relaxed prose-li:marker:text-[#755eb1]
-                      prose-blockquote:border-l-[6px] prose-blockquote:border-[#755eb1] prose-blockquote:pl-8 prose-blockquote:py-6 prose-blockquote:my-10 
-                      prose-blockquote:bg-gradient-to-r prose-blockquote:from-[#c1b4df]/10 prose-blockquote:to-transparent prose-blockquote:rounded-r-2xl
-                      prose-blockquote:text-[#2b2e34] prose-blockquote:italic prose-blockquote:text-xl prose-blockquote:font-serif
-                      prose-code:text-[#755eb1] prose-code:bg-[#755eb1]/10 prose-code:px-3 prose-code:py-1.5 prose-code:rounded-lg prose-code:text-base prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-                      prose-pre:bg-gradient-to-br prose-pre:from-[#2b2e34] prose-pre:to-[#1a1c20] prose-pre:text-gray-100 prose-pre:p-8 prose-pre:rounded-2xl prose-pre:my-10 prose-pre:overflow-x-auto prose-pre:shadow-xl
-                      prose-img:rounded-2xl prose-img:shadow-2xl prose-img:my-10 prose-img:border-4 prose-img:border-white
-                      prose-hr:border-gray-200 prose-hr:my-12 prose-hr:border-t-2
-                      prose-table:my-10 prose-table:border-collapse prose-table:shadow-lg prose-table:rounded-xl prose-table:overflow-hidden
-                      prose-th:bg-gradient-to-br prose-th:from-[#755eb1] prose-th:to-[#6b54a5] prose-th:text-white prose-th:font-bold prose-th:p-4 prose-th:text-left
-                      prose-td:p-4 prose-td:border-t prose-td:border-gray-200"
-                    dangerouslySetInnerHTML={{ __html: post.content }}
-                  />
-                </motion.div>
+                <div
+                  className="blog-content prose prose-lg max-w-none text-[#2b2e34]
+                    prose-headings:text-[#2b2e34] prose-headings:font-serif prose-headings:font-bold
+                    prose-h1:text-5xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
+                    prose-h2:text-4xl prose-h2:mb-6 prose-h2:mt-10 prose-h2:leading-tight
+                    prose-h3:text-3xl prose-h3:mb-5 prose-h3:mt-8
+                    
+                    prose-a:text-[#755eb1] prose-a:no-underline prose-a:font-semibold prose-a:underline-offset-2 hover:prose-a:underline hover:prose-a:text-[#6b54a5]
+                    prose-strong:text-[#2b2e34] prose-strong:font-bold
+                    prose-em:text-[#2b2e34] prose-em:italic
+                    prose-ul:my-8 prose-ul:list-disc prose-ul:pl-8 prose-ul:space-y-4
+                    prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-8 prose-ol:space-y-4
+                    prose-li:text-[#2b2e34] prose-li:text-lg prose-li:leading-relaxed prose-li:marker:text-[#755eb1]
+                    prose-blockquote:border-l-[6px] prose-blockquote:border-[#755eb1] prose-blockquote:pl-8 prose-blockquote:py-6 prose-blockquote:my-10 
+                    prose-blockquote:bg-gradient-to-r prose-blockquote:from-[#c1b4df]/10 prose-blockquote:to-transparent prose-blockquote:rounded-r-2xl
+                    prose-blockquote:text-[#2b2e34] prose-blockquote:italic prose-blockquote:text-xl prose-blockquote:font-serif
+                    prose-code:text-[#755eb1] prose-code:bg-[#755eb1]/10 prose-code:px-3 prose-code:py-1.5 prose-code:rounded-lg prose-code:text-base prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+                    prose-pre:bg-gradient-to-br prose-pre:from-[#2b2e34] prose-pre:to-[#1a1c20] prose-pre:text-gray-100 prose-pre:p-8 prose-pre:rounded-2xl prose-pre:my-10 prose-pre:overflow-x-auto prose-pre:shadow-xl
+                    prose-img:rounded-2xl prose-img:shadow-2xl prose-img:my-10 prose-img:border-4 prose-img:border-white
+                    prose-hr:border-gray-200 prose-hr:my-12 prose-hr:border-t-2
+                    prose-table:my-10 prose-table:border-collapse prose-table:shadow-lg prose-table:rounded-xl prose-table:overflow-hidden
+                    prose-th:bg-gradient-to-br prose-th:from-[#755eb1] prose-th:to-[#6b54a5] prose-th:text-white prose-th:font-bold prose-th:p-4 prose-th:text-left
+                    prose-td:p-4 prose-td:border-t prose-td:border-gray-200"
+                  dangerouslySetInnerHTML={{ __html: post.content }}
+                />
 
-                <motion.section
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
+                <section
                   className="mt-16 bg-gradient-to-br from-[#755eb1]/5 via-[#c7d6c1]/5 to-[#755eb1]/5 rounded-3xl p-8 md:p-10 border-2 border-[#755eb1]/20"
                   aria-labelledby="cta-heading"
                 >
@@ -649,15 +582,12 @@ export default function BlogPostClient({
                       Subscribe Now
                     </button>
                   </div>
-                </motion.section>
+                </section>
               </main>
 
               <aside className="lg:col-span-4" aria-label="Sidebar">
                 <div className="lg:sticky lg:top-24 space-y-6">
-                  <motion.section
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
+                  <section
                     className="bg-gradient-to-br from-[#755eb1] to-[#6b54a5] rounded-2xl p-6 text-white shadow-xl"
                     aria-labelledby="insights-hub-heading"
                   >
@@ -698,13 +628,10 @@ export default function BlogPostClient({
                         aria-hidden="true"
                       />
                     </Link>
-                  </motion.section>
+                  </section>
 
-                  <motion.section
+                  <section
                     id="newsletter-subscribe"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
                     className="bg-gradient-to-br from-[#755eb1] to-[#6b54a5] rounded-2xl p-6 text-white shadow-xl"
                     aria-labelledby="newsletter-heading"
                   >
@@ -779,7 +706,7 @@ export default function BlogPostClient({
                               className="w-5 h-5 animate-spin"
                               aria-hidden="true"
                             />
-                            Subscribing...
+                            <span>Subscribing...</span>
                           </>
                         ) : (
                           "Subscribe Now"
@@ -819,7 +746,7 @@ export default function BlogPostClient({
                         </p>
                       </div>
                     )}
-                  </motion.section>
+                  </section>
                 </div>
               </aside>
             </div>
@@ -832,12 +759,7 @@ export default function BlogPostClient({
             aria-labelledby="related-posts-heading"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.header
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-12"
-              >
+              <header className="text-center mb-12">
                 <div className="inline-flex items-center gap-3 mb-4">
                   <div
                     className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center shadow-lg"
@@ -855,26 +777,18 @@ export default function BlogPostClient({
                 <p className="text-lg text-[#4f475d]">
                   More articles you might enjoy
                 </p>
-              </motion.header>
+              </header>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {relatedPosts.map((relatedPost, index) => (
-                  <motion.article
-                    key={relatedPost.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                  >
-                    <Link
-                      href={`/blog/${relatedPost.slug}`}
-                      aria-label={`Read article: ${relatedPost.title}`}
-                    >
+                  <article key={relatedPost.id}>
+                    <Link href={`/blog/${relatedPost.slug}`}>
                       <div className="group bg-white rounded-3xl overflow-hidden border-2 border-gray-100 hover:border-[#755eb1]/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                        <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+                        <figure className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
                           {relatedPost.featuredImage ? (
                             <img
                               src={relatedPost.featuredImage}
-                              alt={`Featured image for ${relatedPost.title}`}
+                              alt={relatedPost.featuredImageAlt || relatedPost.title}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (
@@ -892,7 +806,7 @@ export default function BlogPostClient({
                               {relatedPost.category}
                             </span>
                           </div>
-                        </div>
+                        </figure>
 
                         <div className="p-8 flex-1 flex flex-col">
                           <h3 className="text-2xl font-serif text-[#2b2e34] mb-4 line-clamp-2 group-hover:text-[#755eb1] transition-colors leading-tight">
@@ -914,7 +828,7 @@ export default function BlogPostClient({
                         </div>
                       </div>
                     </Link>
-                  </motion.article>
+                  </article>
                 ))}
               </div>
             </div>
