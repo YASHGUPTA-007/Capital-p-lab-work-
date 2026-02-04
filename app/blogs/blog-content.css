@@ -199,16 +199,33 @@
 
 
 
-.blog-content {
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
+/* Enable GPU hints only on larger screens (desktop/laptop) */
+@media (min-width: 1024px) {
+  .blog-content {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* Optimize images for scroll performance on large screens */
+  .blog-content img {
+    transform: translateZ(0);
+    will-change: opacity;
+  }
 }
 
-/* Optimize images for scroll performance */
-.blog-content img {
-  transform: translateZ(0);
-  will-change: opacity;
+/* iOS Safari override: disable aggressive transforms that cause image jitter */
+@supports (-webkit-touch-callout: none) {
+  .blog-content {
+    transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+  }
+
+  .blog-content img {
+    transform: none !important;
+    will-change: auto !important;
+  }
 }
 
 
