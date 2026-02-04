@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "Insights & Research Blog",
     description: "Evidence-based analysis on sustainability and social impact",
     type: "website",
-    url: "https://www.capitalp.org/blog",
+    url: "https://www.capitalp.org/blogs",
     images: [
       {
         url: "/og-blog.png",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     images: ["/og-blog.png"],
   },
   alternates: {
-    canonical: "https://www.capitalp.org/blog"
+    canonical: "https://www.capitalp.org/blogs"
   },
   robots: {
     index: true,
@@ -121,7 +121,7 @@ export default async function BlogPage() {
     "@type": "Blog",
     "name": "Insights & Research Blog",
     "description": "Evidence-based analysis on sustainability and social impact",
-    "url": "https://www.capitalp.org/blog",
+    "url": "https://www.capitalp.org/blogs",
     "blogPost": posts.slice(0, 10).map(post => ({
       "@type": "BlogPosting",
       "headline": post.title,
@@ -140,7 +140,7 @@ export default async function BlogPage() {
           "url": "https://www.capitalp.org/logo.png"
         }
       },
-      "url": `https://www.capitalp.org/blog/${post.slug}`,
+      "url": `https://www.capitalp.org/blogs/${post.slug}`,
       "keywords": post.tags?.join(", ") || ""
     }))
   };

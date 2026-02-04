@@ -900,7 +900,7 @@ useEffect(() => {
                       </p>
                     )}
                     <p className="text-xs text-gray-500">
-                      Preview: /blog/{formData.slug}
+                      Preview: /blogs/{formData.slug}
                     </p>
                   </div>
                 </div>

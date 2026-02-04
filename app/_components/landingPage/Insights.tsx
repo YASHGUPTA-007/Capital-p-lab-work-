@@ -12,7 +12,7 @@ const InsightCard = memo(({ item, index }: { item: any; index: number }) => {
     
     const handleClick = useCallback(() => {
         if (item.type === "Blogs") {
-            router.push('/blog')
+            router.push('/blogs')
         }
     }, [item.type, router])
 

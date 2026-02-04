@@ -1,4 +1,4 @@
-// app/blog/[slug]/page.tsx
+// app/blogs/[slug]/page.tsx
 import React from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -153,7 +153,7 @@ export async function generateMetadata(
       modifiedTime: post.createdAt,
       authors: post.author && post.author.trim() !== '' ? [post.author] : ['Editorial Team'],
       tags: post.tags || [],
-      url: `https://www.capitalp.org/blog/${post.slug}`,
+      url: `https://www.capitalp.org/blogs/${post.slug}`,
       images: [
         {
           url: post.featuredImage || 'https://www.capitalp.org/logo.png',
@@ -170,7 +170,7 @@ export async function generateMetadata(
       images: [post.featuredImage || 'https://www.capitalp.org/logo.png'],
     },
     alternates: {
-      canonical: `https://www.capitalp.org/blog/${post.slug}`
+      canonical: `https://www.capitalp.org/blogs/${post.slug}`
     },
     robots: {
       index: true,
@@ -223,10 +223,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         "url": "https://www.capitalp.org/logo.png"
       }
     },
-    "url": `https://www.capitalp.org/blog/${post.slug}`,
+    "url": `https://www.capitalp.org/blogs/${post.slug}`,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://www.capitalp.org/blog/${post.slug}`
+      "@id": `https://www.capitalp.org/blogs/${post.slug}`
     },
     "keywords": post.tags?.join(", ") || "",
     "articleSection": post.category,
@@ -249,13 +249,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://www.capitalp.org/blog"
+        "item": "https://www.capitalp.org/blogs"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.title,
-        "item": `https://www.capitalp.org/blog/${post.slug}`
+        "item": `https://www.capitalp.org/blogs/${post.slug}`
       }
     ]
   };
