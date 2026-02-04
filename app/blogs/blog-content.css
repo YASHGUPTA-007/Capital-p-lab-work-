@@ -1,4 +1,52 @@
 /* ========================================
+   1. CORE CONTAINER FIX (CRITICAL FOR iOS)
+   ======================================== */
+.blog-content {
+  /* FIX: Remove overflow:hidden to prevent iOS memory crash (Layer Explosion).
+     We use 'visible' so the GPU doesn't try to flatten the whole page into one layer. */
+  overflow-x: visible !important; 
+  overflow-y: visible !important;
+  
+  /* Creates a new stacking context safely */
+  isolation: isolate !important; 
+  
+  /* Layout stability */
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ========================================
+   2. IMAGE STABILIZATION
+   ======================================== */
+.blog-content img {
+  /* Hardware accelerate ONLY the image, ensuring it stays in memory */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  
+  /* Prevent painting on the backface (flashing) */
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  
+  /* Standard styling */
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.5rem !important;
+  display: block !important;
+  
+  /* Optimize rendering */
+  will-change: transform, opacity !important;
+  -webkit-user-select: none;
+}
+
+/* Shadow only on hover/desktop to save memory on mobile */
+@media (min-width: 1024px) and (hover: hover) {
+  .blog-content img {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* ========================================
    INLINE STYLE OVERRIDES
    ======================================== */
 
@@ -187,68 +235,32 @@
 }
 
 /* ========================================
-   IMAGES - BASELINE
+   TABLES - RESPONSIVE WRAPPER (Fixes Scroll)
    ======================================== */
 
-.blog-content img {
-  max-width: 100% !important;
-  height: auto !important;
-  border-radius: 0.5rem !important;
+/* Since we removed overflow:hidden from the main container,
+   we use this wrapper (added by React) to handle table scrolling */
+.table-responsive-wrapper {
   display: block !important;
-}
-
-@media (min-width: 1024px) and (hover: hover) {
-  .blog-content img {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-  }
-}
-
-/* Desktop Optimization */
-@media (min-width: 1024px) {
-  .blog-content {
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
-  }
-
-  .blog-content img {
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-}
-
-/* ========================================
-   TABLES - FRONTEND DISPLAY
-   ======================================== */
-
-/* Prevent page-wide horizontal scroll */
-.blog-content {
-  overflow-x: hidden !important; /* Standard behavior */
-  max-width: 100% !important;
-}
-
-/* Make table scrollable on ALL devices (PC + Mobile) */
-.blog-content table {
-  display: block !important;
-  width: auto !important;
-  min-width: 100% !important;
-  max-width: none !important;
+  width: 100% !important;
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch !important;
-  border-collapse: collapse !important;
   margin: 2rem 0 !important;
-  border: 2px solid #000000 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 4px !important;
 }
 
-.blog-content table:focus {
-  outline: 3px solid #755eb1 !important;
-  outline-offset: 2px !important;
+.blog-content table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border: 2px solid #000000 !important;
+  margin: 0 !important; /* Wrapper handles margin */
+  background-color: white !important;
 }
 
 .blog-content thead,
 .blog-content tbody {
-  display: table !important;
+  display: table-header-group !important; /* Revert to standard table behavior inside wrapper */
   width: 100% !important;
 }
 
@@ -286,9 +298,9 @@
   background-color: #f3f4f6 !important;
 }
 
+/* Mobile: Reduce padding and font size */
 @media (max-width: 768px) {
   .blog-content table {
-    margin: 1.5rem 0 !important;
     font-size: 0.875rem !important;
   }
   
@@ -299,6 +311,7 @@
   }
 }
 
+/* Extra small screens */
 @media (max-width: 480px) {
   .blog-content table {
     font-size: 0.813rem !important;
@@ -311,6 +324,7 @@
   }
 }
 
+/* Preserve inline table styles */
 .blog-content table[style*="width"] {
   width: revert !important;
 }
@@ -333,11 +347,13 @@
 /* ========================================
    TABLES - EDITOR (ProseMirror)
    ======================================== */
+/* These styles affect the admin editor only */
 
 .ProseMirror {
   outline: none !important;
 }
 
+/* Make editor tables scrollable to prevent overflow with keyboard accessibility */
 .ProseMirror table {
   display: block !important;
   width: auto !important;
@@ -433,52 +449,4 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
-}
-
-/* ========================================
-   iOS SAFARI FLICKER FIX (STABILIZATION)
-   ======================================== */
-
-@supports (-webkit-touch-callout: none) {
-  
-  /* 1. Stabilize the container first */
-  .blog-content {
-    /* Create a stable 3D context for children */
-    perspective: 1px !important;
-    backface-visibility: hidden !important;
-    -webkit-backface-visibility: hidden !important;
-    
-    /* Ensure scrolling doesn't cause clipping */
-    -webkit-overflow-scrolling: touch !important;
-    
-    /* Avoid 'hidden' if possible on iOS, use 'clip' or just let overflow happen if safe */
-    /* overflow-x: clip !important; */ 
-  }
-
-  /* 2. Force GPU Layering on Images to prevent unloading */
-  .blog-content img {
-    /* FORCE Hardware Acceleration (3D) to keep texture in memory */
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-    
-    /* Ensure the backface is hidden to prevent flashing */
-    backface-visibility: hidden !important;
-    -webkit-backface-visibility: hidden !important;
-
-    /* Reset z-index to avoid stacking context wars */
-    z-index: 1 !important;
-    
-    /* IMPORTANT: Ensure layout stability */
-    min-height: 1px !important;
-    
-    /* Remove expensive effects on mobile to save memory bandwidth */
-    box-shadow: none !important;
-    filter: none !important;
-    
-    /* Ensure pointer events work without triggering hover repaints */
-    pointer-events: auto !important;
-    
-    /* Prevent selection flicker */
-    -webkit-user-select: none;
-  }
 }
