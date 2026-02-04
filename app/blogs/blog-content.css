@@ -187,26 +187,47 @@
 }
 
 /* ========================================
-   IMAGES - SINGLE DEFINITION
+   IMAGES - BASELINE
    ======================================== */
 
 .blog-content img {
-  display: block !important;
   max-width: 100% !important;
   height: auto !important;
   border-radius: 0.5rem !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  display: block !important;
+}
+
+@media (min-width: 1024px) and (hover: hover) {
+  .blog-content img {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Desktop Optimization */
+@media (min-width: 1024px) {
+  .blog-content {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  .blog-content img {
+    transform: translateZ(0);
+    will-change: opacity;
+  }
 }
 
 /* ========================================
    TABLES - FRONTEND DISPLAY
    ======================================== */
 
+/* Prevent page-wide horizontal scroll */
 .blog-content {
-  overflow-x: hidden !important;
+  overflow-x: hidden !important; /* Standard behavior */
   max-width: 100% !important;
 }
 
+/* Make table scrollable on ALL devices (PC + Mobile) */
 .blog-content table {
   display: block !important;
   width: auto !important;
@@ -402,10 +423,6 @@
   content: '\00a0' !important;
 }
 
-/* ========================================
-   ACCESSIBILITY
-   ======================================== */
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -419,37 +436,49 @@
 }
 
 /* ========================================
-   iOS SAFARI JITTER FIX - COMPREHENSIVE
+   iOS SAFARI FLICKER FIX (STABILIZATION)
    ======================================== */
 
 @supports (-webkit-touch-callout: none) {
-  /* Nuclear option: disable ALL GPU acceleration on iOS */
-  .blog-content,
-  .blog-content *,
-  .blog-content img {
-    transform: none !important;
-    -webkit-transform: none !important;
-    will-change: auto !important;
-    backface-visibility: visible !important;
-    -webkit-backface-visibility: visible !important;
-    perspective: none !important;
-    -webkit-perspective: none !important;
-  }
   
-  /* Force stable image rendering on iOS */
+  /* 1. Stabilize the container first */
+  .blog-content {
+    /* Create a stable 3D context for children */
+    perspective: 1px !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    
+    /* Ensure scrolling doesn't cause clipping */
+    -webkit-overflow-scrolling: touch !important;
+    
+    /* Avoid 'hidden' if possible on iOS, use 'clip' or just let overflow happen if safe */
+    /* overflow-x: clip !important; */ 
+  }
+
+  /* 2. Force GPU Layering on Images to prevent unloading */
   .blog-content img {
+    /* FORCE Hardware Acceleration (3D) to keep texture in memory */
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    
+    /* Ensure the backface is hidden to prevent flashing */
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+
+    /* Reset z-index to avoid stacking context wars */
+    z-index: 1 !important;
+    
+    /* IMPORTANT: Ensure layout stability */
+    min-height: 1px !important;
+    
+    /* Remove expensive effects on mobile to save memory bandwidth */
     box-shadow: none !important;
-    transition: none !important;
-    animation: none !important;
     filter: none !important;
+    
+    /* Ensure pointer events work without triggering hover repaints */
     pointer-events: auto !important;
-    cursor: default !important;
-    contain: layout !important;
-  }
-  
-  /* Prevent hover effects on iOS */
-  .blog-content img:hover {
-    transform: none !important;
-    box-shadow: none !important;
+    
+    /* Prevent selection flicker */
+    -webkit-user-select: none;
   }
 }

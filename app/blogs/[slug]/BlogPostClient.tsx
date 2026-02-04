@@ -355,15 +355,19 @@ useEffect(() => {
       <Navbar />
 
       <main>
-        <div
-          className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
-          style={{ transform: `scaleX(${readingProgress / 100})` }}
-          role="progressbar"
-          aria-valuenow={Math.round(readingProgress)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Reading progress: ${Math.round(readingProgress)}%`}
-        />
+       <div
+  className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
+  style={{ 
+    transform: `scaleX(${readingProgress / 100})`,
+    contain: 'strict',
+    willChange: 'transform',
+  }}
+  role="progressbar"
+  aria-valuenow={Math.round(readingProgress)}
+  aria-valuemin={0}
+  aria-valuemax={100}
+  aria-label={`Reading progress: ${Math.round(readingProgress)}%`}
+/>
 
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
