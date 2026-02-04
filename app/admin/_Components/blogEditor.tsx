@@ -278,20 +278,35 @@ export default function BlogEditorModal({
           style: "border: 2px solid #000000; padding: 12px; min-width: 100px;",
         },
       }),
-      Image.configure({
+     Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: null,
+        parseHTML: element => element.getAttribute('width'),
+        renderHTML: attributes => {
+          if (!attributes.width) return {};
+          return { width: attributes.width };
+        },
+      },
+      height: {
+        default: null,
+        parseHTML: element => element.getAttribute('height'),
+        renderHTML: attributes => {
+          if (!attributes.height) return {};
+          return { height: attributes.height };
+        },
+      },
+    };
+  },
+}).configure({
   HTMLAttributes: {
     class: "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
     loading: 'lazy',
   },
   inline: false,
   allowBase64: false,
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      width: { default: null },
-      height: { default: null },
-    };
-  },
 }),
       Link.configure({
         openOnClick: false,
