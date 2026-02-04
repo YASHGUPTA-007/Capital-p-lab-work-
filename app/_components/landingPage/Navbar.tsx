@@ -13,6 +13,7 @@ export const Navbar = memo(() => {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
 
+  // 1. SCROLL LISTENER
   useEffect(() => {
     let ticking = false
     const handleScroll = () => {
@@ -27,6 +28,29 @@ export const Navbar = memo(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // 2. NEW: SCROLL LOCK FOR MOBILE MENU (Fixes iOS Jitter)
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Prevent scrolling on the body when menu is open
+      document.body.style.overflow = 'hidden'
+      // Prevent iOS bounce effect on body
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    } else {
+      // Restore scrolling
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+
+    // Cleanup function to reset styles if component unmounts
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+  }, [isMobileMenuOpen])
 
   const scrollToSection = useCallback((id: string) => {
     if (!isHomePage) {
@@ -45,7 +69,8 @@ export const Navbar = memo(() => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:w-auto px-4 sm:px-6 flex justify-center pointer-events-none"
+        // Added transform-gpu to force hardware acceleration
+        className="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:w-auto px-4 sm:px-6 flex justify-center pointer-events-none transform-gpu"
       >
         <div className="relative pointer-events-auto w-full sm:w-auto">
           {/* Subtle glow effect */}
@@ -71,13 +96,13 @@ export const Navbar = memo(() => {
                {/* Desktop Navigation */}
                <div className="hidden md:flex items-center">
                  {navItems.map((item) => (
-                    <button 
-                      key={item} 
-                      onClick={() => scrollToSection(item.toLowerCase())} 
-                      className="px-4 lg:px-5 py-2 text-[10px] lg:text-xs font-bold uppercase tracking-widest text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1] rounded-full transition-all"
-                    >
-                      {item}
-                    </button>
+                   <button 
+                     key={item} 
+                     onClick={() => scrollToSection(item.toLowerCase())} 
+                     className="px-4 lg:px-5 py-2 text-[10px] lg:text-xs font-bold uppercase tracking-widest text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1] rounded-full transition-all"
+                   >
+                     {item}
+                   </button>
                  ))}
                  
                  {/* Blog Link */}
@@ -117,23 +142,23 @@ export const Navbar = memo(() => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop - Added touch-none to prevent scrolling through it */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden touch-none"
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
-            {/* Mobile Menu Panel */}
+            {/* Mobile Menu Panel - Added transform-gpu */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="fixed top-20 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-2xl shadow-2xl border-2 border-[#c1b4df]/40 z-50 md:hidden overflow-hidden"
+              className="fixed top-20 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-2xl shadow-2xl border-2 border-[#c1b4df]/40 z-50 md:hidden overflow-hidden transform-gpu"
             >
               <div className="p-4 space-y-2">
                 {navItems.map((item, index) => (
