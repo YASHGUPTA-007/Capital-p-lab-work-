@@ -187,52 +187,26 @@
 }
 
 /* ========================================
-   IMAGES
+   IMAGES - SINGLE DEFINITION
    ======================================== */
 
 .blog-content img {
+  display: block !important;
   max-width: 100% !important;
   height: auto !important;
   border-radius: 0.5rem !important;
-  display: block !important;
-  /* Remove box-shadow on mobile/iOS - causes repaints */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 }
-
-@media (min-width: 1024px) and (hover: hover) {
-  .blog-content img {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-  }
-}
-
-
-/* Enable GPU hints only on larger screens (desktop/laptop) */
-@media (min-width: 1024px) {
-  .blog-content {
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
-  }
-
-  /* Optimize images for scroll performance on large screens */
-  .blog-content img {
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-}
-
-
 
 /* ========================================
    TABLES - FRONTEND DISPLAY
    ======================================== */
 
-/* Prevent page-wide horizontal scroll */
 .blog-content {
   overflow-x: hidden !important;
   max-width: 100% !important;
 }
 
-/* Make table scrollable on ALL devices (PC + Mobile) with keyboard accessibility */
 .blog-content table {
   display: block !important;
   width: auto !important;
@@ -244,11 +218,8 @@
   margin: 2rem 0 !important;
   border: 2px solid #000000 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-
 }
 
-
-/* Focus indicator for keyboard navigation */
 .blog-content table:focus {
   outline: 3px solid #755eb1 !important;
   outline-offset: 2px !important;
@@ -294,7 +265,6 @@
   background-color: #f3f4f6 !important;
 }
 
-/* Mobile: Reduce padding and font size */
 @media (max-width: 768px) {
   .blog-content table {
     margin: 1.5rem 0 !important;
@@ -308,7 +278,6 @@
   }
 }
 
-/* Extra small screens */
 @media (max-width: 480px) {
   .blog-content table {
     font-size: 0.813rem !important;
@@ -321,7 +290,6 @@
   }
 }
 
-/* Preserve inline table styles */
 .blog-content table[style*="width"] {
   width: revert !important;
 }
@@ -349,7 +317,6 @@
   outline: none !important;
 }
 
-/* Make editor tables scrollable to prevent overflow with keyboard accessibility */
 .ProseMirror table {
   display: block !important;
   width: auto !important;
@@ -363,7 +330,6 @@
   background-color: white !important;
 }
 
-/* Focus indicator for editor tables */
 .ProseMirror table:focus {
   outline: 3px solid #755eb1 !important;
   outline-offset: 2px !important;
@@ -426,7 +392,6 @@
   cursor: col-resize !important;
 }
 
-/* Empty cells visibility */
 .ProseMirror td p,
 .ProseMirror th p {
   margin: 0 !important;
@@ -436,6 +401,10 @@
 .ProseMirror th:empty::after {
   content: '\00a0' !important;
 }
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
 
 .sr-only {
   position: absolute;
@@ -449,46 +418,38 @@
   border-width: 0;
 }
 
-
 /* ========================================
-   IMAGES - BASELINE
-   ======================================== */
-
-.blog-content img {
-  max-width: 100% !important;
-  height: auto !important;
-  border-radius: 0.5rem !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-  display: block !important;
-}
-
-/* ========================================
-   iOS SAFARI JITTER FIX - IMAGES ONLY
+   iOS SAFARI JITTER FIX - COMPREHENSIVE
    ======================================== */
 
 @supports (-webkit-touch-callout: none) {
-  /* Target ONLY blog content images */
+  /* Nuclear option: disable ALL GPU acceleration on iOS */
+  .blog-content,
+  .blog-content *,
   .blog-content img {
-    /* Kill all GPU acceleration */
     transform: none !important;
     -webkit-transform: none !important;
     will-change: auto !important;
-    
-    /* Force CPU rendering */
     backface-visibility: visible !important;
     -webkit-backface-visibility: visible !important;
-    
-    /* Remove expensive visual effects */
-    box-shadow: none !important;
-    transition: none !important;
-    
-    /* Prevent hover jitter */
-    pointer-events: none !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
   }
   
-  /* Make images clickable but without transforms */
-  .blog-content img.cursor-pointer {
+  /* Force stable image rendering on iOS */
+  .blog-content img {
+    box-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+    filter: none !important;
     pointer-events: auto !important;
-    cursor: pointer !important;
+    cursor: default !important;
+    contain: layout !important;
+  }
+  
+  /* Prevent hover effects on iOS */
+  .blog-content img:hover {
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
