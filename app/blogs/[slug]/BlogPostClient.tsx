@@ -70,13 +70,7 @@ export default function BlogPostClient({
   const [hasLiked, setHasLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
-  useEffect(() => {
-    document.body.style.overflow = "scroll";
-    document.body.style.height = "auto";
-    document.documentElement.style.overflow = "visible";
 
-    return () => {};
-  }, []);
 
   useEffect(() => {
   let ticking = false;
@@ -297,16 +291,33 @@ export default function BlogPostClient({
 
   const hasAuthor = post?.author && post.author.trim() !== "";
 // ✅ FIX: Remove lazy loading from blog images (iOS jitter fix)
-useEffect(() => {
-  const images = document.querySelectorAll('.blog-content img[loading="lazy"]');
-  images.forEach((img) => {
-    img.removeAttribute('loading');
-    // Force immediate load
-    if (img instanceof HTMLImageElement && !img.complete) {
-      img.loading = 'eager';
-    }
-  });
-}, [post.content]);
+// ✅ FIX: "Container Isolation" Strategy (Mimics Featured Image)
+  useEffect(() => {
+    const images = document.querySelectorAll('.blog-content img');
+
+    images.forEach((img) => {
+      // 1. Prevent double-wrapping if React re-renders
+      if (img.parentElement?.classList.contains('blog-image-wrapper')) {
+        return;
+      }
+
+      // 2. Force eager loading settings
+      img.removeAttribute('loading');
+      if (img instanceof HTMLImageElement) {
+        img.loading = 'eager';
+        img.decoding = 'sync';
+      }
+
+      // 3. Create the protective wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'blog-image-wrapper'; // CSS class defined below
+
+      // 4. Wrap the image
+      // Insert wrapper before image, then move image inside wrapper
+      img.parentNode?.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+    });
+  }, [post.content]);
 
 useEffect(() => {
     const wrapTables = () => {

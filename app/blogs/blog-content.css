@@ -17,33 +17,67 @@
 }
 
 /* ========================================
-   2. IMAGE STABILIZATION
+   2. IMAGE WRAPPER (ISOLATION STRATEGY)
    ======================================== */
-.blog-content img {
-  /* Hardware accelerate ONLY the image, ensuring it stays in memory */
+
+/* This wrapper (added by JS) isolates the image from the page flow.
+   It mimics the 'Featured Image' behavior which we know works. */
+.blog-image-wrapper {
+  /* 1. Create a local stacking context (Isolation) */
+  position: relative !important;
+  z-index: 10 !important;
+  
+  /* 2. Mimic Featured Image Container */
+  display: block !important;
+  overflow: hidden !important; /* Critical: Clips the GPU layer size */
+  background-color: #f9fafb !important; /* bg-gray-50 */
+  border-radius: 0.75rem !important; /* rounded-xl */
+  
+  /* 3. Spacing and Layout */
+  margin: 2.5rem 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+
+  /* 4. Hardware Acceleration on the WRAPPER */
   transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
+  will-change: transform !important;
   
-  /* Prevent painting on the backface (flashing) */
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
+  /* 5. Visual Polish (Shadows go here now) */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ensure the image fills the wrapper correctly */
+.blog-image-wrapper img {
+  margin: 0 !important; /* Wrapper handles margins now */
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
   
-  /* Standard styling */
+  /* Reset styles handled by wrapper */
+  border-radius: 0 !important; 
+  transform: none !important; 
+  box-shadow: none !important;
+  
+  /* Prevent interaction flicker */
+  -webkit-user-select: none;
+  pointer-events: auto !important;
+}
+
+/* ========================================
+   3. FALLBACK IMAGE STYLES
+   ======================================== */
+/* These apply if the JS wrapper hasn't loaded yet */
+.blog-content img:not(.blog-image-wrapper img) {
   max-width: 100% !important;
   height: auto !important;
   border-radius: 0.5rem !important;
   display: block !important;
+  margin: 2rem 0 !important;
   
-  /* Optimize rendering */
-  will-change: transform, opacity !important;
-  -webkit-user-select: none;
-}
-
-/* Shadow only on hover/desktop to save memory on mobile */
-@media (min-width: 1024px) and (hover: hover) {
-  .blog-content img {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-  }
+  /* Basic stabilization */
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
 }
 
 /* ========================================
@@ -238,8 +272,6 @@
    TABLES - RESPONSIVE WRAPPER (Fixes Scroll)
    ======================================== */
 
-/* Since we removed overflow:hidden from the main container,
-   we use this wrapper (added by React) to handle table scrolling */
 .table-responsive-wrapper {
   display: block !important;
   width: 100% !important;
@@ -254,13 +286,13 @@
   width: 100% !important;
   border-collapse: collapse !important;
   border: 2px solid #000000 !important;
-  margin: 0 !important; /* Wrapper handles margin */
+  margin: 0 !important;
   background-color: white !important;
 }
 
 .blog-content thead,
 .blog-content tbody {
-  display: table-header-group !important; /* Revert to standard table behavior inside wrapper */
+  display: table-header-group !important;
   width: 100% !important;
 }
 
@@ -298,7 +330,7 @@
   background-color: #f3f4f6 !important;
 }
 
-/* Mobile: Reduce padding and font size */
+/* Mobile Table Tweaks */
 @media (max-width: 768px) {
   .blog-content table {
     font-size: 0.875rem !important;
@@ -311,7 +343,6 @@
   }
 }
 
-/* Extra small screens */
 @media (max-width: 480px) {
   .blog-content table {
     font-size: 0.813rem !important;
@@ -325,35 +356,19 @@
 }
 
 /* Preserve inline table styles */
-.blog-content table[style*="width"] {
-  width: revert !important;
-}
-
-.blog-content th[style*="background"],
-.blog-content td[style*="background"] {
-  background-color: revert !important;
-}
-
-.blog-content th[style*="text-align"],
-.blog-content td[style*="text-align"] {
-  text-align: revert !important;
-}
-
-.blog-content th[style*="color"],
-.blog-content td[style*="color"] {
-  color: revert !important;
-}
+.blog-content table[style*="width"] { width: revert !important; }
+.blog-content th[style*="background"], .blog-content td[style*="background"] { background-color: revert !important; }
+.blog-content th[style*="text-align"], .blog-content td[style*="text-align"] { text-align: revert !important; }
+.blog-content th[style*="color"], .blog-content td[style*="color"] { color: revert !important; }
 
 /* ========================================
    TABLES - EDITOR (ProseMirror)
    ======================================== */
-/* These styles affect the admin editor only */
 
 .ProseMirror {
   outline: none !important;
 }
 
-/* Make editor tables scrollable to prevent overflow with keyboard accessibility */
 .ProseMirror table {
   display: block !important;
   width: auto !important;
