@@ -337,7 +337,43 @@ export default function BlogEditorModal({
       },
     },
   });
+// ✅ Make tables keyboard accessible
+useEffect(() => {
+  if (!editor) return;
 
+  const makeTablesAccessible = () => {
+    const editorElement = document.querySelector('.ProseMirror');
+    if (!editorElement) return;
+
+    const tables = editorElement.querySelectorAll('table');
+    tables.forEach((table) => {
+      // Check if table has horizontal scroll
+      if (table.scrollWidth > table.clientWidth) {
+        table.setAttribute('tabindex', '0');
+        table.setAttribute('role', 'region');
+        table.setAttribute('aria-label', 'Scrollable data table - use arrow keys to scroll');
+      }
+    });
+  };
+
+  // Run on editor update
+  makeTablesAccessible();
+  
+  // Re-run when editor content changes
+  const observer = new MutationObserver(makeTablesAccessible);
+  const editorElement = document.querySelector('.ProseMirror');
+  
+  if (editorElement) {
+    observer.observe(editorElement, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  return () => observer.disconnect();
+}, [editor]);
+
+  
   const insertTable = () => {
     setShowTablePicker(true);
   };

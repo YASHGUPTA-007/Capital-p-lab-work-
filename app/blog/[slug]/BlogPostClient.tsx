@@ -290,10 +290,12 @@ export default function BlogPostClient({
 
   const hasAuthor = post?.author && post.author.trim() !== "";
 
-  return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
 
+return (
+  <div className="min-h-screen bg-white">
+    <Navbar />
+
+    <main>
       <div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
         style={{ transform: `scaleX(${readingProgress / 100})` }}
@@ -524,7 +526,7 @@ export default function BlogPostClient({
         <div className="relative bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-              <main className="lg:col-span-8">
+              <div className="lg:col-span-8">
                 <div
                   className="blog-content prose prose-lg max-w-none text-[#2b2e34]
                     prose-headings:text-[#2b2e34] prose-headings:font-serif prose-headings:font-bold
@@ -583,7 +585,7 @@ export default function BlogPostClient({
                     </button>
                   </div>
                 </section>
-              </main>
+              </div>
 
               <aside className="lg:col-span-4" aria-label="Sidebar">
                 <div className="lg:sticky lg:top-24 space-y-6">
@@ -835,8 +837,9 @@ export default function BlogPostClient({
           </section>
         )}
       </article>
+    </main>
 
-      <Footer />
-    </div>
-  );
+    <Footer />
+  </div>
+);
 }

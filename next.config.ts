@@ -29,6 +29,9 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    
+    // ✅ FIX: Add all quality values being used in your images
+    qualities: [75, 85, 90, 95],
   },
   
   // Enable compression

@@ -212,23 +212,6 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* ========================================
    TABLES - FRONTEND DISPLAY
    ======================================== */
@@ -239,7 +222,7 @@
   max-width: 100% !important;
 }
 
-/* Make table scrollable on ALL devices (PC + Mobile) */
+/* Make table scrollable on ALL devices (PC + Mobile) with keyboard accessibility */
 .blog-content table {
   display: block !important;
   width: auto !important;
@@ -251,6 +234,14 @@
   margin: 2rem 0 !important;
   border: 2px solid #000000 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  /* ACCESSIBILITY FIX: Make scrollable table keyboard accessible */
+  tabindex: 0 !important;
+}
+
+/* Focus indicator for keyboard navigation */
+.blog-content table:focus {
+  outline: 3px solid #755eb1 !important;
+  outline-offset: 2px !important;
 }
 
 .blog-content thead,
@@ -343,15 +334,12 @@
 /* ========================================
    TABLES - EDITOR (ProseMirror)
    ======================================== */
-/* ========================================
-   TABLES - EDITOR (ProseMirror)
-   ======================================== */
 
 .ProseMirror {
   outline: none !important;
 }
 
-/* Make editor tables scrollable to prevent overflow */
+/* Make editor tables scrollable to prevent overflow with keyboard accessibility */
 .ProseMirror table {
   display: block !important;
   width: auto !important;
@@ -363,6 +351,12 @@
   margin: 1rem 0 !important;
   border: 2px solid #000000 !important;
   background-color: white !important;
+}
+
+/* Focus indicator for editor tables */
+.ProseMirror table:focus {
+  outline: 3px solid #755eb1 !important;
+  outline-offset: 2px !important;
 }
 
 .ProseMirror thead,
@@ -432,7 +426,6 @@
 .ProseMirror th:empty::after {
   content: '\00a0' !important;
 }
-
 
 .sr-only {
   position: absolute;
