@@ -1,83 +1,117 @@
 /* ========================================
-   1. CORE CONTAINER FIX (CRITICAL FOR iOS)
+   CORE CONTAINER
    ======================================== */
 .blog-content {
-  /* FIX: Remove overflow:hidden to prevent iOS memory crash (Layer Explosion).
-     We use 'visible' so the GPU doesn't try to flatten the whole page into one layer. */
-  overflow-x: visible !important; 
-  overflow-y: visible !important;
-  
-  /* Creates a new stacking context safely */
-  isolation: isolate !important; 
-  
-  /* Layout stability */
   display: block !important;
   width: 100% !important;
   max-width: 100% !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 /* ========================================
-   2. IMAGE WRAPPER (ISOLATION STRATEGY)
+   IMAGE WRAPPER (iOS Isolation Strategy)
    ======================================== */
 
-/* This wrapper (added by JS) isolates the image from the page flow.
-   It mimics the 'Featured Image' behavior which we know works. */
 .blog-image-wrapper {
-  /* 1. Create a local stacking context (Isolation) */
+  /* Mimic Featured Image Container Structure */
   position: relative !important;
-  z-index: 10 !important;
-  
-  /* 2. Mimic Featured Image Container */
   display: block !important;
-  overflow: hidden !important; /* Critical: Clips the GPU layer size */
-  background-color: #f9fafb !important; /* bg-gray-50 */
-  border-radius: 0.75rem !important; /* rounded-xl */
+  overflow: hidden !important; /* Critical: isolates GPU layer */
   
-  /* 3. Spacing and Layout */
-  margin: 2.5rem 0 !important;
+  /* Layout */
   width: 100% !important;
   max-width: 100% !important;
-
-  /* 4. Hardware Acceleration on the WRAPPER */
-  transform: translate3d(0, 0, 0) !important;
-  will-change: transform !important;
+  margin: 2.5rem 0 !important;
   
-  /* 5. Visual Polish (Shadows go here now) */
+  /* Visual */
+  background-color: #f9fafb !important;
+  border-radius: 0.75rem !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  
+  /* Isolation */
+  isolation: isolate !important;
+  contain: layout style paint !important;
 }
 
-/* Ensure the image fills the wrapper correctly */
 .blog-image-wrapper img {
-  margin: 0 !important; /* Wrapper handles margins now */
+  /* Reset - wrapper handles everything */
+  display: block !important;
   width: 100% !important;
   height: auto !important;
-  display: block !important;
-  
-  /* Reset styles handled by wrapper */
-  border-radius: 0 !important; 
-  transform: none !important; 
+  margin: 0 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
   
-  /* Prevent interaction flicker */
-  -webkit-user-select: none;
+  /* Stability */
+  transform: none !important;
+  -webkit-transform: none !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  
+  /* Interaction */
   pointer-events: auto !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 /* ========================================
-   3. FALLBACK IMAGE STYLES
+   FALLBACK IMAGES (Before JS Wraps Them)
    ======================================== */
-/* These apply if the JS wrapper hasn't loaded yet */
+
 .blog-content img:not(.blog-image-wrapper img) {
+  display: block !important;
   max-width: 100% !important;
   height: auto !important;
-  border-radius: 0.5rem !important;
-  display: block !important;
   margin: 2rem 0 !important;
+  border-radius: 0.5rem !important;
+}
+
+/* ========================================
+   iOS SAFARI COMPREHENSIVE FIX
+   ======================================== */
+
+@supports (-webkit-touch-callout: none) {
+  /* Ensure wrapper creates stable stacking context on iOS */
+  .blog-image-wrapper {
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+  }
   
-  /* Basic stabilization */
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  backface-visibility: hidden !important;
+  /* Force CPU rendering on images inside wrapper */
+  .blog-image-wrapper img {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    
+    /* Remove expensive effects on iOS */
+    box-shadow: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  /* Disable hover effects on iOS */
+  .blog-image-wrapper img:hover,
+  .blog-image-wrapper img:active {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fallback images on iOS */
+  .blog-content img:not(.blog-image-wrapper img) {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    box-shadow: none !important;
+    transition: none !important;
+  }
 }
 
 /* ========================================
@@ -269,7 +303,7 @@
 }
 
 /* ========================================
-   TABLES - RESPONSIVE WRAPPER (Fixes Scroll)
+   TABLES - RESPONSIVE WRAPPER
    ======================================== */
 
 .table-responsive-wrapper {
@@ -330,7 +364,6 @@
   background-color: #f3f4f6 !important;
 }
 
-/* Mobile Table Tweaks */
 @media (max-width: 768px) {
   .blog-content table {
     font-size: 0.875rem !important;
@@ -355,7 +388,6 @@
   }
 }
 
-/* Preserve inline table styles */
 .blog-content table[style*="width"] { width: revert !important; }
 .blog-content th[style*="background"], .blog-content td[style*="background"] { background-color: revert !important; }
 .blog-content th[style*="text-align"], .blog-content td[style*="text-align"] { text-align: revert !important; }
@@ -453,6 +485,10 @@
 .ProseMirror th:empty::after {
   content: '\00a0' !important;
 }
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
 
 .sr-only {
   position: absolute;
