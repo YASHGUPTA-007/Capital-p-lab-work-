@@ -214,19 +214,6 @@
   }
 }
 
-/* iOS Safari override: disable aggressive transforms that cause image jitter */
-@supports (-webkit-touch-callout: none) {
-  .blog-content {
-    transform: none !important;
-    will-change: auto !important;
-    backface-visibility: visible !important;
-  }
-
-  .blog-content img {
-    transform: none !important;
-    will-change: auto !important;
-  }
-}
 
 
 /* ========================================
@@ -251,9 +238,9 @@
   margin: 2rem 0 !important;
   border: 2px solid #000000 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  /* ACCESSIBILITY FIX: Make scrollable table keyboard accessible */
-  tabindex: 0 !important;
+
 }
+
 
 /* Focus indicator for keyboard navigation */
 .blog-content table:focus {
@@ -456,34 +443,48 @@
   border-width: 0;
 }
 
+
+
+/* Enable GPU hints only on larger screens (desktop/laptop) */
+@media (min-width: 1024px) {
+  .blog-content {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* Optimize images for scroll performance on large screens */
+  .blog-content img {
+    transform: translateZ(0);
+    will-change: opacity;
+  }
+}
+/* ========================================
+   iOS SAFARI JITTER FIX - FINAL
+   ======================================== */
+
+/* Detect iOS Safari (iPhone + iPad) */
 @supports (-webkit-touch-callout: none) {
-  /* Disable ALL transforms on iOS */
+  /* Disable ALL GPU acceleration on iOS */
   .blog-content,
   .blog-content *,
-  img {
+  .blog-content img {
     transform: none !important;
+    -webkit-transform: none !important;
     will-change: auto !important;
     backface-visibility: visible !important;
     -webkit-backface-visibility: visible !important;
   }
   
-  /* Force explicit dimensions for images */
+  /* Force stable image dimensions */
   .blog-content img {
-    width: auto !important;
+    display: block !important;
     max-width: 100% !important;
     height: auto !important;
-    display: block !important;
-  }
-  
-  /* Disable hover animations on iOS */
-  .group:hover img {
-    transform: none !important;
   }
 }
 
-/* Force aspect-ratio for featured images */
-img[src*="cloudinary"],
-img[src*="featured"] {
-  aspect-ratio: 16/9;
-  object-fit: cover;
+/* Ensure images with dimensions maintain aspect ratio */
+.blog-content img[width][height] {
+  aspect-ratio: auto !important;
 }
