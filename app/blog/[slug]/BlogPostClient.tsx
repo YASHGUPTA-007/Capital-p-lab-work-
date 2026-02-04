@@ -289,7 +289,38 @@ export default function BlogPostClient({
   };
 
   const hasAuthor = post?.author && post.author.trim() !== "";
+useEffect(() => {
+  const makeTablesAccessible = () => {
+    const blogContent = document.querySelector('.blog-content');
+    if (!blogContent) return;
 
+    const tables = blogContent.querySelectorAll('table');
+    tables.forEach((table) => {
+      // Check if table has horizontal scroll
+      if (table.scrollWidth > table.clientWidth) {
+        table.setAttribute('tabindex', '0');
+        table.setAttribute('role', 'region');
+        table.setAttribute('aria-label', 'Scrollable data table - use arrow keys to scroll');
+      }
+    });
+  };
+
+  // Run after content is rendered
+  makeTablesAccessible();
+  
+  // Re-run when content changes
+  const observer = new MutationObserver(makeTablesAccessible);
+  const blogContent = document.querySelector('.blog-content');
+  
+  if (blogContent) {
+    observer.observe(blogContent, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  return () => observer.disconnect();
+}, [post.content]);
 
 return (
   <div className="min-h-screen bg-white">
