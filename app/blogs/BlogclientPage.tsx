@@ -551,10 +551,13 @@ const [newsletterStatus, setNewsletterStatus] = useState<
                           <div className="relative h-48 bg-gray-100 overflow-hidden flex-shrink-0">
                             {post.featuredImage ? (
                               <img
-                                src={post.featuredImage}
-                                alt={post.featuredImageAlt || post.title}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              />
+    src={post.featuredImage}
+    alt={post.featuredImageAlt || post.title}
+    width="400"
+    height="300"
+    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+    style={{ aspectRatio: '4/3' }}
+  />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-[#c1b4df]/15 to-[#c7d6c1]/15 flex items-center justify-center">
                                 <span className="text-5xl opacity-20" aria-hidden="true">📝</span>

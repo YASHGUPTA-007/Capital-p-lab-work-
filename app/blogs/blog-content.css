@@ -455,3 +455,35 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+@supports (-webkit-touch-callout: none) {
+  /* Disable ALL transforms on iOS */
+  .blog-content,
+  .blog-content *,
+  img {
+    transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+  }
+  
+  /* Force explicit dimensions for images */
+  .blog-content img {
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+  }
+  
+  /* Disable hover animations on iOS */
+  .group:hover img {
+    transform: none !important;
+  }
+}
+
+/* Force aspect-ratio for featured images */
+img[src*="cloudinary"],
+img[src*="featured"] {
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}

@@ -279,13 +279,20 @@ export default function BlogEditorModal({
         },
       }),
       Image.configure({
-        HTMLAttributes: {
-          class: "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
-          loading: 'lazy',
-        },
-        inline: false,
-        allowBase64: false,
-      }),
+  HTMLAttributes: {
+    class: "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
+    loading: 'lazy',
+  },
+  inline: false,
+  allowBase64: false,
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: { default: null },
+      height: { default: null },
+    };
+  },
+}),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -529,14 +536,20 @@ useEffect(() => {
             console.error("Background cleanup failed:", err),
           );
         }
-      } else if (cropType === "editor" && editor) {
-        editor.chain().focus().setImage({ 
-          src: uploadedUrl,
-          alt: metadata.altText,
-          title: metadata.name || metadata.altText,
-        
-        }).run();
-      }
+    } else if (cropType === "editor" && editor) {
+  // Get image dimensions
+  const img = new window.Image();
+  img.onload = () => {
+    editor.chain().focus().setImage({ 
+      src: uploadedUrl,
+      alt: metadata.altText,
+      title: metadata.name || metadata.altText,
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+    }).run();
+  };
+  img.src = uploadedUrl;
+}
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image. Please try again.");
@@ -581,13 +594,19 @@ useEffect(() => {
           );
         }
       } else if (cropType === "editor" && editor) {
-        editor.chain().focus().setImage({ 
-          src: uploadedUrl,
-          alt: metadata.altText,
-          title: metadata.name || metadata.altText,
-       
-        }).run();
-      }
+  // Get image dimensions
+  const img = new window.Image();
+  img.onload = () => {
+    editor.chain().focus().setImage({ 
+      src: uploadedUrl,
+      alt: metadata.altText,
+      title: metadata.name || metadata.altText,
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+    }).run();
+  };
+  img.src = uploadedUrl;
+}
     } catch (error) {
       console.error("Error uploading cropped image:", error);
       alert("Failed to upload cropped image. Please try again.");
@@ -625,14 +644,16 @@ useEffect(() => {
 
     if (imagePos !== null) {
       editor
-        .chain()
-        .focus()
-        .setNodeSelection(imagePos)
-        .updateAttributes('image', {
-          alt: metadata.altText,
-          title: metadata.title || metadata.altText,
-        })
-        .run();
+  .chain()
+  .focus()
+  .setNodeSelection(imagePos)
+  .updateAttributes('image', {
+    alt: metadata.altText,
+    title: metadata.title || metadata.altText,
+    // Preserve existing width/height if present
+    ...(editingImage.src && {}),
+  })
+  .run();
     }
 
     setEditingImage(null);
