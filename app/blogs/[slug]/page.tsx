@@ -43,8 +43,29 @@ export async function generateStaticParams() {
     return [];
   }
 }
+// ✅ Server-side HTML transformer (runs before client render)
+function wrapBlogImages(html: string): string {
+  if (!html) return html;
+  
+  // Simple regex approach (no dependencies needed)
+  return html.replace(
+    /<img([^>]+)>/gi,
+    (match, attributes) => {
+      // Remove loading="lazy" attribute
+      const cleanedAttributes = attributes.replace(/loading=["']lazy["']/gi, '');
+      
+      // Add loading="eager"
+      const finalAttributes = cleanedAttributes.includes('loading=')
+        ? cleanedAttributes
+        : `${cleanedAttributes} loading="eager"`;
+      
+      // Wrap in isolation div
+      return `<div class="blog-image-wrapper"><img${finalAttributes}></div>`;
+    }
+  );
+}
 
-// Fetch post data and serialize
+
 async function getPost(slug: string): Promise<BlogPost | null> {
   try {
     const q = query(
@@ -61,28 +82,31 @@ async function getPost(slug: string): Promise<BlogPost | null> {
     
     const data = querySnapshot.docs[0].data();
     
-    // Serialize Firestore Timestamps to ISO strings
- return {
-  id: querySnapshot.docs[0].id,
-  title: data.title || '',
-  slug: data.slug || '',
-  excerpt: data.excerpt || '',
-  content: data.content || '',
-  author: data.author || '',
-  category: data.category || '',
-  tags: data.tags || [],
-  featuredImage: data.featuredImage || '',
-  status: data.status || 'published',
-  likes: data.likes || 0, // ✅ ADD THIS LINE
-  createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-  publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-};
+    // ✅ Transform content BEFORE returning
+    const wrappedContent = wrapBlogImages(data.content || '');
+    
+    return {
+      id: querySnapshot.docs[0].id,
+      title: data.title || '',
+      slug: data.slug || '',
+      excerpt: data.excerpt || '',
+      content: wrappedContent, // ✅ Use transformed content
+      author: data.author || '',
+      category: data.category || '',
+      tags: data.tags || [],
+      featuredImage: data.featuredImage || '',
+      featuredImageAlt: data.featuredImageAlt || '',
+      featuredImageName: data.featuredImageName || '',
+      status: data.status || 'published',
+      likes: data.likes || 0,
+      createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+    };
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
   }
 }
-
 // Fetch related posts and serialize
 async function getRelatedPosts(category: string, currentPostId: string): Promise<BlogPost[]> {
   try {
