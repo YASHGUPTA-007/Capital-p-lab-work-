@@ -94,11 +94,11 @@ export const Footer = () => {
                
                <div className="flex flex-wrap items-center gap-2 font-bold text-xs uppercase tracking-widest text-white">
                   <span>© 2026</span>
-                  <span className="mx-2 text-[#c1b4df]">·</span>
-                  <span className="text-[#c1b4df]">Planet</span>
                   <span className="mx-2 text-white">·</span>
-                  <span className="text-[#c1b4df]">People</span>
-                  <span className="mx-2 text-[#c1b4df]">·</span>
+                  <span className="text-white">Planet</span>
+                  <span className="mx-2 text-white">·</span>
+                  <span className="text-white">People</span>
+                  <span className="mx-2 text-white">·</span>
                   <span className="text-white">Profit</span>
                </div>
             </div>

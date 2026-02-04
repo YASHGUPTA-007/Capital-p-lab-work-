@@ -164,7 +164,7 @@ export const AboutSection = () => {
                 <div className="absolute inset-0 bg-white/60 backdrop-blur-xl z-0" />
                 <div className="absolute -top-20 -right-20 w-[600px] h-[600px] bg-[#c1b4df]/30 rounded-full blur-[120px] mix-blend-multiply z-0" />
                 <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#c7d6c1]/20 rounded-full blur-[100px] mix-blend-multiply z-0" />
-                <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] z-0 mix-blend-overlay" />
+              
                 <div className="absolute inset-0 rounded-2xl md:rounded-[2.5rem] lg:rounded-[3rem] border border-[#755eb1]/10 z-10" />
               </>
             )}
