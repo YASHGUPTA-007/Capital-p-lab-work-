@@ -94,7 +94,7 @@ export const Hero = memo(() => {
             {/* Purple blob */}
             <div className="absolute bottom-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-[#755eb1]/20 rounded-full blur-[120px] mix-blend-multiply will-change-transform" />
             {/* Texture overlay */}
-            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+       
           </>
         )}
       </div>

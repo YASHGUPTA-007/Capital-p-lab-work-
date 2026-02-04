@@ -39,7 +39,7 @@ export const TestimonialSection = () => {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#c1b4df]/15 rounded-full blur-[80px] sm:blur-[100px]" />
         <div className="absolute bottom-0 left-0 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#c7d6c1]/15 rounded-full blur-[80px] sm:blur-[100px]" />
-        <div className="hidden sm:block absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+       
       </div>
 
       {/* Changed max-w to match other sections */}
