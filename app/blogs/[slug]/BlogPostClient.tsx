@@ -288,34 +288,44 @@ export default function BlogPostClient({
   };
 
   const hasAuthor = post?.author && post.author.trim() !== "";
-  useEffect(() => {
-    const makeTablesAccessible = () => {
-      const blogContent = document.querySelector('.blog-content');
+
+useEffect(() => {
+    const wrapTables = () => {
+      const blogContent = document.querySelector(".blog-content");
       if (!blogContent) return;
 
-      const tables = blogContent.querySelectorAll('table');
+      const tables = blogContent.querySelectorAll("table");
+
       tables.forEach((table) => {
-        // Check if table has horizontal scroll
-        if (table.scrollWidth > table.clientWidth) {
-          table.setAttribute('tabindex', '0');
-          table.setAttribute('role', 'region');
-          table.setAttribute('aria-label', 'Scrollable data table - use arrow keys to scroll');
+        // Prevent double-wrapping if this runs twice
+        if (table.parentElement?.classList.contains("table-responsive-wrapper")) {
+          return;
         }
+
+        // 1. Create the wrapper div
+        const wrapper = document.createElement("div");
+        wrapper.className = "table-responsive-wrapper"; // Matches our new CSS
+        
+        // 2. Add Accessibility (VoiceOver needs this on the wrapper, not the table)
+        wrapper.setAttribute("role", "region");
+        wrapper.setAttribute("aria-label", "Scrollable data table");
+        wrapper.setAttribute("tabindex", "0");
+
+        // 3. Insert wrapper before table
+        table.parentNode?.insertBefore(wrapper, table);
+
+        // 4. Move table inside wrapper
+        wrapper.appendChild(table);
       });
     };
+    // Run immediately
+    wrapTables();
 
-    // Run after content is rendered
-    makeTablesAccessible();
-    
-    // Re-run when content changes
-    const observer = new MutationObserver(makeTablesAccessible);
-    const blogContent = document.querySelector('.blog-content');
-    
+    // Re-run if content changes (safety net)
+    const observer = new MutationObserver(wrapTables);
+    const blogContent = document.querySelector(".blog-content");
     if (blogContent) {
-      observer.observe(blogContent, {
-        childList: true,
-        subtree: true,
-      });
+      observer.observe(blogContent, { childList: true, subtree: true });
     }
 
     return () => observer.disconnect();
