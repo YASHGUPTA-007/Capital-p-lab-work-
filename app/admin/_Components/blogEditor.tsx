@@ -278,7 +278,7 @@ export default function BlogEditorModal({
           style: "border: 2px solid #000000; padding: 12px; min-width: 100px;",
         },
       }),
-     Image.extend({
+   Image.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
@@ -298,12 +298,14 @@ export default function BlogEditorModal({
           return { height: attributes.height };
         },
       },
+      loading: {
+        default: 'eager',  // ✅ No lazy loading
+      },
     };
   },
 }).configure({
   HTMLAttributes: {
     class: "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
-    loading: 'lazy',
   },
   inline: false,
   allowBase64: false,

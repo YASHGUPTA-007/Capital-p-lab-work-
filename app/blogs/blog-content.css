@@ -194,9 +194,15 @@
   max-width: 100% !important;
   height: auto !important;
   border-radius: 0.5rem !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  display: block !important;
+  /* Remove box-shadow on mobile/iOS - causes repaints */
 }
 
+@media (min-width: 1024px) and (hover: hover) {
+  .blog-content img {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+}
 
 
 /* Enable GPU hints only on larger screens (desktop/laptop) */
@@ -444,47 +450,45 @@
 }
 
 
-
-/* Enable GPU hints only on larger screens (desktop/laptop) */
-@media (min-width: 1024px) {
-  .blog-content {
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
-  }
-
-  /* Optimize images for scroll performance on large screens */
-  .blog-content img {
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-}
 /* ========================================
-   iOS SAFARI JITTER FIX - FINAL
+   IMAGES - BASELINE
    ======================================== */
 
-/* Detect iOS Safari (iPhone + iPad) */
+.blog-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  display: block !important;
+}
+
+/* ========================================
+   iOS SAFARI JITTER FIX - IMAGES ONLY
+   ======================================== */
+
 @supports (-webkit-touch-callout: none) {
-  /* Disable ALL GPU acceleration on iOS */
-  .blog-content,
-  .blog-content *,
+  /* Target ONLY blog content images */
   .blog-content img {
+    /* Kill all GPU acceleration */
     transform: none !important;
     -webkit-transform: none !important;
     will-change: auto !important;
+    
+    /* Force CPU rendering */
     backface-visibility: visible !important;
     -webkit-backface-visibility: visible !important;
+    
+    /* Remove expensive visual effects */
+    box-shadow: none !important;
+    transition: none !important;
+    
+    /* Prevent hover jitter */
+    pointer-events: none !important;
   }
   
-  /* Force stable image dimensions */
-  .blog-content img {
-    display: block !important;
-    max-width: 100% !important;
-    height: auto !important;
+  /* Make images clickable but without transforms */
+  .blog-content img.cursor-pointer {
+    pointer-events: auto !important;
+    cursor: pointer !important;
   }
-}
-
-/* Ensure images with dimensions maintain aspect ratio */
-.blog-content img[width][height] {
-  aspect-ratio: auto !important;
 }
