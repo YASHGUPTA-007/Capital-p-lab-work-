@@ -48,10 +48,9 @@ const TestimonialSection = dynamic(
   { ssr: false, loading: () => <div className="min-h-screen" /> }
 );
 
-const TeamSection = dynamic(
-  () => import("./_components/landingPage/Team").then(mod => ({ default: mod.TeamSection })),
-  { ssr: false, loading: () => <div className="min-h-screen" /> }
-);
+// For named exports, we need to import the whole module then destructure
+// Or better yet, just import it normally since we need it on first render anyway
+import { TeamSection } from "./_components/landingPage/Team";
 
 const ContactForm = dynamic(
   () => import("./_components/landingPage/ContactForm").then(mod => ({ default: mod.ContactForm })),
@@ -71,6 +70,44 @@ export default function TheCapitalPLab() {
     // Force body scroll on mount
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'visible';
+
+    // Handle hash navigation after page load (for cross-page navigation)
+    const handleHashScroll = () => {
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        // Wait for dynamic components to load, then scroll
+        const attemptScroll = (attempts = 0) => {
+          const element = document.getElementById(hash);
+          
+          if (element) {
+            const navbarHeight = 100;
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - navbarHeight;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          } else if (attempts < 20) {
+            // Retry after 100ms if element not found (dynamic components still loading)
+            setTimeout(() => attemptScroll(attempts + 1), 100);
+          }
+        };
+
+        // Small initial delay to let components start mounting
+        setTimeout(() => attemptScroll(), 300);
+      }
+    };
+
+    // Run on mount
+    handleHashScroll();
+
+    // Also listen for hash changes
+    window.addEventListener('hashchange', handleHashScroll);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashScroll);
+    };
   }, []);
 
   return (
