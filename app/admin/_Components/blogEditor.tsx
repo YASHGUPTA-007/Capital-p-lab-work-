@@ -220,6 +220,9 @@ export default function BlogEditorModal({
   const originalFeaturedImage = useRef<string>(blog?.featuredImage || "");
   const originalContentImages = useRef<string[]>([]);
   const uploadedImagesThisSession = useRef<string[]>([]);
+  // ✅ ADD THIS NEW STATE
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   const [showTablePicker, setShowTablePicker] = useState(false);
   const [tableSize, setTableSize] = useState({ rows: 3, cols: 3 });
@@ -244,6 +247,7 @@ export default function BlogEditorModal({
     extensions: [
       StarterKit.configure({
         heading: false,
+
         bulletList: {
           HTMLAttributes: { class: "list-disc pl-6 my-6 space-y-3" },
         },
@@ -254,6 +258,7 @@ export default function BlogEditorModal({
           HTMLAttributes: { class: "text-gray-900 text-lg leading-relaxed" },
         },
       }),
+
       CustomHeading.configure({ levels: [1, 2, 3] }),
       Table.configure({
         resizable: true,
@@ -278,38 +283,39 @@ export default function BlogEditorModal({
           style: "border: 2px solid #000000; padding: 12px; min-width: 100px;",
         },
       }),
-   Image.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      width: {
-        default: null,
-        parseHTML: element => element.getAttribute('width'),
-        renderHTML: attributes => {
-          if (!attributes.width) return {};
-          return { width: attributes.width };
+      Image.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            width: {
+              default: null,
+              parseHTML: (element) => element.getAttribute("width"),
+              renderHTML: (attributes) => {
+                if (!attributes.width) return {};
+                return { width: attributes.width };
+              },
+            },
+            height: {
+              default: null,
+              parseHTML: (element) => element.getAttribute("height"),
+              renderHTML: (attributes) => {
+                if (!attributes.height) return {};
+                return { height: attributes.height };
+              },
+            },
+            loading: {
+              default: "eager", // ✅ No lazy loading
+            },
+          };
         },
-      },
-      height: {
-        default: null,
-        parseHTML: element => element.getAttribute('height'),
-        renderHTML: attributes => {
-          if (!attributes.height) return {};
-          return { height: attributes.height };
+      }).configure({
+        HTMLAttributes: {
+          class:
+            "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
         },
-      },
-      loading: {
-        default: 'eager',  // ✅ No lazy loading
-      },
-    };
-  },
-}).configure({
-  HTMLAttributes: {
-    class: "max-w-full h-auto rounded-lg my-8 shadow-md cursor-pointer hover:shadow-xl transition-shadow",
-  },
-  inline: false,
-  allowBase64: false,
-}),
+        inline: false,
+        allowBase64: false,
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -330,14 +336,14 @@ export default function BlogEditorModal({
           "prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-gray-900",
       },
       handleKeyDown: (view, event) => {
-        if (event.key === 'Backspace') {
+        if (event.key === "Backspace") {
           const { state } = view;
           const { selection } = state;
           const { $from } = selection;
-          
-          if ($from.node(-1)?.type.name === 'table') {
+
+          if ($from.node(-1)?.type.name === "table") {
             const cell = $from.node(0);
-            if (cell && cell.textContent === '') {
+            if (cell && cell.textContent === "") {
               editor?.chain().focus().deleteTable().run();
               return true;
             }
@@ -347,13 +353,13 @@ export default function BlogEditorModal({
       },
       // ✅ Handle image clicks for editing
       handleClickOn: (view, pos, node, nodePos, event) => {
-        if (node.type.name === 'image') {
+        if (node.type.name === "image") {
           event.preventDefault();
           const attrs = node.attrs;
           setEditingImage({
-            src: attrs.src || '',
-            alt: attrs.alt || '',
-            title: attrs.title || '',
+            src: attrs.src || "",
+            alt: attrs.alt || "",
+            title: attrs.title || "",
           });
           return true;
         }
@@ -361,46 +367,68 @@ export default function BlogEditorModal({
       },
     },
   });
-// ✅ Make tables keyboard accessible
-useEffect(() => {
-  if (!editor) return;
+  // ✅ Make tables keyboard accessible
+  useEffect(() => {
+    if (!editor) return;
 
-  const makeTablesAccessible = () => {
-    const editorElement = document.querySelector('.ProseMirror');
-    if (!editorElement) return;
+    const makeTablesAccessible = () => {
+      const editorElement = document.querySelector(".ProseMirror");
+      if (!editorElement) return;
 
-    const tables = editorElement.querySelectorAll('table');
-    tables.forEach((table) => {
-      // Check if table has horizontal scroll
-      if (table.scrollWidth > table.clientWidth) {
-        table.setAttribute('tabindex', '0');
-        table.setAttribute('role', 'region');
-        table.setAttribute('aria-label', 'Scrollable data table - use arrow keys to scroll');
-      }
-    });
-  };
+      const tables = editorElement.querySelectorAll("table");
+      tables.forEach((table) => {
+        // Check if table has horizontal scroll
+        if (table.scrollWidth > table.clientWidth) {
+          table.setAttribute("tabindex", "0");
+          table.setAttribute("role", "region");
+          table.setAttribute(
+            "aria-label",
+            "Scrollable data table - use arrow keys to scroll",
+          );
+        }
+      });
+    };
 
-  // Run on editor update
-  makeTablesAccessible();
-  
-  // Re-run when editor content changes
-  const observer = new MutationObserver(makeTablesAccessible);
-  const editorElement = document.querySelector('.ProseMirror');
-  
-  if (editorElement) {
-    observer.observe(editorElement, {
-      childList: true,
-      subtree: true,
-    });
-  }
+    // Run on editor update
+    makeTablesAccessible();
 
-  return () => observer.disconnect();
-}, [editor]);
+    // Re-run when editor content changes
+    const observer = new MutationObserver(makeTablesAccessible);
+    const editorElement = document.querySelector(".ProseMirror");
 
-  
+    if (editorElement) {
+      observer.observe(editorElement, {
+        childList: true,
+        subtree: true,
+      });
+    }
+
+    return () => observer.disconnect();
+  }, [editor]);
+
   const insertTable = () => {
     setShowTablePicker(true);
   };
+
+  // ✅ Track undo/redo state changes
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateHistoryState = () => {
+      setCanUndo(editor.can().undo());
+      setCanRedo(editor.can().redo());
+    };
+
+    // Update immediately
+    updateHistoryState();
+
+    // Update on every transaction
+    editor.on("transaction", updateHistoryState);
+
+    return () => {
+      editor.off("transaction", updateHistoryState);
+    };
+  }, [editor]);
 
   const confirmInsertTable = () => {
     editor
@@ -522,7 +550,10 @@ useEffect(() => {
     reader.readAsDataURL(file);
   };
 
-  const handleAddDirectly = async (imageUrl: string, metadata: ImageMetadata) => {
+  const handleAddDirectly = async (
+    imageUrl: string,
+    metadata: ImageMetadata,
+  ) => {
     setSelectionModalOpen(false);
 
     if (cropType === "featured") {
@@ -541,32 +572,39 @@ useEffect(() => {
 
       if (cropType === "featured") {
         const oldFeaturedImage = formData.featuredImage;
-        setFormData((prev) => ({ 
-          ...prev, 
+        setFormData((prev) => ({
+          ...prev,
           featuredImage: uploadedUrl,
           featuredImageAlt: metadata.altText,
-          featuredImageName: metadata.name
+          featuredImageName: metadata.name,
         }));
 
-        if (oldFeaturedImage && oldFeaturedImage !== originalFeaturedImage.current) {
+        if (
+          oldFeaturedImage &&
+          oldFeaturedImage !== originalFeaturedImage.current
+        ) {
           deleteCloudinaryImage(oldFeaturedImage).catch((err) =>
             console.error("Background cleanup failed:", err),
           );
         }
-    } else if (cropType === "editor" && editor) {
-  // Get image dimensions
-  const img = new window.Image();
-  img.onload = () => {
-    editor.chain().focus().setImage({ 
-      src: uploadedUrl,
-      alt: metadata.altText,
-      title: metadata.name || metadata.altText,
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-    }).run();
-  };
-  img.src = uploadedUrl;
-}
+      } else if (cropType === "editor" && editor) {
+        // Get image dimensions
+        const img = new window.Image();
+        img.onload = () => {
+          editor
+            .chain()
+            .focus()
+            .setImage({
+              src: uploadedUrl,
+              alt: metadata.altText,
+              title: metadata.name || metadata.altText,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            })
+            .run();
+        };
+        img.src = uploadedUrl;
+      }
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image. Please try again.");
@@ -579,7 +617,10 @@ useEffect(() => {
     }
   };
 
-  const handleCropComplete = async (croppedImageUrl: string, metadata: ImageMetadata) => {
+  const handleCropComplete = async (
+    croppedImageUrl: string,
+    metadata: ImageMetadata,
+  ) => {
     setSelectionModalOpen(false);
 
     if (cropType === "featured") {
@@ -598,32 +639,39 @@ useEffect(() => {
 
       if (cropType === "featured") {
         const oldFeaturedImage = formData.featuredImage;
-        setFormData((prev) => ({ 
-          ...prev, 
+        setFormData((prev) => ({
+          ...prev,
           featuredImage: uploadedUrl,
           featuredImageAlt: metadata.altText,
-          featuredImageName: metadata.name
+          featuredImageName: metadata.name,
         }));
 
-        if (oldFeaturedImage && oldFeaturedImage !== originalFeaturedImage.current) {
+        if (
+          oldFeaturedImage &&
+          oldFeaturedImage !== originalFeaturedImage.current
+        ) {
           deleteCloudinaryImage(oldFeaturedImage).catch((err) =>
             console.error("Background cleanup failed:", err),
           );
         }
       } else if (cropType === "editor" && editor) {
-  // Get image dimensions
-  const img = new window.Image();
-  img.onload = () => {
-    editor.chain().focus().setImage({ 
-      src: uploadedUrl,
-      alt: metadata.altText,
-      title: metadata.name || metadata.altText,
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-    }).run();
-  };
-  img.src = uploadedUrl;
-}
+        // Get image dimensions
+        const img = new window.Image();
+        img.onload = () => {
+          editor
+            .chain()
+            .focus()
+            .setImage({
+              src: uploadedUrl,
+              alt: metadata.altText,
+              title: metadata.name || metadata.altText,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            })
+            .run();
+        };
+        img.src = uploadedUrl;
+      }
     } catch (error) {
       console.error("Error uploading cropped image:", error);
       alert("Failed to upload cropped image. Please try again.");
@@ -643,17 +691,20 @@ useEffect(() => {
   };
 
   // ✅ NEW: Handle image edit save
-  const handleImageEditSave = (metadata: { altText: string; title: string }) => {
+  const handleImageEditSave = (metadata: {
+    altText: string;
+    title: string;
+  }) => {
     if (!editor || !editingImage) return;
 
     // Find and update the image in the editor
     const { state } = editor;
     const { doc } = state;
-    
+
     let imagePos: number | null = null;
-    
+
     doc.descendants((node, pos) => {
-      if (node.type.name === 'image' && node.attrs.src === editingImage.src) {
+      if (node.type.name === "image" && node.attrs.src === editingImage.src) {
         imagePos = pos;
         return false;
       }
@@ -661,16 +712,16 @@ useEffect(() => {
 
     if (imagePos !== null) {
       editor
-  .chain()
-  .focus()
-  .setNodeSelection(imagePos)
-  .updateAttributes('image', {
-    alt: metadata.altText,
-    title: metadata.title || metadata.altText,
-    // Preserve existing width/height if present
-    ...(editingImage.src && {}),
-  })
-  .run();
+        .chain()
+        .focus()
+        .setNodeSelection(imagePos)
+        .updateAttributes("image", {
+          alt: metadata.altText,
+          title: metadata.title || metadata.altText,
+          // Preserve existing width/height if present
+          ...(editingImage.src && {}),
+        })
+        .run();
     }
 
     setEditingImage(null);
@@ -678,14 +729,17 @@ useEffect(() => {
 
   const handleRemoveFeaturedImage = async () => {
     const imageToRemove = formData.featuredImage;
-    setFormData((prev) => ({ 
-      ...prev, 
+    setFormData((prev) => ({
+      ...prev,
       featuredImage: "",
       featuredImageAlt: "",
-      featuredImageName: ""
+      featuredImageName: "",
     }));
 
-    if (imageToRemove && uploadedImagesThisSession.current.includes(imageToRemove)) {
+    if (
+      imageToRemove &&
+      uploadedImagesThisSession.current.includes(imageToRemove)
+    ) {
       deleteCloudinaryImage(imageToRemove).catch((err) =>
         console.error("Failed to delete image:", err),
       );
@@ -740,29 +794,35 @@ useEffect(() => {
 
     // ✅ Validate featured image has alt text
     if (formData.featuredImage && !formData.featuredImageAlt) {
-      alert("⚠️ Featured image is missing alt text. Please provide it for accessibility.");
+      alert(
+        "⚠️ Featured image is missing alt text. Please provide it for accessibility.",
+      );
       return;
     }
 
     // ✅ Validate all content images have alt text
     const currentContent = editor.getHTML();
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = currentContent;
-    const contentImages = tempDiv.querySelectorAll('img');
-    
+    const contentImages = tempDiv.querySelectorAll("img");
+
     const imagesWithoutAlt: string[] = [];
     contentImages.forEach((img) => {
-      const alt = img.getAttribute('alt');
-      const src = img.getAttribute('src');
-      if (!alt || alt.trim() === '') {
+      const alt = img.getAttribute("alt");
+      const src = img.getAttribute("src");
+      if (!alt || alt.trim() === "") {
         // Get a preview of the image URL for the alert
-        const urlPreview = src ? new URL(src).pathname.split('/').pop()?.substring(0, 30) : 'Unknown';
-        imagesWithoutAlt.push(urlPreview || 'Unknown image');
+        const urlPreview = src
+          ? new URL(src).pathname.split("/").pop()?.substring(0, 30)
+          : "Unknown";
+        imagesWithoutAlt.push(urlPreview || "Unknown image");
       }
     });
 
     if (imagesWithoutAlt.length > 0) {
-      alert(`⚠️ ${imagesWithoutAlt.length} image(s) in content are missing alt text:\n\n${imagesWithoutAlt.join('\n')}\n\nAll images must have alt text for accessibility.\n\nClick on images in the editor to add alt text.`);
+      alert(
+        `⚠️ ${imagesWithoutAlt.length} image(s) in content are missing alt text:\n\n${imagesWithoutAlt.join("\n")}\n\nAll images must have alt text for accessibility.\n\nClick on images in the editor to add alt text.`,
+      );
       return;
     }
 
@@ -1100,8 +1160,12 @@ useEffect(() => {
                         {/* Display Alt Text */}
                         {formData.featuredImageAlt && (
                           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                            <p className="text-xs font-bold text-green-900 mb-1">✅ Alt Text:</p>
-                            <p className="text-xs text-green-800">{formData.featuredImageAlt}</p>
+                            <p className="text-xs font-bold text-green-900 mb-1">
+                              ✅ Alt Text:
+                            </p>
+                            <p className="text-xs text-green-800">
+                              {formData.featuredImageAlt}
+                            </p>
                           </div>
                         )}
                       </div>
@@ -1405,48 +1469,51 @@ useEffect(() => {
                   )}
                 </div>
 
-                {/* Media */}
-                <div className="flex items-center gap-1 px-2 border-r border-gray-300">
-                  <button
-                    type="button"
-                    onClick={addLink}
-                    className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors ${editor.isActive("link") ? "bg-gray-300" : ""}`}
-                    title="Add Link"
-                  >
-                    <LinkIcon size={18} />
-                  </button>
-                  <label
-                    className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer ${uploadingImage ? "opacity-50 cursor-not-allowed" : ""}`}
-                    title="Upload Image with Alt Text"
-                  >
-                    <ImageIcon size={18} />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleEditorImageUpload}
-                      disabled={uploadingImage}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
+    
+            {/* Media */}
+<div className="flex items-center gap-1 px-2 border-r border-gray-300">
+  <label
+    className={`p-2 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer ${uploadingImage ? "opacity-50 cursor-not-allowed" : ""}`}
+    title="Upload Image with Alt Text"
+  >
+    <ImageIcon size={18} />
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleEditorImageUpload}
+      disabled={uploadingImage}
+      className="hidden"
+    />
+  </label>
+</div>
 
+                {/* Undo/Redo */}
+                {/* Undo/Redo */}
                 {/* Undo/Redo */}
                 <div className="ml-auto flex items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => editor.chain().focus().undo().run()}
-                    disabled={!editor.can().undo()}
-                    className="p-2 rounded hover:bg-gray-200 text-gray-700 disabled:opacity-30"
-                    title="Undo"
+                    onClick={() => editor?.chain().focus().undo().run()}
+                    disabled={!canUndo}
+                    className={`p-2 rounded transition-colors ${
+                      canUndo
+                        ? "hover:bg-gray-200 text-gray-700 cursor-pointer"
+                        : "text-gray-400 cursor-not-allowed opacity-50"
+                    }`}
+                    title="Undo (Ctrl+Z)"
                   >
                     <Undo size={18} />
                   </button>
                   <button
                     type="button"
-                    onClick={() => editor.chain().focus().redo().run()}
-                    disabled={!editor.can().redo()}
-                    className="p-2 rounded hover:bg-gray-200 text-gray-700 disabled:opacity-30"
-                    title="Redo"
+                    onClick={() => editor?.chain().focus().redo().run()}
+                    disabled={!canRedo}
+                    className={`p-2 rounded transition-colors ${
+                      canRedo
+                        ? "hover:bg-gray-200 text-gray-700 cursor-pointer"
+                        : "text-gray-400 cursor-not-allowed opacity-50"
+                    }`}
+                    title="Redo (Ctrl+Y)"
                   >
                     <Redo size={18} />
                   </button>
