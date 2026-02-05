@@ -6,11 +6,17 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -35,6 +41,33 @@ export const metadata: Metadata = {
     url: "https://www.capitalp.org",
     siteName: "The Capital P Lab",
     type: "website",
+    images: [
+      {
+        url: "https://www.capitalp.org/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "The Capital P Lab",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "The Capital P Lab",
+    description: "Turning evidence into impact for people, planet, and prosperity",
+    images: ["https://www.capitalp.org/logo.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -48,11 +81,7 @@ const organizationSchema = {
   logo: "https://www.capitalp.org/logo.png",
   description:
     "We help turn evidence into impact for people, the planet, and profit. Research and consulting services for sustainable development.",
-  sameAs: [
-    // Add social profiles if available
-    // "https://www.linkedin.com/company/capitalp",
-    // "https://twitter.com/capitalp",
-  ],
+  sameAs: [],
 };
 
 export default function RootLayout({
@@ -61,8 +90,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
+        {/* DNS Prefetch & Preconnect for performance */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
         {/* Organization Schema */}
         <Script
           id="organization-schema"
@@ -89,9 +125,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
@@ -102,7 +136,7 @@ export default function RootLayout({
           />
         </noscript>
 
-     {children}
+        {children}
       </body>
     </html>
   );
