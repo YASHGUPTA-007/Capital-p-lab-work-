@@ -157,7 +157,7 @@ const { formatted: totalLikesFormatted } = formatViewCount(totalLikes, 'intl');
         <div className="mb-4 md:mb-6 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-xl md:text-2xl font-semibold text-gray-900 mb-1">Blog Posts</h1>
-            <p className="text-xs md:text-sm text-gray-600">Manage all blog content</p>
+            
           </div>
           <button
             onClick={onNewBlog}

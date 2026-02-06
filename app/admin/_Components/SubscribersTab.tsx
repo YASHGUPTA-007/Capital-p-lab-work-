@@ -313,46 +313,60 @@ export default function SubscribersTab({
           </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-5 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Total</p>
-                <p className="text-3xl font-bold text-gray-900">{subscribers.length}</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                <Mail size={24} className="text-blue-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-xl p-5 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Active</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {subscribers.filter(s => s.status === 'active').length}
-                </p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                <CheckCircle size={24} className="text-green-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">Unsubscribed</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {subscribers.filter(s => s.status === 'unsubscribed').length}
-                </p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                <XCircle size={24} className="text-gray-600" />
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Stats Cards */}
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+  {/* Total */}
+  <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-lg p-3 hover:shadow transition-shadow">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-[10px] sm:text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+          Total
+        </p>
+        <p className="text-xl sm:text-2xl font-bold text-gray-900">
+          {subscribers.length}
+        </p>
+      </div>
+      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+        <Mail size={18} className="text-blue-600" />
+      </div>
+    </div>
+  </div>
+
+  {/* Active */}
+  <div className="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-lg p-3 hover:shadow transition-shadow">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-[10px] sm:text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+          Active
+        </p>
+        <p className="text-xl sm:text-2xl font-bold text-gray-900">
+          {subscribers.filter(s => s.status === 'active').length}
+        </p>
+      </div>
+      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-green-100 flex items-center justify-center">
+        <CheckCircle size={18} className="text-green-600" />
+      </div>
+    </div>
+  </div>
+
+  {/* Unsubscribed */}
+  <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-lg p-3 hover:shadow transition-shadow">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-[10px] sm:text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+          Unsubscribed
+        </p>
+        <p className="text-xl sm:text-2xl font-bold text-gray-900">
+          {subscribers.filter(s => s.status === 'unsubscribed').length}
+        </p>
+      </div>
+      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+        <XCircle size={18} className="text-gray-600" />
+      </div>
+    </div>
+  </div>
+</div>
+
 
         {/* Search and Filter Bar */}
         <div className="bg-white border border-gray-200 rounded-xl mb-4 shadow-sm">

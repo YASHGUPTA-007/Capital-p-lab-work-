@@ -1,41 +1,51 @@
 // app/admin/dashboard/page.tsx
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { auth, db } from '@/lib/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { 
-  collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, getDoc
-} from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
-import Sidebar from './_Components/sidebar';
-import OverviewTab from './_Components/overview';
-import ContactsTab from './_Components/ContactsTab';
-import SubscribersTab from './_Components/SubscribersTab';
-import BlogsTab from './_Components/blogManagement';
-import BlogEditorModal from './_Components/blogEditor';
-import ContactDetailModal from './_Components/ContactDetailModal';
-import { Contact, Subscriber, BlogPost } from '@/types/admin';
+import { useEffect, useState } from "react";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  deleteDoc,
+  doc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import Sidebar from "./_Components/sidebar";
+import OverviewTab from "./_Components/overview";
+import ContactsTab from "./_Components/ContactsTab";
+import SubscribersTab from "./_Components/SubscribersTab";
+import BlogsTab from "./_Components/blogManagement";
+import BlogEditorModal from "./_Components/blogEditor";
+import ContactDetailModal from "./_Components/ContactDetailModal";
+import { Contact, Subscriber, BlogPost } from "@/types/admin";
+import CommentsTab from "./_Components/CommentsTab";
+import { Comment } from "@/types/admin";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
+  const [comments, setComments] = useState<Comment[]>([]);
+
   // Data States
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [totalVisits, setTotalVisits] = useState(0);
-  
+
   // Modal States
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
-  
+
   const router = useRouter();
 
   // Authentication Check
@@ -44,7 +54,7 @@ export default function AdminDashboard() {
       if (currentUser) {
         setUser(currentUser);
       } else {
-        router.push('/admin/login');
+        router.push("/admin/login");
       }
       setLoading(false);
     });
@@ -56,13 +66,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchVisits = async () => {
       try {
-        const docRef = doc(db, 'site-stats', 'general');
+        const docRef = doc(db, "site-stats", "general");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setTotalVisits(docSnap.data().totalVisits || 0);
         }
       } catch (error) {
-        console.error('Error fetching visits:', error);
+        console.error("Error fetching visits:", error);
       }
     };
     fetchVisits();
@@ -70,7 +80,7 @@ export default function AdminDashboard() {
 
   // Fetch contacts
   useEffect(() => {
-    const q = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, "contacts"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const contactsData: Contact[] = [];
       snapshot.forEach((doc) => {
@@ -83,7 +93,10 @@ export default function AdminDashboard() {
 
   // Fetch subscribers
   useEffect(() => {
-    const q = query(collection(db, 'newsletter-subscribers'), orderBy('subscribedAt', 'desc'));
+    const q = query(
+      collection(db, "newsletter-subscribers"),
+      orderBy("subscribedAt", "desc"),
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const subscribersData: Subscriber[] = [];
       snapshot.forEach((doc) => {
@@ -96,7 +109,7 @@ export default function AdminDashboard() {
 
   // Fetch blog posts
   useEffect(() => {
-    const q = query(collection(db, 'blog-posts'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, "blog-posts"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const postsData: BlogPost[] = [];
       snapshot.forEach((doc) => {
@@ -107,33 +120,77 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const q = query(collection(db, "comments"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const commentsData: Comment[] = [];
+      snapshot.forEach((doc) => {
+        commentsData.push({ id: doc.id, ...doc.data() } as Comment);
+      });
+      setComments(commentsData);
+    });
+    return () => unsubscribe();
+  }, []);
+  
+  
+  const handleApproveComment = async (id: string) => {
+    try {
+      await updateDoc(doc(db, "comments", id), {
+        status: "approved",
+      });
+    } catch (error) {
+      console.error("Error approving comment:", error);
+      throw error;
+    }
+  };
+
+  const handleRejectComment = async (id: string) => {
+    try {
+      await updateDoc(doc(db, "comments", id), {
+        status: "rejected",
+      });
+    } catch (error) {
+      console.error("Error rejecting comment:", error);
+      throw error;
+    }
+  };
+const handleDeleteComment = async (id: string) => {
+  // ✅ FIXED - No confirm() needed, CommentsTab handles confirmation
+  try {
+    await deleteDoc(doc(db, "comments", id));
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+};
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push('/admin/login');
+      router.push("/admin/login");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
   // ✅ UPDATED: Removed confirm() - ContactsTab handles confirmation now
   const handleDeleteContact = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'contacts', id));
+      await deleteDoc(doc(db, "contacts", id));
       if (selectedContact?.id === id) setSelectedContact(null);
     } catch (error) {
-      console.error('Error deleting contact:', error);
+      console.error("Error deleting contact:", error);
       throw error;
     }
   };
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await updateDoc(doc(db, 'contacts', id), {
-        status: 'read'
+      await updateDoc(doc(db, "contacts", id), {
+        status: "read",
       });
     } catch (error) {
-      console.error('Error updating contact:', error);
+      console.error("Error updating contact:", error);
       throw error;
     }
   };
@@ -141,9 +198,9 @@ export default function AdminDashboard() {
   // ✅ UPDATED: Removed confirm() - SubscribersTab handles confirmation now
   const handleDeleteSubscriber = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'newsletter-subscribers', id));
+      await deleteDoc(doc(db, "newsletter-subscribers", id));
     } catch (error) {
-      console.error('Error deleting subscriber:', error);
+      console.error("Error deleting subscriber:", error);
       throw error;
     }
   };
@@ -151,9 +208,9 @@ export default function AdminDashboard() {
   // ✅ UPDATED: Removed confirm() - BlogsTab handles confirmation now
   const handleDeleteBlog = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'blog-posts', id));
+      await deleteDoc(doc(db, "blog-posts", id));
     } catch (error) {
-      console.error('Error deleting blog:', error);
+      console.error("Error deleting blog:", error);
       throw error;
     }
   };
@@ -170,34 +227,36 @@ export default function AdminDashboard() {
 
   const exportSubscribers = () => {
     const csv = [
-      ['Name', 'Email', 'Subscribed At', 'Source', 'Status'],
-      ...subscribers.map(sub => [
+      ["Name", "Email", "Subscribed At", "Source", "Status"],
+      ...subscribers.map((sub) => [
         sub.name,
         sub.email,
         formatDate(sub.subscribedAt),
         sub.source,
-        sub.status
-      ])
-    ].map(row => row.join(',')).join('\n');
+        sub.status,
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `newsletter-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `newsletter-subscribers-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
   const formatDate = (timestamp: any) => {
-    if (!timestamp) return 'N/A';
+    if (!timestamp) return "N/A";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   };
 
@@ -243,9 +302,13 @@ export default function AdminDashboard() {
             setActiveTab={setActiveTab}
             user={user}
             contactsCount={contacts.length}
-            newContactsCount={contacts.filter(c => c.status === 'new').length}
+            newContactsCount={contacts.filter((c) => c.status === "new").length}
             subscribersCount={subscribers.length}
             blogPostsCount={blogPosts.length}
+            commentsCount={comments.length} // ADD THIS
+            pendingCommentsCount={
+              comments.filter((c) => c.status === "pending").length
+            } // ADD THIS
             onLogout={handleLogout}
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -255,7 +318,7 @@ export default function AdminDashboard() {
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <>
-            <div 
+            <div
               className="lg:hidden fixed inset-0 bg-black/50 z-40"
               onClick={() => setSidebarOpen(false)}
             />
@@ -268,9 +331,15 @@ export default function AdminDashboard() {
                 }}
                 user={user}
                 contactsCount={contacts.length}
-                newContactsCount={contacts.filter(c => c.status === 'new').length}
+                newContactsCount={
+                  contacts.filter((c) => c.status === "new").length
+                }
                 subscribersCount={subscribers.length}
                 blogPostsCount={blogPosts.length}
+                commentsCount={comments.length} // ADD THIS
+                pendingCommentsCount={
+                  comments.filter((c) => c.status === "pending").length
+                } // ADD THIS
                 onLogout={handleLogout}
                 collapsed={false}
                 onToggleCollapse={() => {}}
@@ -281,23 +350,32 @@ export default function AdminDashboard() {
 
         <main className="flex-1 overflow-auto">
           <div className="h-full">
-          {activeTab === 'overview' && (
-  <OverviewTab
-    contactsCount={contacts.length}
-    newContactsCount={contacts.filter(c => c.status === 'new').length}
-    subscribersCount={subscribers.length}
-    publishedBlogsCount={blogPosts.filter(b => b.status === 'published').length}
-    totalVisits={totalVisits}
-    totalLikes={blogPosts.reduce((sum, post) => sum + (post.likes || 0), 0)}
-    recentContacts={contacts.slice(0, 5)}
-    recentBlogs={blogPosts.filter(b => b.status === 'published').slice(0, 5)}
-    formatDate={formatDate}
-    onNavigateToInquiries={() => setActiveTab('contacts')}
-    onNavigateToBlogs={() => setActiveTab('blogs')}
-  />
-)}
+            {activeTab === "overview" && (
+              <OverviewTab
+                contactsCount={contacts.length}
+                newContactsCount={
+                  contacts.filter((c) => c.status === "new").length
+                }
+                subscribersCount={subscribers.length}
+                publishedBlogsCount={
+                  blogPosts.filter((b) => b.status === "published").length
+                }
+                totalVisits={totalVisits}
+                totalLikes={blogPosts.reduce(
+                  (sum, post) => sum + (post.likes || 0),
+                  0,
+                )}
+                recentContacts={contacts.slice(0, 5)}
+                recentBlogs={blogPosts
+                  .filter((b) => b.status === "published")
+                  .slice(0, 5)}
+                formatDate={formatDate}
+                onNavigateToInquiries={() => setActiveTab("contacts")}
+                onNavigateToBlogs={() => setActiveTab("blogs")}
+              />
+            )}
 
-            {activeTab === 'contacts' && (
+            {activeTab === "contacts" && (
               <ContactsTab
                 contacts={contacts}
                 onDeleteContact={handleDeleteContact}
@@ -307,7 +385,7 @@ export default function AdminDashboard() {
               />
             )}
 
-            {activeTab === 'subscribers' && (
+            {activeTab === "subscribers" && (
               <SubscribersTab
                 subscribers={subscribers}
                 onDeleteSubscriber={handleDeleteSubscriber}
@@ -316,13 +394,23 @@ export default function AdminDashboard() {
               />
             )}
 
-            {activeTab === 'blogs' && (
+            {activeTab === "blogs" && (
               <BlogsTab
                 blogPosts={blogPosts}
                 onDeleteBlog={handleDeleteBlog}
                 onEditBlog={handleEditBlog}
                 onNewBlog={handleNewBlog}
                 formatDate={formatDate}
+              />
+            )}
+
+            {activeTab === "comments" && (
+              <CommentsTab
+                comments={comments}
+                onApprove={handleApproveComment}
+                onReject={handleRejectComment}
+                onDelete={handleDeleteComment}
+                blogPosts={blogPosts}
               />
             )}
           </div>

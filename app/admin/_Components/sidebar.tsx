@@ -1,6 +1,6 @@
 // components/admin/Sidebar.tsx
 import Image from 'next/image';
-import { LayoutDashboard, Mail, LogOut, Users, FileText, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Mail, LogOut, Users, FileText, Sparkles, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -10,6 +10,8 @@ interface SidebarProps {
   newContactsCount: number;
   subscribersCount: number;
   blogPostsCount: number;
+  commentsCount: number;
+  pendingCommentsCount: number;
   onLogout: () => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
@@ -23,6 +25,8 @@ export default function Sidebar({
   newContactsCount,
   subscribersCount,
   blogPostsCount,
+  commentsCount,
+  pendingCommentsCount,
   onLogout,
   collapsed,
   onToggleCollapse
@@ -176,6 +180,36 @@ export default function Sidebar({
               }`}>
                 {blogPostsCount}
               </span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('comments')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
+            activeTab === 'comments'
+              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
+              : 'text-white/70 hover:bg-white/5 hover:text-white'
+          } ${collapsed ? 'justify-center' : ''}`}
+          title={collapsed ? 'Comments' : ''}
+        >
+          <div className="relative">
+            <MessageCircle 
+              size={18} 
+              className={activeTab === 'comments' ? '' : 'group-hover:scale-110 transition-transform'} 
+            />
+            {pendingCommentsCount > 0 && collapsed && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+            )}
+          </div>
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Comments</span>
+              {pendingCommentsCount > 0 && (
+                <span className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-yellow-500/30 animate-pulse">
+                  {pendingCommentsCount}
+                </span>
+              )}
             </>
           )}
         </button>

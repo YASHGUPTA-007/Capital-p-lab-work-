@@ -26,7 +26,7 @@ import Image from "next/image";
 import { Navbar } from "@/app/_components/landingPage/Navbar";
 import { Footer } from "@/app/_components/landingPage/Footer";
 import "../blog-content.css";
-
+import CommentSection from "@/app/blogs/_components/CommentSection";
 interface BlogPost {
   id: string;
   title: string;
@@ -70,28 +70,27 @@ export default function BlogPostClient({
   const [hasLiked, setHasLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
-
-
   useEffect(() => {
-  let ticking = false;
-  
-  const handleScroll = () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        const scrollTop = window.scrollY;
-        const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
-        setReadingProgress(Math.min(scrollPercent, 100));
-        ticking = false;
-      });
-      ticking = true;
-    }
-  };
+    let ticking = false;
 
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const scrollTop = window.scrollY;
+          const scrollPercent =
+            (scrollTop / (documentHeight - windowHeight)) * 100;
+          setReadingProgress(Math.min(scrollPercent, 100));
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -291,8 +290,7 @@ export default function BlogPostClient({
 
   const hasAuthor = post?.author && post.author.trim() !== "";
 
-
-useEffect(() => {
+  useEffect(() => {
     const wrapTables = () => {
       const blogContent = document.querySelector(".blog-content");
       if (!blogContent) return;
@@ -301,14 +299,16 @@ useEffect(() => {
 
       tables.forEach((table) => {
         // Prevent double-wrapping if this runs twice
-        if (table.parentElement?.classList.contains("table-responsive-wrapper")) {
+        if (
+          table.parentElement?.classList.contains("table-responsive-wrapper")
+        ) {
           return;
         }
 
         // 1. Create the wrapper div
         const wrapper = document.createElement("div");
         wrapper.className = "table-responsive-wrapper"; // Matches our new CSS
-        
+
         // 2. Add Accessibility (VoiceOver needs this on the wrapper, not the table)
         wrapper.setAttribute("role", "region");
         wrapper.setAttribute("aria-label", "Scrollable data table");
@@ -339,19 +339,19 @@ useEffect(() => {
       <Navbar />
 
       <main>
-       <div
-  className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
-  style={{ 
-    transform: `scaleX(${readingProgress / 100})`,
-    contain: 'strict',
-    willChange: 'transform',
-  }}
-  role="progressbar"
-  aria-valuenow={Math.round(readingProgress)}
-  aria-valuemin={0}
-  aria-valuemax={100}
-  aria-label={`Reading progress: ${Math.round(readingProgress)}%`}
-/>
+        <div
+          className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#755eb1] via-[#6b54a5] to-[#755eb1] z-50 origin-left"
+          style={{
+            transform: `scaleX(${readingProgress / 100})`,
+            contain: "strict",
+            willChange: "transform",
+          }}
+          role="progressbar"
+          aria-valuenow={Math.round(readingProgress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Reading progress: ${Math.round(readingProgress)}%`}
+        />
 
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -372,7 +372,10 @@ useEffect(() => {
                   href="/blogs"
                   className="group inline-flex items-center gap-2 text-[#755eb1] hover:text-[#6b54a5] font-semibold transition-all"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#755eb1]/10 flex items-center justify-center group-hover:bg-[#755eb1]/20 transition-all" aria-hidden="true">
+                  <div
+                    className="w-8 h-8 rounded-full bg-[#755eb1]/10 flex items-center justify-center group-hover:bg-[#755eb1]/20 transition-all"
+                    aria-hidden="true"
+                  >
                     <ArrowLeft size={16} />
                   </div>
                   <span>Back to Blog</span>
@@ -390,7 +393,9 @@ useEffect(() => {
                     <p className="text-xs font-bold text-[#755eb1] uppercase tracking-wider">
                       Insights
                     </p>
-                    <p className="text-xs text-[#4f475d]">Research & Analysis</p>
+                    <p className="text-xs text-[#4f475d]">
+                      Research & Analysis
+                    </p>
                   </div>
                 </div>
               </nav>
@@ -459,68 +464,6 @@ useEffect(() => {
                     </>
                   )}
                 </div>
-                <nav aria-label="Share article">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#2b2e34] mr-2">
-                      Share:
-                    </span>
-                    <button
-                      onClick={() => sharePost("twitter")}
-                      className="w-10 h-10 rounded-full bg-[#1DA1F2] text-white hover:bg-[#1a8cd8] transition-all flex items-center justify-center shadow-md"
-                      aria-label="Share on Twitter"
-                    >
-                      <Twitter size={18} aria-hidden="true" />
-                    </button>
-                    <button
-                      onClick={() => sharePost("linkedin")}
-                      className="w-10 h-10 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-all flex items-center justify-center shadow-md"
-                      aria-label="Share on LinkedIn"
-                    >
-                      <Linkedin size={18} aria-hidden="true" />
-                    </button>
-                    <button
-                      onClick={() => sharePost("facebook")}
-                      className="w-10 h-10 rounded-full bg-[#1877F2] text-white hover:bg-[#0c63d4] transition-all flex items-center justify-center shadow-md"
-                      aria-label="Share on Facebook"
-                    >
-                      <Facebook size={18} aria-hidden="true" />
-                    </button>
-                    <button
-                      onClick={copyLink}
-                      className="w-10 h-10 rounded-full bg-[#2b2e34] text-white hover:bg-[#1a1c20] transition-all flex items-center justify-center shadow-md"
-                      aria-label="Copy link to clipboard"
-                    >
-                      <Share2 size={18} aria-hidden="true" />
-                    </button>
-                    <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-                      <button
-                        onClick={handleLike}
-                        disabled={hasLiked || isLiking}
-                        className={`group flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all shadow-md ${
-                          hasLiked
-                            ? "bg-red-500 text-white cursor-default"
-                            : "bg-red-50 text-red-700 hover:bg-red-500 hover:text-white"
-                        }`}
-                        aria-label={
-                          hasLiked
-                            ? `You've liked this post. ${formatViewCount(likes, "intl").full} total likes`
-                            : `Like this post. ${formatViewCount(likes, "intl").full} total likes`
-                        }
-                      >
-                        <Heart
-                          size={18}
-                          className={
-                            hasLiked ? "fill-current" : "group-hover:fill-current"
-                          }
-                          aria-hidden="true"
-                        />
-                        <span className="text-sm">
-                          {formatViewCount(likes, "intl").formatted}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                </nav>
               </div>
 
               {post.tags && post.tags.length > 0 && (
@@ -528,7 +471,10 @@ useEffect(() => {
                   <span className="text-sm font-semibold text-gray-700 mb-2 block">
                     Topics:
                   </span>
-                  <ul className="flex items-center gap-2 flex-wrap" aria-label="Article topics">
+                  <ul
+                    className="flex items-center gap-2 flex-wrap"
+                    aria-label="Article topics"
+                  >
                     {post.tags.map((tag, index) => (
                       <li key={index}>
                         <span className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors border border-gray-200">
@@ -549,7 +495,8 @@ useEffect(() => {
                   <img
                     src={post.featuredImage}
                     alt={
-                      post.featuredImageAlt || `Featured image for: ${post.title}`
+                      post.featuredImageAlt ||
+                      `Featured image for: ${post.title}`
                     }
                     className="w-full h-auto object-contain"
                     style={{
@@ -599,12 +546,12 @@ useEffect(() => {
                       prose-td:p-4 prose-td:border-t prose-td:border-gray-200"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                   />
-
                   <section
                     className="mt-16 bg-gradient-to-br from-[#755eb1]/5 via-[#c7d6c1]/5 to-[#755eb1]/5 rounded-3xl p-8 md:p-10 border-2 border-[#755eb1]/20"
                     aria-labelledby="cta-heading"
                   >
-                    <div className="flex flex-col md:flex-row items-center gap-6">
+                    {/* --- Top Section: Newsletter (Unchanged) --- */}
+                    <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
                       <div
                         className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#755eb1] to-[#6b54a5] flex items-center justify-center flex-shrink-0 shadow-xl"
                         aria-hidden="true"
@@ -626,10 +573,88 @@ useEffect(() => {
                       <button
                         onClick={scrollToSubscribe}
                         className="px-8 py-4 bg-gradient-to-r from-[#755eb1] to-[#6b54a5] text-white rounded-xl font-bold hover:shadow-2xl transition-all transform hover:scale-105 whitespace-nowrap"
-                        aria-label="Subscribe to newsletter"
                       >
                         Subscribe Now
                       </button>
+                    </div>
+
+                    {/* --- Bottom Section: Actions --- */}
+                    {/* We use 'items-end' to align the bottom of the buttons visually */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-8 border-t-2 border-[#755eb1]/10">
+                      {/* ENHANCED LIKE BUTTON */}
+                      {/* Strategy: Use white bg to contrast with the section's light purple bg, plus a deep colored shadow */}
+                      <button
+                        onClick={handleLike}
+                        disabled={hasLiked || isLiking}
+                        className={`
+        relative group flex items-center gap-3 px-8 py-3 rounded-full border-2 transition-all duration-300
+        ${
+          hasLiked
+            ? "bg-red-50 border-red-100 text-red-500 cursor-default"
+            : "bg-white border-[#755eb1]/10 text-[#755eb1] hover:border-[#755eb1] hover:shadow-[0_8px_30px_rgb(117,94,177,0.2)] hover:-translate-y-1 active:translate-y-0"
+        }
+      `}
+                        aria-label={
+                          hasLiked ? "You liked this" : "Like this article"
+                        }
+                      >
+                        <div
+                          className={`
+        p-2 rounded-full transition-colors duration-300
+        ${hasLiked ? "bg-red-100" : "bg-[#755eb1]/5 group-hover:bg-[#755eb1]"}
+      `}
+                        >
+                          <Heart
+                            size={20}
+                            className={`
+            transition-all duration-300
+            ${hasLiked ? "fill-current text-red-500" : "text-[#755eb1] group-hover:text-white group-hover:scale-110"}
+          `}
+                            aria-hidden="true"
+                          />
+                        </div>
+
+                        <span
+                          className={`text-lg font-bold ${hasLiked ? "text-red-500" : "text-[#2b2e34] group-hover:text-[#755eb1]"}`}
+                        >
+                          {likes} {likes === 1 ? "Like" : "Likes"}
+                        </span>
+                      </button>
+
+                      {/* ORIGINAL SHARE SECTION (Preserved for AAA Compliance) */}
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-[#4f475d] hidden sm:block">
+                          Share:
+                        </span>
+                        <button
+                          onClick={() => sharePost("twitter")}
+                          className="w-10 h-10 rounded-lg bg-white hover:bg-[#1DA1F2] text-[#1DA1F2] hover:text-white flex items-center justify-center transition-all hover:shadow-lg"
+                          aria-label="Share on Twitter"
+                        >
+                          <Twitter size={18} aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={() => sharePost("facebook")}
+                          className="w-10 h-10 rounded-lg bg-white hover:bg-[#1877F2] text-[#1877F2] hover:text-white flex items-center justify-center transition-all hover:shadow-lg"
+                          aria-label="Share on Facebook"
+                        >
+                          <Facebook size={18} aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={() => sharePost("linkedin")}
+                          className="w-10 h-10 rounded-lg bg-white hover:bg-[#0A66C2] text-[#0A66C2] hover:text-white flex items-center justify-center transition-all hover:shadow-lg"
+                          aria-label="Share on LinkedIn"
+                        >
+                          <Linkedin size={18} aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={copyLink}
+                          className="w-10 h-10 rounded-lg bg-white hover:bg-[#755eb1] text-[#755eb1] hover:text-white flex items-center justify-center transition-all hover:shadow-lg"
+                          aria-label="Copy link to clipboard"
+                        >
+                          <Share2 size={18} aria-hidden="true" />
+                        </button>
+                      </div>
                     </div>
                   </section>
                 </div>
@@ -801,6 +826,8 @@ useEffect(() => {
               </div>
             </div>
           </div>
+
+          <CommentSection blogId={post.id} />
 
           {relatedPosts.length > 0 && (
             <section

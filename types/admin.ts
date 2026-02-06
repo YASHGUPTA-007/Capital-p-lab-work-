@@ -39,3 +39,17 @@ export interface BlogPost {
    views?: number;
     likes?: number; 
 }
+
+// Add to existing file after BlogPost interface
+
+export interface Comment {
+  id: string;
+  blogId: string;
+  authorName: string;
+  authorEmail: string;
+  content: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+  ipAddress?: string;
+  userAgent?: string;
+}

@@ -86,3 +86,177 @@ img, video, iframe {
   white-space: nowrap;
   border-width: 0;
 }
+/* Add these styles to your global CSS or blog-content.css file */
+/* for enhanced comment section responsiveness and animations */
+
+/* Smooth scroll behavior for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Comment card animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comment-card {
+  animation: slideInUp 0.5s ease-out forwards;
+}
+
+/* Improved focus states for accessibility */
+input:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid #755eb1;
+  outline-offset: 2px;
+}
+
+/* Better mobile spacing for comment section */
+@media (max-width: 640px) {
+  .comment-section-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Smooth transitions for form inputs */
+input,
+textarea {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:focus,
+textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(117, 94, 177, 0.15);
+}
+
+/* Loading state improvements */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button hover effects */
+.submit-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.submit-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Pagination button improvements */
+.pagination-button {
+  transition: all 0.3s ease;
+}
+
+.pagination-button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.pagination-button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Empty state improvements */
+.empty-state {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Success/Error message animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-message {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Character counter styling */
+.character-counter {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Responsive typography adjustments */
+@media (max-width: 768px) {
+  .comment-heading {
+    font-size: 2rem;
+  }
+  
+  .comment-content {
+    font-size: 0.95rem;
+  }
+}
+
+/* Dark mode support (optional - if you plan to add it) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles here if needed */
+}
+
+/* Print styles */
+@media print {
+  .comment-form,
+  .pagination-controls {
+    display: none;
+  }
+  
+  .comment-card {
+    break-inside: avoid;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

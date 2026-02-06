@@ -363,8 +363,8 @@ const [newsletterStatus, setNewsletterStatus] = useState<
       {/* Main Content - Single <main> landmark for entire page */}
       <main>
         {/* Hero Section with Branding */}
-        <section aria-labelledby="page-title" className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5">
-          <div className="max-w-7xl mx-auto">
+        <section aria-labelledby="page-title" className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#755eb1]/5 via-white to-[#c7d6c1]/5 ">
+          <div className="max-w-7xl mx-auto mt-10">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
                 <Image
