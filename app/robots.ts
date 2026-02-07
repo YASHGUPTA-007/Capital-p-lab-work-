@@ -10,6 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/admin/', '/_next/'],
       },
     ],
-    sitemap: 'https://www.capitalp.org/sitemap.xml', // Replace with your actual domain
+    sitemap: 'https://www.capitalp.org/sitemap.xml', 
+    host: 'https://www.capitalp.org',// Replace with your actual domain
   };
 }
