@@ -4,8 +4,8 @@ import React, { useEffect } from "react";
 import dynamic from "next/dynamic";
 import Script from "next/script";
 
-// Critical components - loaded immediately
-import { Navbar } from "./_components/landingPage/Navbar";
+
+
 import { Hero } from "./_components/landingPage/Hero";
 
 // Background elements with lower priority
@@ -135,7 +135,7 @@ export default function TheCapitalPLab() {
       <div className="bg-white min-h-screen text-zinc-900 selection:bg-[#c7d6c1] selection:text-[#4f75d] font-sans">
         <CustomCursor />
         <NoiseOverlay />
-        <Navbar />
+       
 
         <main>
           <Hero />

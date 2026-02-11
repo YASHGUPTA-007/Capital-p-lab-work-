@@ -2,8 +2,6 @@
 
 /**
  * Extract Cloudinary public_id from URL
- * Example: https://res.cloudinary.com/demo/image/upload/v1234567890/blog_images/abc123.jpg
- * Returns: blog_images/abc123
  */
 export function extractPublicId(cloudinaryUrl: string): string | null {
   try {
@@ -48,9 +46,7 @@ export async function deleteCloudinaryImage(imageUrl: string): Promise<boolean> 
 
     const response = await fetch('/api/cloudinary/delete', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ publicId }),
     });
 
@@ -93,13 +89,12 @@ export async function deleteCloudinaryImages(imageUrls: string[]): Promise<{
 }
 
 /**
- * Upload to Cloudinary
+ * Upload image to Cloudinary
  */
 export async function uploadToCloudinary(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'blog_images');
-  formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '');
 
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -111,6 +106,27 @@ export async function uploadToCloudinary(file: File): Promise<string> {
   return data.secure_url;
 }
 
+/**
+ * Get download URL with fl_attachment flag to force download
+ * ✅ Uses URL parameter for raw files (documents)
+ * 
+ * @param cloudinaryUrl - Original Cloudinary URL
+ * @returns URL with fl_attachment parameter
+ */
+export function getDownloadUrl(cloudinaryUrl: string): string {
+  try {
+    const url = new URL(cloudinaryUrl);
+    
+    // ✅ Add both fl_attachment flag AND Content-Disposition header request
+    url.searchParams.set('fl_attachment', '');
+    url.searchParams.set('attachment', ''); // Additional browser hint
+    
+    return url.toString();
+  } catch (error) {
+    console.error('Error generating download URL:', error);
+    return cloudinaryUrl;
+  }
+}
 /**
  * Convert blob URL to File
  */

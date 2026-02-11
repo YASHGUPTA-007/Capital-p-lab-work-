@@ -124,6 +124,18 @@ export const Navbar = memo(() => {
               >
                 Blog
               </Link>
+
+              {/* Research Link */}
+              <Link 
+                href="/research"
+                className={`px-4 lg:px-5 py-2 text-[10px] lg:text-xs font-bold uppercase tracking-widest rounded-full transition-all ${
+                  pathname.startsWith('/research')
+                    ? 'bg-gradient-to-r from-[#c1b4df]/30 to-[#c7d6c1]/30 text-[#755eb1]'
+                    : 'text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1]'
+                }`}
+              >
+                Research
+              </Link>
             </div>
 
             {/* Contact Button */}
@@ -176,6 +188,19 @@ export const Navbar = memo(() => {
                 }`}
               >
                 Blog
+              </Link>
+
+              {/* Research Link - Mobile */}
+              <Link
+                href="/research"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block w-full text-left px-5 py-3 text-sm font-bold uppercase tracking-widest rounded-xl transition-all ${
+                  pathname.startsWith('/research')
+                    ? 'bg-gradient-to-r from-[#c1b4df]/30 to-[#c7d6c1]/30 text-[#755eb1]'
+                    : 'text-[#4f475d] hover:bg-gradient-to-r hover:from-[#c1b4df]/30 hover:to-[#c7d6c1]/30 hover:text-[#755eb1]'
+                }`}
+              >
+                Research
               </Link>
               
               <button

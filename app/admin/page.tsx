@@ -1,4 +1,4 @@
-// app/admin/dashboard/page.tsx
+// app/admin/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -26,6 +26,9 @@ import ContactDetailModal from "./_Components/ContactDetailModal";
 import { Contact, Subscriber, BlogPost } from "@/types/admin";
 import CommentsTab from "./_Components/CommentsTab";
 import { Comment } from "@/types/admin";
+import ResearchTab from "./_Components/ResearchTab";
+import ResearchEditor from "./_Components/ResearchEditor";
+import { ResearchItem } from "@/types/research";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -39,12 +42,15 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [researchItems, setResearchItems] = useState<ResearchItem[]>([]);
   const [totalVisits, setTotalVisits] = useState(0);
 
   // Modal States
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  const [showResearchEditor, setShowResearchEditor] = useState(false);
+  const [editingResearch, setEditingResearch] = useState<ResearchItem | null>(null);
 
   const router = useRouter();
 
@@ -120,6 +126,7 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, []);
 
+  // Fetch comments
   useEffect(() => {
     const q = query(collection(db, "comments"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -131,8 +138,21 @@ export default function AdminDashboard() {
     });
     return () => unsubscribe();
   }, []);
-  
-  
+
+  // Fetch research items
+  useEffect(() => {
+    const q = query(collection(db, "research-items"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const itemsData: ResearchItem[] = [];
+      snapshot.forEach((doc) => {
+        itemsData.push({ id: doc.id, ...doc.data() } as ResearchItem);
+      });
+      setResearchItems(itemsData);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Comment handlers
   const handleApproveComment = async (id: string) => {
     try {
       await updateDoc(doc(db, "comments", id), {
@@ -154,15 +174,15 @@ export default function AdminDashboard() {
       throw error;
     }
   };
-const handleDeleteComment = async (id: string) => {
-  // ✅ FIXED - No confirm() needed, CommentsTab handles confirmation
-  try {
-    await deleteDoc(doc(db, "comments", id));
-  } catch (error) {
-    console.error("Error deleting comment:", error);
-    throw error;
-  }
-};
+
+  const handleDeleteComment = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "comments", id));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      throw error;
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -173,7 +193,6 @@ const handleDeleteComment = async (id: string) => {
     }
   };
 
-  // ✅ UPDATED: Removed confirm() - ContactsTab handles confirmation now
   const handleDeleteContact = async (id: string) => {
     try {
       await deleteDoc(doc(db, "contacts", id));
@@ -195,7 +214,6 @@ const handleDeleteComment = async (id: string) => {
     }
   };
 
-  // ✅ UPDATED: Removed confirm() - SubscribersTab handles confirmation now
   const handleDeleteSubscriber = async (id: string) => {
     try {
       await deleteDoc(doc(db, "newsletter-subscribers", id));
@@ -205,7 +223,6 @@ const handleDeleteComment = async (id: string) => {
     }
   };
 
-  // ✅ UPDATED: Removed confirm() - BlogsTab handles confirmation now
   const handleDeleteBlog = async (id: string) => {
     try {
       await deleteDoc(doc(db, "blog-posts", id));
@@ -223,6 +240,26 @@ const handleDeleteComment = async (id: string) => {
   const handleNewBlog = () => {
     setEditingBlog(null);
     setShowBlogEditor(true);
+  };
+
+  // Research handlers
+  const handleDeleteResearch = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "research-items", id));
+    } catch (error) {
+      console.error("Error deleting research item:", error);
+      throw error;
+    }
+  };
+
+  const handleEditResearch = (item: ResearchItem) => {
+    setEditingResearch(item);
+    setShowResearchEditor(true);
+  };
+
+  const handleNewResearch = () => {
+    setEditingResearch(null);
+    setShowResearchEditor(true);
   };
 
   const exportSubscribers = () => {
@@ -305,10 +342,11 @@ const handleDeleteComment = async (id: string) => {
             newContactsCount={contacts.filter((c) => c.status === "new").length}
             subscribersCount={subscribers.length}
             blogPostsCount={blogPosts.length}
-            commentsCount={comments.length} // ADD THIS
+            researchItemsCount={researchItems.length}
+            commentsCount={comments.length}
             pendingCommentsCount={
               comments.filter((c) => c.status === "pending").length
-            } // ADD THIS
+            }
             onLogout={handleLogout}
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -336,10 +374,11 @@ const handleDeleteComment = async (id: string) => {
                 }
                 subscribersCount={subscribers.length}
                 blogPostsCount={blogPosts.length}
-                commentsCount={comments.length} // ADD THIS
+                researchItemsCount={researchItems.length}
+                commentsCount={comments.length}
                 pendingCommentsCount={
                   comments.filter((c) => c.status === "pending").length
-                } // ADD THIS
+                }
                 onLogout={handleLogout}
                 collapsed={false}
                 onToggleCollapse={() => {}}
@@ -404,6 +443,16 @@ const handleDeleteComment = async (id: string) => {
               />
             )}
 
+            {activeTab === "research" && (
+              <ResearchTab
+                items={researchItems}
+                onDeleteItem={handleDeleteResearch}
+                onEditItem={handleEditResearch}
+                onNewItem={handleNewResearch}
+                formatDate={formatDate}
+              />
+            )}
+
             {activeTab === "comments" && (
               <CommentsTab
                 comments={comments}
@@ -428,6 +477,20 @@ const handleDeleteComment = async (id: string) => {
           onSave={() => {
             setShowBlogEditor(false);
             setEditingBlog(null);
+          }}
+        />
+      )}
+
+      {showResearchEditor && (
+        <ResearchEditor
+          item={editingResearch}
+          onClose={() => {
+            setShowResearchEditor(false);
+            setEditingResearch(null);
+          }}
+          onSave={() => {
+            setShowResearchEditor(false);
+            setEditingResearch(null);
           }}
         />
       )}

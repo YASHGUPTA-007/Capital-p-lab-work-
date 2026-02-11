@@ -23,8 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Navbar } from "@/app/_components/landingPage/Navbar";
-import { Footer } from "@/app/_components/landingPage/Footer";
+
 import "../blog-content.css";
 import CommentSection from "@/app/blogs/_components/CommentSection";
 interface BlogPost {
@@ -336,7 +335,6 @@ export default function BlogPostClient({
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
 
       <main>
         <div
@@ -918,7 +916,7 @@ export default function BlogPostClient({
         </article>
       </main>
 
-      <Footer />
+   
     </div>
   );
 }

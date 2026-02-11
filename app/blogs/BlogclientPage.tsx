@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Navbar } from "../_components/landingPage/Navbar";
-import { Footer } from "../_components/landingPage/Footer";
+
+
 import Lenis from "lenis";
 
 interface BlogPost {
@@ -250,7 +250,7 @@ const [newsletterStatus, setNewsletterStatus] = useState<
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+     
 
       {/* Newsletter Popup - Outside main landmarks as it's a modal */}
       <AnimatePresence>
@@ -630,7 +630,7 @@ const [newsletterStatus, setNewsletterStatus] = useState<
         </section>
       </main>
 
-      <Footer />
+
     </div>
   );
 }

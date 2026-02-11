@@ -1,6 +1,6 @@
 // components/admin/Sidebar.tsx
 import Image from 'next/image';
-import { LayoutDashboard, Mail, LogOut, Users, FileText, Sparkles, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
+import { LayoutDashboard, Mail, LogOut, Users, FileText, Sparkles, ChevronLeft, ChevronRight, MessageCircle, BookOpen } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -10,6 +10,7 @@ interface SidebarProps {
   newContactsCount: number;
   subscribersCount: number;
   blogPostsCount: number;
+  researchItemsCount: number;
   commentsCount: number;
   pendingCommentsCount: number;
   onLogout: () => void;
@@ -25,6 +26,7 @@ export default function Sidebar({
   newContactsCount,
   subscribersCount,
   blogPostsCount,
+  researchItemsCount,
   commentsCount,
   pendingCommentsCount,
   onLogout,
@@ -179,6 +181,33 @@ export default function Sidebar({
                   : 'bg-white/10 text-white/60'
               }`}>
                 {blogPostsCount}
+              </span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('research')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
+            activeTab === 'research'
+              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
+              : 'text-white/70 hover:bg-white/5 hover:text-white'
+          } ${collapsed ? 'justify-center' : ''}`}
+          title={collapsed ? 'Research' : ''}
+        >
+          <BookOpen 
+            size={18} 
+            className={activeTab === 'research' ? '' : 'group-hover:scale-110 transition-transform'} 
+          />
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Research</span>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                activeTab === 'research' 
+                  ? 'bg-white/20 text-white' 
+                  : 'bg-white/10 text-white/60'
+              }`}>
+                {researchItemsCount}
               </span>
             </>
           )}
