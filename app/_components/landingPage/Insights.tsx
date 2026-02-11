@@ -14,7 +14,7 @@ const InsightCard = memo(({ item, index }: { item: any; index: number }) => {
         if (item.type === "Blogs") {
             router.push('/blogs')
         } else if (item.type === "Reports") {
-            router.push('/research')
+            router.push('/Research')
         }
     }, [item.type, router])
 
