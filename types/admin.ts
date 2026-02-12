@@ -36,15 +36,14 @@ export interface BlogPost {
   createdAt: any;
   updatedAt: any;
   publishedAt?: any;
-   views?: number;
-    likes?: number; 
+  views?: number;
+  likes?: number; 
 }
-
-// Add to existing file after BlogPost interface
 
 export interface Comment {
   id: string;
-  blogId: string;
+  blogId?: string;
+  researchId?: string;
   authorName: string;
   authorEmail: string;
   content: string;

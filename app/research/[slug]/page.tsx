@@ -6,6 +6,7 @@ import { ResearchItem } from "@/types/research";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ResearchDetailClient from "./ResearchDetailClient";
+import CommentSection from "../Components/CommentSection";
 
 // Generate metadata for SEO - PARAMS IS NOW A PROMISE
 export async function generateMetadata({ 
@@ -114,6 +115,7 @@ async function getResearchItem(slug: string): Promise<ResearchItem | null> {
       publishedAt: data.publishedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
       downloads: data.downloads || 0,
       views: data.views || 0,
+       likes: data.likes || 0,
     } as ResearchItem;
   } catch (error) {
     console.error("❌ Error fetching research item:", error);
@@ -136,5 +138,10 @@ export default async function ResearchDetailPage({
   }
 
   console.log("✅ Rendering page for:", item.title);
-  return <ResearchDetailClient item={item} />;
+  return (
+    <>
+      <ResearchDetailClient item={item} />
+      <CommentSection researchId={item.id} />
+    </>
+  );
 }

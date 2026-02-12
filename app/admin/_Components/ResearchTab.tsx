@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Filter,
   Download,
+  Heart,
 } from "lucide-react";
 import { ResearchItem } from "@/types/research";
 import { formatViewCount } from "@/lib/formatters";
@@ -74,25 +75,24 @@ export default function ResearchTab({
     }
   };
 
+  // Calculate totals for stats
   const totalDownloads = items.reduce(
     (sum, item) => sum + (item.downloads || 0),
     0,
   );
   const totalViews = items.reduce((sum, item) => sum + (item.views || 0), 0);
+  const totalLikes = items.reduce((sum, item) => sum + (item.likes || 0), 0);
 
   const { formatted: downloadsFormatted } = formatViewCount(
     totalDownloads,
     "intl",
   );
   const { formatted: viewsFormatted } = formatViewCount(totalViews, "intl");
+  const { formatted: likesFormatted } = formatViewCount(totalLikes, "intl");
 
   return (
- 
-      
-
     <div className="p-4 md:p-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Research Library</h1>
@@ -110,8 +110,8 @@ export default function ResearchTab({
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      {/* Stats - Now with 5 cards */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
@@ -163,6 +163,20 @@ export default function ResearchTab({
               <p className="text-xs text-gray-600">Total Views</p>
               <p className="text-2xl font-semibold text-gray-900">
                 {viewsFormatted}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center">
+              <Heart size={20} className="text-pink-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-600">Total Likes</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {likesFormatted}
               </p>
             </div>
           </div>
@@ -279,7 +293,7 @@ export default function ResearchTab({
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-[280px]">
                       Title
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -290,6 +304,12 @@ export default function ResearchTab({
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Downloads
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Views
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Likes
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Status
@@ -305,33 +325,50 @@ export default function ResearchTab({
                       item.downloads || 0,
                       "intl",
                     );
+                    const { formatted: viewCount } = formatViewCount(
+                      item.views || 0,
+                      "intl",
+                    );
+                    const { formatted: likeCount } = formatViewCount(
+                      item.likes || 0,
+                      "intl",
+                    );
+
+                    // Truncate title if longer than 30 characters
+                    const displayTitle =
+                      item.title.length > 30
+                        ? item.title.substring(0, 30) + "..."
+                        : item.title;
 
                     return (
                       <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 max-w-[250px]">
                           <div className="flex items-center gap-3">
                             <img
                               src={item.coverImage}
                               alt={item.title}
-                              className="w-12 h-12 object-cover rounded-lg"
+                              className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                             />
-                            <div>
-                              <p className="font-medium text-gray-900">
-                                {item.title}
+                            <div className="min-w-0 flex-1">
+                              <p
+                                className="font-medium text-gray-900 truncate"
+                                title={item.title}
+                              >
+                                {displayTitle}
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 truncate">
                                 {item.author}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700">
+                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700 whitespace-nowrap">
                             {item.category}
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap">
                             {item.type === "document" ? (
                               <>
                                 <FileText size={16} />
@@ -345,12 +382,18 @@ export default function ResearchTab({
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
+                        <td className="px-6 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                           {downloadCount}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                          {viewCount}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                          {likeCount}
                         </td>
                         <td className="px-6 py-4">
                           <span
-                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${
                               item.status === "published"
                                 ? "bg-green-100 text-green-700"
                                 : "bg-yellow-100 text-yellow-700"
@@ -363,7 +406,7 @@ export default function ResearchTab({
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => onEditItem(item)}
-                              className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg"
+                              className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-colors"
                               title="Edit"
                             >
                               <Edit2 size={18} />
@@ -371,7 +414,7 @@ export default function ResearchTab({
                             <button
                               onClick={() => handleDelete(item.id)}
                               disabled={deletingId === item.id}
-                              className="p-2 hover:bg-red-50 text-red-600 rounded-lg disabled:opacity-50"
+                              className="p-2 hover:bg-red-50 text-red-600 rounded-lg disabled:opacity-50 transition-colors"
                               title="Delete"
                             >
                               {deletingId === item.id ? (
@@ -399,7 +442,7 @@ export default function ResearchTab({
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50"
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     <ChevronLeft size={20} />
                   </button>
@@ -408,7 +451,7 @@ export default function ResearchTab({
                       setCurrentPage((p) => Math.min(totalPages, p + 1))
                     }
                     disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50"
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     <ChevronRight size={20} />
                   </button>
@@ -419,6 +462,5 @@ export default function ResearchTab({
         </>
       )}
     </div>
-      
   );
 }

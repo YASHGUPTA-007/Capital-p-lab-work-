@@ -5,9 +5,10 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { blogId, authorName, authorEmail, content } = body;
+    const { blogId, researchId, authorName, authorEmail, content } = body;
 
-    if (!blogId || !authorName || !authorEmail || !content) {
+    // Must have either blogId or researchId
+    if ((!blogId && !researchId) || !authorName || !authorEmail || !content) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
@@ -30,8 +31,7 @@ export async function POST(request: Request) {
     }
 
     const commentsRef = collection(db, 'comments');
-    const docRef = await addDoc(commentsRef, {
-      blogId,
+    const commentData: any = {
       authorName: authorName.trim(),
       authorEmail: authorEmail.toLowerCase().trim(),
       content: content.trim(),
@@ -39,7 +39,16 @@ export async function POST(request: Request) {
       createdAt: serverTimestamp(),
       ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
       userAgent: request.headers.get('user-agent') || 'unknown',
-    });
+    };
+
+    // Add either blogId or researchId
+    if (blogId) {
+      commentData.blogId = blogId;
+    } else {
+      commentData.researchId = researchId;
+    }
+
+    const docRef = await addDoc(commentsRef, commentData);
 
     return NextResponse.json(
       { 

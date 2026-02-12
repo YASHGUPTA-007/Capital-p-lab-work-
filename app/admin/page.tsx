@@ -1,4 +1,3 @@
-// app/admin/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,10 +12,10 @@ import {
   doc,
   updateDoc,
   getDoc,
+  getDocs,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
 import Sidebar from "./_Components/sidebar";
 import OverviewTab from "./_Components/overview";
 import ContactsTab from "./_Components/ContactsTab";
@@ -24,26 +23,29 @@ import SubscribersTab from "./_Components/SubscribersTab";
 import BlogsTab from "./_Components/blogManagement";
 import BlogEditorModal from "./_Components/blogEditor";
 import ContactDetailModal from "./_Components/ContactDetailModal";
-import { Contact, Subscriber, BlogPost } from "@/types/admin";
+import { Contact, Subscriber, BlogPost, Comment } from "@/types/admin";
 import CommentsTab from "./_Components/CommentsTab";
-import { Comment } from "@/types/admin";
 import ResearchTab from "./_Components/ResearchTab";
 import ResearchEditor from "./_Components/ResearchEditor";
+import ResearchLeadsTab from "./_Components/ResearchLeadsTab";
 import { ResearchItem } from "@/types/research";
+
+type TabType = "overview" | "contacts" | "subscribers" | "blogs" | "research" | "comments" | "leads";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [comments, setComments] = useState<Comment[]>([]);
 
   // Data States
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [researchItems, setResearchItems] = useState<ResearchItem[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [researchLeads, setResearchLeads] = useState<any[]>([]);
   const [totalVisits, setTotalVisits] = useState(0);
 
   // Modal States
@@ -51,9 +53,7 @@ export default function AdminDashboard() {
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const [showResearchEditor, setShowResearchEditor] = useState(false);
-  const [editingResearch, setEditingResearch] = useState<ResearchItem | null>(
-    null,
-  );
+  const [editingResearch, setEditingResearch] = useState<ResearchItem | null>(null);
 
   const router = useRouter();
 
@@ -85,6 +85,26 @@ export default function AdminDashboard() {
       }
     };
     fetchVisits();
+  }, []);
+
+  // Fetch Research Leads
+  const fetchResearchLeads = async () => {
+    try {
+      const leadsRef = collection(db, "research-leads");
+      const q = query(leadsRef, orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+      const leadsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setResearchLeads(leadsData);
+    } catch (error) {
+      console.error("Error fetching research leads:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchResearchLeads();
   }, []);
 
   // Fetch contacts
@@ -186,6 +206,29 @@ export default function AdminDashboard() {
       await deleteDoc(doc(db, "comments", id));
     } catch (error) {
       console.error("Error deleting comment:", error);
+      throw error;
+    }
+  };
+
+  // Research Leads handlers
+  const handleDeleteLead = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "research-leads", id));
+      await fetchResearchLeads();
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+      throw error;
+    }
+  };
+
+  const handleBulkDeleteLeads = async (ids: string[]) => {
+    try {
+      await Promise.all(
+        ids.map((id) => deleteDoc(doc(db, "research-leads", id)))
+      );
+      await fetchResearchLeads();
+    } catch (error) {
+      console.error("Error bulk deleting leads:", error);
       throw error;
     }
   };
@@ -340,23 +383,24 @@ export default function AdminDashboard() {
       <div className="flex h-screen overflow-hidden pt-16 lg:pt-0">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block">
-          <Sidebar
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            user={user}
-            contactsCount={contacts.length}
-            newContactsCount={contacts.filter((c) => c.status === "new").length}
-            subscribersCount={subscribers.length}
-            blogPostsCount={blogPosts.length}
-            researchItemsCount={researchItems.length}
-            commentsCount={comments.length}
-            pendingCommentsCount={
-              comments.filter((c) => c.status === "pending").length
-            }
-            onLogout={handleLogout}
-            collapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
+       <Sidebar
+  activeTab={activeTab}
+  setActiveTab={setActiveTab}
+  user={user}
+  contactsCount={contacts.length}
+  newContactsCount={contacts.filter((c) => c.status === "new").length}
+  subscribersCount={subscribers.length}
+  blogPostsCount={blogPosts.length}
+  researchItemsCount={researchItems.length}
+  commentsCount={comments.length}
+  pendingCommentsCount={
+    comments.filter((c) => c.status === "pending").length
+  }
+  leadsCount={researchLeads.length}
+  onLogout={handleLogout}
+  collapsed={sidebarCollapsed}
+  onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+/>
         </div>
 
         {/* Mobile Sidebar Overlay */}
@@ -367,28 +411,29 @@ export default function AdminDashboard() {
               onClick={() => setSidebarOpen(false)}
             />
             <div className="lg:hidden fixed inset-y-0 left-0 w-64 z-50 pt-16">
-              <Sidebar
-                activeTab={activeTab}
-                setActiveTab={(tab) => {
-                  setActiveTab(tab);
-                  setSidebarOpen(false);
-                }}
-                user={user}
-                contactsCount={contacts.length}
-                newContactsCount={
-                  contacts.filter((c) => c.status === "new").length
-                }
-                subscribersCount={subscribers.length}
-                blogPostsCount={blogPosts.length}
-                researchItemsCount={researchItems.length}
-                commentsCount={comments.length}
-                pendingCommentsCount={
-                  comments.filter((c) => c.status === "pending").length
-                }
-                onLogout={handleLogout}
-                collapsed={false}
-                onToggleCollapse={() => {}}
-              />
+             <Sidebar
+  activeTab={activeTab}
+  setActiveTab={(tab) => {
+    setActiveTab(tab);
+    setSidebarOpen(false);
+  }}
+  user={user}
+  contactsCount={contacts.length}
+  newContactsCount={
+    contacts.filter((c) => c.status === "new").length
+  }
+  subscribersCount={subscribers.length}
+  blogPostsCount={blogPosts.length}
+  researchItemsCount={researchItems.length}
+  commentsCount={comments.length}
+  pendingCommentsCount={
+    comments.filter((c) => c.status === "pending").length
+  }
+  leadsCount={researchLeads.length}
+  onLogout={handleLogout}
+  collapsed={false}
+  onToggleCollapse={() => {}}
+/>
             </div>
           </>
         )}
@@ -466,6 +511,16 @@ export default function AdminDashboard() {
                 onReject={handleRejectComment}
                 onDelete={handleDeleteComment}
                 blogPosts={blogPosts}
+                researchItems={researchItems}
+              />
+            )}
+
+            {activeTab === "leads" && (
+              <ResearchLeadsTab
+                leads={researchLeads}
+                onDelete={handleDeleteLead}
+                onBulkDelete={handleBulkDeleteLeads}
+                researchItems={researchItems}
               />
             )}
           </div>

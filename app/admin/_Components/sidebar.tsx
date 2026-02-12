@@ -1,10 +1,30 @@
-// components/admin/Sidebar.tsx
-import Image from 'next/image';
-import { LayoutDashboard, Mail, LogOut, Users, FileText, Sparkles, ChevronLeft, ChevronRight, MessageCircle, BookOpen } from 'lucide-react';
+import Image from "next/image";
+import {
+  LayoutDashboard,
+  Mail,
+  LogOut,
+  Users,
+  FileText,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  MessageCircle,
+  BookOpen,
+  UserCheck,
+} from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (
+    tab:
+      | "overview"
+      | "contacts"
+      | "subscribers"
+      | "blogs"
+      | "research"
+      | "comments"
+      | "leads",
+  ) => void;
   user: any;
   contactsCount: number;
   newContactsCount: number;
@@ -13,6 +33,7 @@ interface SidebarProps {
   researchItemsCount: number;
   commentsCount: number;
   pendingCommentsCount: number;
+  leadsCount: number;
   onLogout: () => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
@@ -29,29 +50,34 @@ export default function Sidebar({
   researchItemsCount,
   commentsCount,
   pendingCommentsCount,
+  leadsCount,
   onLogout,
   collapsed,
-  onToggleCollapse
+  onToggleCollapse,
 }: SidebarProps) {
   return (
-    <aside className={`bg-gradient-to-b from-[#2b2e34] via-[#2b2e34] to-[#1a1c20] flex flex-col relative overflow-visible h-full transition-all duration-300 ${
-      collapsed ? 'w-20' : 'w-64'
-    }`}>
+    <aside
+      className={`bg-gradient-to-b from-[#2b2e34] via-[#2b2e34] to-[#1a1c20] flex flex-col relative overflow-visible h-full transition-all duration-300 ${
+        collapsed ? "w-20" : "w-64"
+      }`}
+    >
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-[#755eb1]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#4f7f5d]/10 rounded-full blur-3xl pointer-events-none" />
-      
+
       {/* Logo Section */}
-      <div className={`hidden lg:flex h-20 items-center border-b border-white/10 relative z-10 bg-[#2b2e34]/80 backdrop-blur-sm transition-all duration-300 ${
-        collapsed ? 'px-4 justify-center' : 'px-6 gap-3'
-      }`}>
+      <div
+        className={`hidden lg:flex h-20 items-center border-b border-white/10 relative z-10 bg-[#2b2e34]/80 backdrop-blur-sm transition-all duration-300 ${
+          collapsed ? "px-4 justify-center" : "px-6 gap-3"
+        }`}
+      >
         {!collapsed ? (
           <>
             <div className="w-10 h-10 relative flex-shrink-0 rounded-lg bg-gradient-to-br from-[#755eb1] to-[#4f7f5d] p-0.5">
               <div className="w-full h-full bg-white rounded-lg flex items-center justify-center">
-                <Image 
-                  src="/logo.png" 
-                  alt="Logo" 
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
                   width={32}
                   height={32}
                   className="object-contain"
@@ -59,19 +85,23 @@ export default function Sidebar({
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-bold text-white truncate tracking-tight">The Capital P Lab</h1>
+              <h1 className="text-sm font-bold text-white truncate tracking-tight">
+                The Capital P Lab
+              </h1>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#4f7f5d] animate-pulse" />
-                <p className="text-xs text-white/60 font-medium">Admin Dashboard</p>
+                <p className="text-xs text-white/60 font-medium">
+                  Admin Dashboard
+                </p>
               </div>
             </div>
           </>
         ) : (
           <div className="w-10 h-10 relative flex-shrink-0 rounded-lg bg-gradient-to-br from-[#755eb1] to-[#4f7f5d] p-0.5">
             <div className="w-full h-full bg-white rounded-lg flex items-center justify-center">
-              <Image 
-                src="/logo.png" 
-                alt="Logo" 
+              <Image
+                src="/logo.png"
+                alt="Logo"
                 width={32}
                 height={32}
                 className="object-contain"
@@ -85,42 +115,50 @@ export default function Sidebar({
       <button
         onClick={onToggleCollapse}
         className="hidden lg:flex absolute -right-4 top-24 z-20 w-8 h-8 bg-white hover:bg-gray-50 text-[#755eb1] rounded-full items-center justify-center shadow-xl border-2 border-[#755eb1] transition-all duration-200 hover:scale-110"
-        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
-      
+
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 relative z-10 overflow-y-auto">
         <button
-          onClick={() => setActiveTab('overview')}
+          onClick={() => setActiveTab("overview")}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group ${
-            activeTab === 'overview'
-              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
-              : 'text-white/70 hover:bg-white/5 hover:text-white'
-          } ${collapsed ? 'justify-center' : ''}`}
-          title={collapsed ? 'Overview' : ''}
+            activeTab === "overview"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Overview" : ""}
         >
-          <LayoutDashboard 
-            size={18} 
-            className={activeTab === 'overview' ? '' : 'group-hover:scale-110 transition-transform'} 
+          <LayoutDashboard
+            size={18}
+            className={
+              activeTab === "overview"
+                ? ""
+                : "group-hover:scale-110 transition-transform"
+            }
           />
           {!collapsed && <span className="truncate">Overview</span>}
         </button>
 
         <button
-          onClick={() => setActiveTab('contacts')}
+          onClick={() => setActiveTab("contacts")}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
-            activeTab === 'contacts'
-              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
-              : 'text-white/70 hover:bg-white/5 hover:text-white'
-          } ${collapsed ? 'justify-center' : ''}`}
-          title={collapsed ? 'Inquiries' : ''}
+            activeTab === "contacts"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Inquiries" : ""}
         >
           <div className="relative">
-            <Mail 
-              size={18} 
-              className={activeTab === 'contacts' ? '' : 'group-hover:scale-110 transition-transform'} 
+            <Mail
+              size={18}
+              className={
+                activeTab === "contacts"
+                  ? ""
+                  : "group-hover:scale-110 transition-transform"
+              }
             />
             {newContactsCount > 0 && collapsed && (
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
@@ -139,93 +177,22 @@ export default function Sidebar({
         </button>
 
         <button
-          onClick={() => setActiveTab('subscribers')}
+          onClick={() => setActiveTab("comments")}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
-            activeTab === 'subscribers'
-              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
-              : 'text-white/70 hover:bg-white/5 hover:text-white'
-          } ${collapsed ? 'justify-center' : ''}`}
-          title={collapsed ? 'Newsletter' : ''}
-        >
-          <Users 
-            size={18} 
-            className={activeTab === 'subscribers' ? '' : 'group-hover:scale-110 transition-transform'} 
-          />
-          {!collapsed && (
-            <>
-              <span className="truncate flex-1 text-left">Newsletter</span>
-           
-            </>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('blogs')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
-            activeTab === 'blogs'
-              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
-              : 'text-white/70 hover:bg-white/5 hover:text-white'
-          } ${collapsed ? 'justify-center' : ''}`}
-          title={collapsed ? 'Blog Posts' : ''}
-        >
-          <FileText 
-            size={18} 
-            className={activeTab === 'blogs' ? '' : 'group-hover:scale-110 transition-transform'} 
-          />
-          {!collapsed && (
-            <>
-              <span className="truncate flex-1 text-left">Blog Posts</span>
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
-                activeTab === 'blogs' 
-                  ? 'bg-white/20 text-white' 
-                  : 'bg-white/10 text-white/60'
-              }`}>
-                {blogPostsCount}
-              </span>
-            </>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('research')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
-            activeTab === 'research'
-              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
-              : 'text-white/70 hover:bg-white/5 hover:text-white'
-          } ${collapsed ? 'justify-center' : ''}`}
-          title={collapsed ? 'Research' : ''}
-        >
-          <BookOpen 
-            size={18} 
-            className={activeTab === 'research' ? '' : 'group-hover:scale-110 transition-transform'} 
-          />
-          {!collapsed && (
-            <>
-              <span className="truncate flex-1 text-left">Research</span>
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
-                activeTab === 'research' 
-                  ? 'bg-white/20 text-white' 
-                  : 'bg-white/10 text-white/60'
-              }`}>
-                {researchItemsCount}
-              </span>
-            </>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('comments')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
-            activeTab === 'comments'
-              ? 'bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25'
-              : 'text-white/70 hover:bg-white/5 hover:text-white'
-          } ${collapsed ? 'justify-center' : ''}`}
-          title={collapsed ? 'Comments' : ''}
+            activeTab === "comments"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Comments" : ""}
         >
           <div className="relative">
-            <MessageCircle 
-              size={18} 
-              className={activeTab === 'comments' ? '' : 'group-hover:scale-110 transition-transform'} 
+            <MessageCircle
+              size={18}
+              className={
+                activeTab === "comments"
+                  ? ""
+                  : "group-hover:scale-110 transition-transform"
+              }
             />
             {pendingCommentsCount > 0 && collapsed && (
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
@@ -242,6 +209,127 @@ export default function Sidebar({
             </>
           )}
         </button>
+
+        <button
+          onClick={() => setActiveTab("blogs")}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
+            activeTab === "blogs"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Blog Posts" : ""}
+        >
+          <FileText
+            size={18}
+            className={
+              activeTab === "blogs"
+                ? ""
+                : "group-hover:scale-110 transition-transform"
+            }
+          />
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Blog Posts</span>
+              <span
+                className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                  activeTab === "blogs"
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-white/60"
+                }`}
+              >
+                {blogPostsCount}
+              </span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab("research")}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
+            activeTab === "research"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Research" : ""}
+        >
+          <BookOpen
+            size={18}
+            className={
+              activeTab === "research"
+                ? ""
+                : "group-hover:scale-110 transition-transform"
+            }
+          />
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Research</span>
+              <span
+                className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                  activeTab === "research"
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-white/60"
+                }`}
+              >
+                {researchItemsCount}
+              </span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab("leads")}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
+            activeTab === "leads"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Research Leads" : ""}
+        >
+          <UserCheck
+            size={18}
+            className={
+              activeTab === "leads"
+                ? ""
+                : "group-hover:scale-110 transition-transform"
+            }
+          />
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Research Leads</span>
+              <span
+                className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                  activeTab === "leads"
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-white/60"
+                }`}
+              >
+                {leadsCount}
+              </span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab("subscribers")}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 relative group ${
+            activeTab === "subscribers"
+              ? "bg-gradient-to-r from-[#755eb1] to-[#755eb1]/90 text-white shadow-lg shadow-[#755eb1]/25"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Newsletter" : ""}
+        >
+          <Users
+            size={18}
+            className={
+              activeTab === "subscribers"
+                ? ""
+                : "group-hover:scale-110 transition-transform"
+            }
+          />
+          {!collapsed && (
+            <span className="truncate flex-1 text-left">Newsletter</span>
+          )}
+        </button>
       </nav>
 
       {/* User Section */}
@@ -253,10 +341,14 @@ export default function Sidebar({
               {user?.email?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{user?.email}</p>
+              <p className="text-xs font-semibold text-white truncate">
+                {user?.email}
+              </p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Sparkles size={10} className="text-[#4f7f5d] flex-shrink-0" />
-                <p className="text-xs text-white/50 font-medium truncate">Administrator</p>
+                <p className="text-xs text-white/50 font-medium truncate">
+                  Administrator
+                </p>
               </div>
             </div>
           </div>
@@ -272,9 +364,9 @@ export default function Sidebar({
         <button
           onClick={onLogout}
           className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-red-400 hover:text-white hover:bg-red-500/20 rounded-xl transition-all duration-200 border border-red-500/20 hover:border-red-500/40 ${
-            collapsed ? 'justify-center' : 'justify-center'
+            collapsed ? "justify-center" : "justify-center"
           }`}
-          title={collapsed ? 'Sign Out' : ''}
+          title={collapsed ? "Sign Out" : ""}
         >
           <LogOut size={16} />
           {!collapsed && <span>Sign Out</span>}

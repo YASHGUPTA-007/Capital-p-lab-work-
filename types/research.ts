@@ -1,25 +1,27 @@
 // types/research.ts
 
+import { Timestamp } from "firebase/firestore";
+
 export interface ResearchItem {
   id: string;
   title: string;
   slug: string;
-  category: string; // ✅ Changed from union to string to allow custom categories
-  description: string; // TipTap HTML content
+  category: string;
+  description: string;
   coverImage: string;
   coverImageAlt?: string;
   coverImageName?: string;
   
   // Document or Link
   type: 'document' | 'link';
-  documentUrl?: string; // Cloudinary URL for uploaded file
-  documentName?: string; // Original filename
-  documentSize?: string; // e.g., "2.4 MB"
-  externalLink?: string; // For type='link'
+  documentUrl?: string;
+  documentName?: string;
+  documentSize?: string;
+  externalLink?: string;
   
   // Metadata
   author: string;
-  readTime: string; // e.g., "12 min"
+  readTime: string;
   tags: string[];
   
   // Status
@@ -33,6 +35,7 @@ export interface ResearchItem {
   // Stats
   downloads?: number;
   views?: number;
+  likes?: number; // ✅ Added this property
 }
 
 export interface ResearchLead {
@@ -50,4 +53,16 @@ export interface ResearchLead {
   createdAt: any;
   ipAddress?: string;
   userAgent?: string;
+}
+
+export interface ResearchComment {
+  id: string;
+  researchId: string;
+  authorName: string;
+  authorEmail: string;
+  content: string;
+  status: "pending" | "approved" | "rejected";
+  createdAt: Timestamp;
+  ipAddress: string;
+  userAgent: string;
 }
