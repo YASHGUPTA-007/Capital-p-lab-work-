@@ -15,6 +15,8 @@ import {
   Sparkles,
   Tag as TagIcon,
   Plus,
+  Undo,
+  Redo,
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import toast, { Toaster } from 'react-hot-toast';
@@ -85,6 +87,10 @@ export default function ResearchEditor({
   const [tags, setTags] = useState<string[]>(item?.tags || []);
   const [tagInput, setTagInput] = useState("");
   const [showCustomCategory, setShowCustomCategory] = useState(false);
+  
+  // ✅ Track undo/redo state
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   // ✅ Deferred upload states
   const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
@@ -128,6 +134,26 @@ export default function ResearchEditor({
       },
     },
   });
+
+  // ✅ Track undo/redo state changes
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateHistoryState = () => {
+      setCanUndo(editor.can().undo());
+      setCanRedo(editor.can().redo());
+    };
+
+    // Update immediately
+    updateHistoryState();
+
+    // Update on every transaction
+    editor.on("transaction", updateHistoryState);
+
+    return () => {
+      editor.off("transaction", updateHistoryState);
+    };
+  }, [editor]);
 
   useEffect(() => {
     if (formData.title && !item) {
@@ -954,64 +980,33 @@ export default function ResearchEditor({
                 </button>
               </div>
 
-              {/* Lists */}
-              <div className="flex items-center gap-0.5 px-2 border-r border-gray-300">
-                <button
-                  onClick={() => editor.chain().focus().toggleBulletList().run()}
-                  className={`p-2 rounded-lg transition-all ${
-                    editor.isActive("bulletList")
-                      ? "bg-purple-100 text-purple-700 shadow-sm"
-                      : "hover:bg-gray-200 text-gray-600"
-                  }`}
-                  type="button"
-                  title="Bullet List"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                    <path fillRule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                  </svg>
-                </button>
-                <button
-                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                  className={`p-2 rounded-lg transition-all ${
-                    editor.isActive("orderedList")
-                      ? "bg-purple-100 text-purple-700 shadow-sm"
-                      : "hover:bg-gray-200 text-gray-600"
-                  }`}
-                  type="button"
-                  title="Numbered List"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                    <path fillRule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5z"/>
-                    <path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338v.041z"/>
-                  </svg>
-                </button>
-              </div>
-
               {/* Undo/Redo */}
-              <div className="flex items-center gap-0.5 px-2">
+              <div className="ml-auto flex items-center gap-0.5 px-2">
                 <button
-                  onClick={() => editor.chain().focus().undo().run()}
-                  disabled={!editor.can().undo()}
-                  className="p-2 rounded-lg transition-all hover:bg-gray-200 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
                   type="button"
+                  onClick={() => editor?.chain().focus().undo().run()}
+                  disabled={!canUndo}
+                  className={`p-2 rounded-lg transition-all ${
+                    canUndo
+                      ? "hover:bg-gray-200 text-gray-600 cursor-pointer"
+                      : "text-gray-400 cursor-not-allowed opacity-50"
+                  }`}
                   title="Undo (Ctrl+Z)"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                    <path fillRule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-                    <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
-                  </svg>
+                  <Undo size={16} />
                 </button>
                 <button
-                  onClick={() => editor.chain().focus().redo().run()}
-                  disabled={!editor.can().redo()}
-                  className="p-2 rounded-lg transition-all hover:bg-gray-200 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
                   type="button"
+                  onClick={() => editor?.chain().focus().redo().run()}
+                  disabled={!canRedo}
+                  className={`p-2 rounded-lg transition-all ${
+                    canRedo
+                      ? "hover:bg-gray-200 text-gray-600 cursor-pointer"
+                      : "text-gray-400 cursor-not-allowed opacity-50"
+                  }`}
                   title="Redo (Ctrl+Y)"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                    <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                  </svg>
+                  <Redo size={16} />
                 </button>
               </div>
             </div>

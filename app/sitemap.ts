@@ -19,19 +19,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9, 
     },
+    {
+      url: `${baseUrl}/research`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
   ]
 
   try {
-    const q = query(
+    // Fetch published blog posts
+    const blogsQuery = query(
       collection(db, "blog-posts"), 
       where("status", "==", "published"),
       orderBy("publishedAt", "desc") 
     );
     
-    const querySnapshot = await getDocs(q);
+    const blogsSnapshot = await getDocs(blogsQuery);
     const blogRoutes: MetadataRoute.Sitemap = [];
 
-    querySnapshot.forEach((doc) => {
+    blogsSnapshot.forEach((doc) => {
       const data = doc.data();
       if (data.slug) {
         blogRoutes.push({
@@ -43,11 +50,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     });
 
-    return [...staticRoutes, ...blogRoutes];
+    // Fetch published research items
+    const researchQuery = query(
+      collection(db, "research-items"),
+      where("status", "==", "published"),
+      orderBy("publishedAt", "desc")
+    );
+
+    const researchSnapshot = await getDocs(researchQuery);
+    const researchRoutes: MetadataRoute.Sitemap = [];
+
+    researchSnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.slug) {
+        researchRoutes.push({
+          url: `${baseUrl}/research/${data.slug}`,
+          lastModified: data.publishedAt?.toDate?.() || data.createdAt?.toDate?.() || new Date(),
+          changeFrequency: 'monthly',
+          priority: 0.8,
+        });
+      }
+    });
+
+    return [...staticRoutes, ...blogRoutes, ...researchRoutes];
   } catch (error) {
     console.error("Error generating sitemap:", error);
     return staticRoutes;
   }
 }
 
-export const revalidate = 3600; 
+export const revalidate = 3600;
