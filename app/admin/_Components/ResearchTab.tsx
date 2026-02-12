@@ -87,8 +87,12 @@ export default function ResearchTab({
   const { formatted: viewsFormatted } = formatViewCount(totalViews, "intl");
 
   return (
+ 
+      
+
     <div className="p-4 md:p-6 max-w-[1400px] mx-auto">
       {/* Header */}
+      
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Research Library</h1>
@@ -415,5 +419,6 @@ export default function ResearchTab({
         </>
       )}
     </div>
+      
   );
 }

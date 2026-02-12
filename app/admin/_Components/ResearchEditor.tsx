@@ -17,6 +17,7 @@ import {
   Plus,
 } from "lucide-react";
 import { db } from "@/lib/firebase";
+import toast, { Toaster } from 'react-hot-toast';
 import {
   doc,
   updateDoc,
@@ -83,8 +84,6 @@ export default function ResearchEditor({
 
   const [tags, setTags] = useState<string[]>(item?.tags || []);
   const [tagInput, setTagInput] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"success" | "error" | null>(null);
   const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   // ✅ Deferred upload states
@@ -278,21 +277,21 @@ export default function ResearchEditor({
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  // ✅ Save with deferred uploads
+// ✅ Save with deferred uploads and background processing
   const handleSave = async () => {
     if (!formData.title || !editor?.getHTML()) {
-      alert("Title and description are required");
+      toast.error("Title and description are required");
       return;
     }
 
     // Check if we have either existing or pending cover image
     if (!formData.coverImage && !pendingCoverFile) {
-      alert("Cover image is required");
+      toast.error("Cover image is required");
       return;
     }
 
     if (!formData.slug) {
-      alert("URL slug is required");
+      toast.error("URL slug is required");
       return;
     }
 
@@ -303,134 +302,142 @@ export default function ResearchEditor({
         : formData.category;
 
     if (!finalCategory) {
-      alert("Category is required");
+      toast.error("Category is required");
       return;
     }
 
     if (formData.type === "document" && !formData.documentUrl && !pendingDocumentFile) {
-      alert("Please upload a document");
+      toast.error("Please upload a document");
       return;
     }
 
     if (formData.type === "link") {
       if (!formData.externalLink) {
-        alert("Please provide an external link");
+        toast.error("Please provide an external link");
         return;
       }
       if (!isValidUrl(formData.externalLink)) {
-        alert(
-          "Please provide a valid URL (must start with http:// or https://)",
-        );
+        toast.error("Please provide a valid URL (must start with http:// or https://)");
         return;
       }
     }
 
-    setSaving(true);
+    // Close modal immediately for better UX
+    onClose();
 
-    try {
-      let finalCoverImage = formData.coverImage;
-      let finalDocumentUrl = formData.documentUrl;
-      let finalDocumentName = formData.documentName;
-      let finalDocumentSize = formData.documentSize;
+    // Show loading toast
+    const loadingToast = toast.loading('Saving research item...');
 
-      // ✅ Upload pending cover image
-      if (pendingCoverFile) {
-        console.log("Uploading cover image...");
-        finalCoverImage = await uploadToCloudinary(pendingCoverFile);
-      }
+    // Process save in background
+    (async () => {
+      try {
+        let finalCoverImage = formData.coverImage;
+        let finalDocumentUrl = formData.documentUrl;
+        let finalDocumentName = formData.documentName;
+        let finalDocumentSize = formData.documentSize;
 
-      // ✅ Upload pending document
-      if (pendingDocumentFile && formData.type === "document") {
-        console.log("Uploading document...");
-        const result = await uploadDocumentToCloudinary(pendingDocumentFile);
-        finalDocumentUrl = result.url;
-        finalDocumentName = result.name;
-        finalDocumentSize = result.size;
-      }
+        // ✅ Upload pending cover image
+        if (pendingCoverFile) {
+          toast.loading('Uploading cover image...', { id: loadingToast });
+          finalCoverImage = await uploadToCloudinary(pendingCoverFile);
+        }
 
-      const description = editor.getHTML();
-      const readTime = calculateReadTime(description);
+        // ✅ Upload pending document
+        if (pendingDocumentFile && formData.type === "document") {
+          toast.loading('Uploading document...', { id: loadingToast });
+          const result = await uploadDocumentToCloudinary(pendingDocumentFile);
+          finalDocumentUrl = result.url;
+          finalDocumentName = result.name;
+          finalDocumentSize = result.size;
+        }
 
-      const data: any = {
-        title: formData.title,
-        slug: formData.slug,
-        category: finalCategory,
-        description,
-        coverImage: finalCoverImage,
-        coverImageAlt: formData.coverImageAlt || "",
-        coverImageName: formData.coverImageName || "",
-        type: formData.type,
-        author: formData.author,
-        readTime,
-        tags,
-        status: formData.status,
-        updatedAt: serverTimestamp(),
-      };
+        toast.loading('Saving to database...', { id: loadingToast });
 
-      if (formData.type === "document") {
-        data.documentUrl = finalDocumentUrl;
-        data.documentName = finalDocumentName;
-        data.documentSize = finalDocumentSize;
-        data.externalLink = null;
-      } else {
-        data.externalLink = formData.externalLink;
-        data.documentUrl = null;
-        data.documentName = null;
-        data.documentSize = null;
-      }
+        const description = editor.getHTML();
+        const readTime = calculateReadTime(description);
 
-      if (item) {
-        await updateDoc(doc(db, "research-items", item.id), data);
-      } else {
-        await addDoc(collection(db, "research-items"), {
-          ...data,
-          createdAt: serverTimestamp(),
-          publishedAt:
-            formData.status === "published" ? serverTimestamp() : null,
-          downloads: 0,
-          views: 0,
+        const data: any = {
+          title: formData.title,
+          slug: formData.slug,
+          category: finalCategory,
+          description,
+          coverImage: finalCoverImage,
+          coverImageAlt: formData.coverImageAlt || "",
+          coverImageName: formData.coverImageName || "",
+          type: formData.type,
+          author: formData.author,
+          readTime,
+          tags,
+          status: formData.status,
+          updatedAt: serverTimestamp(),
+        };
+
+        if (formData.type === "document") {
+          data.documentUrl = finalDocumentUrl;
+          data.documentName = finalDocumentName;
+          data.documentSize = finalDocumentSize;
+          data.externalLink = null;
+        } else {
+          data.externalLink = formData.externalLink;
+          data.documentUrl = null;
+          data.documentName = null;
+          data.documentSize = null;
+        }
+
+        if (item) {
+          await updateDoc(doc(db, "research-items", item.id), data);
+        } else {
+          await addDoc(collection(db, "research-items"), {
+            ...data,
+            createdAt: serverTimestamp(),
+            publishedAt:
+              formData.status === "published" ? serverTimestamp() : null,
+            downloads: 0,
+            views: 0,
+          });
+        }
+
+        // ✅ Delete old files AFTER successful save
+        if (item) {
+          // Delete old cover if replaced
+          if (
+            pendingCoverFile &&
+            originalCoverImage.current &&
+            originalCoverImage.current !== finalCoverImage
+          ) {
+            deleteCloudinaryImage(originalCoverImage.current).catch((err) =>
+              console.error("Failed to delete old cover:", err),
+            );
+          }
+
+          // Delete old document if replaced
+          if (
+            pendingDocumentFile &&
+            originalDocumentUrl.current &&
+            originalDocumentUrl.current !== finalDocumentUrl
+          ) {
+            deleteDocumentFromCloudinary(originalDocumentUrl.current).catch((err) =>
+              console.error("Failed to delete old document:", err),
+            );
+          }
+        }
+
+        // Success notification
+        toast.success(
+          item ? 'Research item updated successfully!' : 'Research item created successfully!',
+          { id: loadingToast, duration: 4000 }
+        );
+
+        // Refresh the list
+        onSave();
+      } catch (error) {
+        console.error("Error saving research item:", error);
+        toast.error('Failed to save research item. Please try again.', {
+          id: loadingToast,
+          duration: 5000
         });
       }
-
-      // ✅ Delete old files AFTER successful save
-      if (item) {
-        // Delete old cover if replaced
-        if (
-          pendingCoverFile &&
-          originalCoverImage.current &&
-          originalCoverImage.current !== finalCoverImage
-        ) {
-          console.log("Deleting old cover image:", originalCoverImage.current);
-          deleteCloudinaryImage(originalCoverImage.current).catch((err) =>
-            console.error("Failed to delete old cover:", err),
-          );
-        }
-
-        // Delete old document if replaced
-        if (
-          pendingDocumentFile &&
-          originalDocumentUrl.current &&
-          originalDocumentUrl.current !== finalDocumentUrl
-        ) {
-          console.log("Deleting old document:", originalDocumentUrl.current);
-          deleteDocumentFromCloudinary(originalDocumentUrl.current).catch((err) =>
-            console.error("Failed to delete old document:", err),
-          );
-        }
-      }
-
-      setSaveStatus("success");
-      setTimeout(() => {
-        onSave();
-      }, 1000);
-    } catch (error) {
-      console.error("Error saving research item:", error);
-      setSaveStatus("error");
-      alert("Failed to save. Please try again.");
-      setTimeout(() => setSaveStatus(null), 3000);
-    } finally {
-      setSaving(false);
-    }
+    })();
   };
 
   const handleCancel = () => {
@@ -451,6 +458,8 @@ export default function ResearchEditor({
   if (!editor) return null;
 
   return (
+     
+      
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white rounded-lg w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col my-4 shadow-xl">
         {/* Header */}
@@ -1067,37 +1076,15 @@ export default function ResearchEditor({
             Cancel
           </button>
 
-          <div className="flex items-center gap-3">
-            {saveStatus === "success" && (
-              <span className="flex items-center gap-2 text-green-600 text-sm font-semibold">
-                <CheckCircle size={18} />
-                Saved!
-              </span>
-            )}
-            {saveStatus === "error" && (
-              <span className="flex items-center gap-2 text-red-600 text-sm font-semibold">
-                <AlertCircle size={18} />
-                Failed
-              </span>
-            )}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold shadow-md transition-all"
-            >
-              {saving ? (
-                <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <CheckCircle size={16} />
-                  Save Item
-                </>
-              )}
-            </button>
-          </div>
+        <div className="flex items-center gap-3">
+  <button
+    onClick={handleSave}
+    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm rounded-lg hover:from-purple-700 hover:to-blue-700 flex items-center gap-2 font-semibold shadow-md transition-all"
+  >
+    <CheckCircle size={16} />
+    Save Item
+  </button>
+</div>
         </div>
       </div>
 
@@ -1112,6 +1099,7 @@ export default function ResearchEditor({
           type="featured"
         />
       )}
+      
 
       {/* Editor Styles - FIXED PLACEHOLDER */}
       <style jsx global>{`
@@ -1157,5 +1145,6 @@ export default function ResearchEditor({
         }
       `}</style>
     </div>
+  
   );
 }

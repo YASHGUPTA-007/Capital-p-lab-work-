@@ -58,15 +58,26 @@ export default function ResearchClientPage({
     return matchesCategory && matchesSearch;
   });
 
-  const getCategoryStyle = (category: string) => {
-    const styles: Record<string, string> = {
-      Environment: "bg-[#4f7f5d]/90 text-white",
-      Social: "bg-[#755eb1]/90 text-white",
-      Economic: "bg-[#d4a574]/90 text-white",
-      Policy: "bg-[#c97064]/90 text-white",
-      Technology: "bg-[#5e8fb8]/90 text-white",
-    };
-    return styles[category] || "bg-gray-600/90 text-white";
+  // Generate a consistent color for any category using a hash function
+  const getCategoryColor = (category: string) => {
+    let hash = 0;
+    for (let i = 0; i < category.length; i++) {
+      hash = category.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Predefined color palette for better aesthetics
+    const colors = [
+      "bg-[#4f7f5d]/90 text-white",   // Green
+      "bg-[#755eb1]/90 text-white",   // Purple
+      "bg-[#d4a574]/90 text-white",   // Gold
+      "bg-[#c97064]/90 text-white",   // Coral
+      "bg-[#5e8fb8]/90 text-white",   // Blue
+      "bg-[#8b7355]/90 text-white",   // Brown
+      "bg-[#6b9080]/90 text-white",   // Teal
+      "bg-[#a87c9f]/90 text-white",   // Mauve
+    ];
+    
+    return colors[Math.abs(hash) % colors.length];
   };
 
   return (
@@ -100,7 +111,7 @@ export default function ResearchClientPage({
               >
                 Research <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#755eb1] to-[#4f7f5d]">
-                  Reports.
+                  Reports
                 </span>
               </motion.h1>
             </div>
@@ -186,8 +197,8 @@ export default function ResearchClientPage({
                         {/* Floating Category Tag */}
                         <div className="absolute top-4 left-4">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md shadow-sm ${getCategoryStyle(
-                              item.category,
+                            className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md shadow-sm ${getCategoryColor(
+                              item.category
                             )}`}
                           >
                             {item.category}

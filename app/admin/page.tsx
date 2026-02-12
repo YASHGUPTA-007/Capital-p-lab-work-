@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 import Sidebar from "./_Components/sidebar";
 import OverviewTab from "./_Components/overview";
 import ContactsTab from "./_Components/ContactsTab";
@@ -50,7 +51,9 @@ export default function AdminDashboard() {
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const [showResearchEditor, setShowResearchEditor] = useState(false);
-  const [editingResearch, setEditingResearch] = useState<ResearchItem | null>(null);
+  const [editingResearch, setEditingResearch] = useState<ResearchItem | null>(
+    null,
+  );
 
   const router = useRouter();
 
@@ -141,7 +144,10 @@ export default function AdminDashboard() {
 
   // Fetch research items
   useEffect(() => {
-    const q = query(collection(db, "research-items"), orderBy("createdAt", "desc"));
+    const q = query(
+      collection(db, "research-items"),
+      orderBy("createdAt", "desc"),
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const itemsData: ResearchItem[] = [];
       snapshot.forEach((doc) => {
