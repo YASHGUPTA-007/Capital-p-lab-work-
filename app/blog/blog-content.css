@@ -1,0 +1,503 @@
+/* ========================================
+   CORE CONTAINER
+   ======================================== */
+.blog-content {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+/* ========================================
+   IMAGE WRAPPER (iOS Isolation Strategy)
+   ======================================== */
+
+.blog-image-wrapper {
+  /* Mimic Featured Image Container Structure */
+  position: relative !important;
+  display: block !important;
+  overflow: hidden !important; /* Critical: isolates GPU layer */
+  
+  /* Layout */
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 2.5rem 0 !important;
+  
+  /* Visual */
+  background-color: #f9fafb !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  
+  /* Isolation */
+  isolation: isolate !important;
+  contain: layout style paint !important;
+}
+
+.blog-image-wrapper img {
+  /* Reset - wrapper handles everything */
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  
+  /* Stability */
+  transform: none !important;
+  -webkit-transform: none !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  
+  /* Interaction */
+  pointer-events: auto !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* ========================================
+   FALLBACK IMAGES (Before JS Wraps Them)
+   ======================================== */
+
+.blog-content img:not(.blog-image-wrapper img) {
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 2rem 0 !important;
+  border-radius: 0.5rem !important;
+}
+
+/* ========================================
+   iOS SAFARI COMPREHENSIVE FIX
+   ======================================== */
+
+@supports (-webkit-touch-callout: none) {
+  /* Ensure wrapper creates stable stacking context on iOS */
+  .blog-image-wrapper {
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+  }
+  
+  /* Force CPU rendering on images inside wrapper */
+  .blog-image-wrapper img {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    
+    /* Remove expensive effects on iOS */
+    box-shadow: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  /* Disable hover effects on iOS */
+  .blog-image-wrapper img:hover,
+  .blog-image-wrapper img:active {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fallback images on iOS */
+  .blog-content img:not(.blog-image-wrapper img) {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    box-shadow: none !important;
+    transition: none !important;
+  }
+}
+
+/* ========================================
+   INLINE STYLE OVERRIDES
+   ======================================== */
+
+.blog-content [style*="font-size"] {
+  font-size: revert !important;
+}
+
+.blog-content [style*="font-family"] {
+  font-family: revert !important;
+}
+
+.blog-content [style*="color"] {
+  color: revert !important;
+}
+
+.blog-content [style*="background-color"] {
+  background-color: revert !important;
+}
+
+/* ========================================
+   FONT SIZES (PX AND PT)
+   ======================================== */
+
+.blog-content [style*="font-size: 11pt"],
+.blog-content [style*="font-size: 12pt"],
+.blog-content [style*="font-size: 14pt"],
+.blog-content [style*="font-size: 16pt"],
+.blog-content [style*="font-size: 18pt"],
+.blog-content [style*="font-size: 14px"],
+.blog-content [style*="font-size: 16px"],
+.blog-content [style*="font-size: 18px"],
+.blog-content [style*="font-size: 20px"],
+.blog-content [style*="font-size: 24px"],
+.blog-content [style*="font-size: 28px"],
+.blog-content [style*="font-size: 32px"] {
+  font-size: inherit !important;
+}
+
+/* ========================================
+   FONT FAMILIES
+   ======================================== */
+
+.blog-content [style*="font-family: Georgia"],
+.blog-content [style*="font-family: 'Georgia'"] { 
+  font-family: Georgia, serif !important; 
+}
+
+.blog-content [style*="font-family: Inter"],
+.blog-content [style*="font-family: 'Inter'"] { 
+  font-family: Inter, sans-serif !important; 
+}
+
+.blog-content [style*="font-family: Merriweather"],
+.blog-content [style*="font-family: 'Merriweather'"] { 
+  font-family: Merriweather, serif !important; 
+}
+
+.blog-content [style*="font-family: Arial"],
+.blog-content [style*="font-family: 'Arial'"] { 
+  font-family: Arial, sans-serif !important; 
+}
+
+.blog-content [style*="font-family: Roboto"],
+.blog-content [style*="font-family: 'Roboto'"] { 
+  font-family: Roboto, sans-serif !important; 
+}
+
+/* ========================================
+   COLORS & HIGHLIGHTS
+   ======================================== */
+
+.blog-content [style*="color: rgb"],
+.blog-content [style*="color: #"] {
+  color: revert !important;
+}
+
+.blog-content [style*="background-color: rgb"],
+.blog-content [style*="background-color: #"] {
+  background-color: revert !important;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+/* ========================================
+   PRESERVE EMPTY PARAGRAPHS
+   ======================================== */
+
+.blog-content p:empty {
+  min-height: 1.5em;
+  display: block;
+}
+
+.blog-content p:empty::before {
+  content: "\00a0";
+  display: inline-block;
+}
+
+/* ========================================
+   HEADINGS
+   ======================================== */
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3 {
+  font-family: serif !important;
+  font-weight: bold !important;
+  color: #2b2e34 !important;
+  line-height: 1.2 !important;
+}
+
+.blog-content h1 {
+  font-size: 2.25rem !important;
+}
+
+.blog-content h2 {
+  font-size: 1.875rem !important;
+}
+
+.blog-content h3 {
+  font-size: 1.5rem !important;
+}
+
+/* ========================================
+   TEXT FORMATTING
+   ======================================== */
+
+.blog-content strong {
+  font-weight: 700 !important;
+}
+
+.blog-content em {
+  font-style: italic !important;
+}
+
+.blog-content u {
+  text-decoration: underline !important;
+}
+
+/* ========================================
+   LINKS
+   ======================================== */
+
+.blog-content a {
+  color: #755eb1 !important;
+  text-decoration: underline !important;
+}
+
+.blog-content a:hover {
+  color: #6b54a5 !important;
+}
+
+/* ========================================
+   LISTS
+   ======================================== */
+
+.blog-content ul {
+  list-style-type: disc !important;
+}
+
+.blog-content ol {
+  list-style-type: decimal !important;
+}
+
+.blog-content li::marker {
+  color: #755eb1 !important;
+}
+
+/* ========================================
+   TEXT ALIGNMENT
+   ======================================== */
+
+.blog-content [style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.blog-content [style*="text-align: right"] {
+  text-align: right !important;
+}
+
+.blog-content [style*="text-align: left"] {
+  text-align: left !important;
+}
+
+.blog-content [style*="text-align: justify"] {
+  text-align: justify !important;
+}
+
+/* ========================================
+   TABLES - RESPONSIVE WRAPPER
+   ======================================== */
+
+.table-responsive-wrapper {
+  display: block !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+.blog-content table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border: 2px solid #000000 !important;
+  margin: 0 !important;
+  background-color: white !important;
+}
+
+.blog-content thead,
+.blog-content tbody {
+  display: table-header-group !important;
+  width: 100% !important;
+}
+
+.blog-content tr {
+  display: table-row !important;
+}
+
+.blog-content th,
+.blog-content td {
+  display: table-cell !important;
+  white-space: nowrap !important;
+}
+
+.blog-content th {
+  background: linear-gradient(135deg, #755eb1 0%, #6b54a5 100%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  padding: 0.875rem 0.75rem !important;
+  text-align: left !important;
+  border: 1px solid #000000 !important;
+}
+
+.blog-content td {
+  padding: 0.875rem 0.75rem !important;
+  border: 1px solid #000000 !important;
+  color: #2b2e34 !important;
+  background-color: white !important;
+}
+
+.blog-content tbody tr:nth-child(even) td {
+  background-color: #f9fafb !important;
+}
+
+.blog-content tbody tr:hover td {
+  background-color: #f3f4f6 !important;
+}
+
+@media (max-width: 768px) {
+  .blog-content table {
+    font-size: 0.875rem !important;
+  }
+  
+  .blog-content th,
+  .blog-content td {
+    padding: 0.625rem 0.5rem !important;
+    font-size: 0.813rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-content table {
+    font-size: 0.813rem !important;
+  }
+  
+  .blog-content th,
+  .blog-content td {
+    padding: 0.5rem 0.375rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+.blog-content table[style*="width"] { width: revert !important; }
+.blog-content th[style*="background"], .blog-content td[style*="background"] { background-color: revert !important; }
+.blog-content th[style*="text-align"], .blog-content td[style*="text-align"] { text-align: revert !important; }
+.blog-content th[style*="color"], .blog-content td[style*="color"] { color: revert !important; }
+
+/* ========================================
+   TABLES - EDITOR (ProseMirror)
+   ======================================== */
+
+.ProseMirror {
+  outline: none !important;
+}
+
+.ProseMirror table {
+  display: block !important;
+  width: auto !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  border-collapse: collapse !important;
+  margin: 1rem 0 !important;
+  border: 2px solid #000000 !important;
+  background-color: white !important;
+}
+
+.ProseMirror table:focus {
+  outline: 3px solid #755eb1 !important;
+  outline-offset: 2px !important;
+}
+
+.ProseMirror thead,
+.ProseMirror tbody {
+  display: table !important;
+  width: 100% !important;
+}
+
+.ProseMirror tr {
+  display: table-row !important;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  display: table-cell !important;
+  min-width: 100px !important;
+  border: 1px solid #000000 !important;
+  padding: 12px !important;
+  vertical-align: top !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  background-color: white !important;
+  white-space: nowrap !important;
+}
+
+.ProseMirror th {
+  font-weight: bold !important;
+  text-align: left !important;
+  background-color: #755eb1 !important;
+  color: white !important;
+}
+
+.ProseMirror .selectedCell:after {
+  z-index: 2 !important;
+  position: absolute !important;
+  content: "" !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  background: rgba(117, 94, 177, 0.2) !important;
+  pointer-events: none !important;
+}
+
+.ProseMirror .column-resize-handle {
+  position: absolute !important;
+  right: -2px !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 4px !important;
+  background-color: #755eb1 !important;
+  pointer-events: none !important;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: ew-resize !important;
+  cursor: col-resize !important;
+}
+
+.ProseMirror td p,
+.ProseMirror th p {
+  margin: 0 !important;
+}
+
+.ProseMirror td:empty::after,
+.ProseMirror th:empty::after {
+  content: '\00a0' !important;
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
