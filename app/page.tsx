@@ -57,11 +57,6 @@ const ContactForm = dynamic(
   { ssr: false }
 );
 
-const Footer = dynamic(
-  () => import("./_components/landingPage/Footer").then(mod => ({ default: mod.Footer })),
-  { ssr: false }
-);
-
 const WhatsAppFloat = dynamic(() => import("./WhatsAppFloat"), { ssr: false });
 const VisitTracker = dynamic(() => import("./_components/VisitTracker"), { ssr: false });
 
@@ -148,7 +143,6 @@ export default function TheCapitalPLab() {
           <ContactForm />
         </main>
 
-        <Footer />
         <WhatsAppFloat />
         <VisitTracker />
       </div>
