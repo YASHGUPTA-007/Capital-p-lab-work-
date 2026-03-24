@@ -106,15 +106,31 @@ export const Footer = () => {
                 </h3>
                 <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base text-white/90 font-medium">
                   <li>
-                    <Link 
-                      href="/blogs" 
+                    <Link
+                      href="/blogs"
                       className="hover:text-[#c1b4df] transition-colors duration-300 inline-block"
                     >
                       Blogs
                     </Link>
                   </li>
                   <li>
-                    <button 
+                    <Link
+                      href="/events"
+                      className="hover:text-[#c1b4df] transition-colors duration-300 inline-block"
+                    >
+                      Events
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/research"
+                      className="hover:text-[#c1b4df] transition-colors duration-300 inline-block"
+                    >
+                      Research
+                    </Link>
+                  </li>
+                  <li>
+                    <button
                       onClick={() => scrollToSection("team")}
                       className="hover:text-[#c1b4df] transition-colors duration-300 inline-block cursor-pointer"
                     >
@@ -122,7 +138,7 @@ export const Footer = () => {
                     </button>
                   </li>
                   <li>
-                    <button 
+                    <button
                       onClick={() => scrollToSection("about")}
                       className="hover:text-[#c1b4df] transition-colors duration-300 inline-block cursor-pointer"
                     >

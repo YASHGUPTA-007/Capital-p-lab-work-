@@ -15,6 +15,8 @@ const InsightCard = memo(({ item, index }: { item: any; index: number }) => {
             router.push('/blogs')
         } else if (item.type === "Reports") {
             router.push('/research')
+        } else if (item.type === "Events") {
+            router.push('/events')
         }
     }, [item.type, router])
 
@@ -24,7 +26,7 @@ const InsightCard = memo(({ item, index }: { item: any; index: number }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: index * 0.08, duration: 0.5 }}
-            className={`group ${item.type === "Blogs" || item.type === "Reports" ? "cursor-pointer" : ""}`}
+            className={`group ${item.type === "Blogs" || item.type === "Reports" || item.type === "Events" ? "cursor-pointer" : ""}`}
             onClick={handleClick}
         >
             <div className="relative h-80 sm:h-96 flex flex-col justify-between border-2 border-[#c1b4df]/30 group-hover:border-[#755eb1] rounded-xl sm:rounded-2xl group-hover:shadow-2xl transition-all duration-300 overflow-hidden will-change-transform">
