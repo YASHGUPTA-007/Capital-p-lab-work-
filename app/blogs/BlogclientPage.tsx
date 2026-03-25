@@ -370,8 +370,8 @@ const [newsletterStatus, setNewsletterStatus] = useState<
                 <Image
                   src="/logo.png"
                   alt="Company Logo"
-                  width={50}
-                  height={50}
+                  width={100}
+                  height={100}
                   className="rounded-lg"
                 />
                 <div>
