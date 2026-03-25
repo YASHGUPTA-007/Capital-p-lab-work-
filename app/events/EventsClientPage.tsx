@@ -104,7 +104,7 @@ function FeaturedCard({ event }: { event: Event }) {
             </div>
 
             <div className="flex-1">
-              <h2 className="text-[#2b2e34] font-black text-2xl xl:text-3xl leading-[1.1] tracking-tight group-hover:text-[#755eb1] transition-colors duration-400 mb-3">
+              <h2 className="text-[#2b2e34] font-serif text-2xl xl:text-3xl leading-[1.1] tracking-tight group-hover:text-[#755eb1] transition-colors duration-400 mb-3">
                 {event.title}
               </h2>
               {event.subtitle && (
@@ -210,7 +210,7 @@ function EventCard({ event, index }: { event: Event; index: number }) {
           {/* Body */}
           <div className="p-5 flex-1 flex flex-col gap-3">
             <div className="flex-1">
-              <h2 className="text-[#2b2e34] font-black text-base leading-snug group-hover:text-[#755eb1] transition-colors duration-300 line-clamp-2">
+              <h2 className="text-[#2b2e34] font-serif text-base leading-snug group-hover:text-[#755eb1] transition-colors duration-300 line-clamp-2">
                 {event.title}
               </h2>
               {event.subtitle && (
@@ -268,7 +268,7 @@ export default function EventsPage() {
       <section
         ref={heroRef}
         className="relative w-full overflow-hidden"
-        style={{ minHeight: '88vh' }}
+        style={{ minHeight: '72vh' }}
       >
         {/* ── parallax background image ── */}
         <motion.div style={{ y: bgY }} className="absolute inset-0 scale-110 origin-top">
@@ -284,18 +284,18 @@ export default function EventsPage() {
         </motion.div>
 
         {/* ── layered overlays ── */}
-        {/* Heavy left-to-right wash so text is always legible */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#f4f7f5]/95 via-[#f4f7f5]/80 to-[#f4f7f5]/20" />
+        {/* Dark base so image is rich, not washed */}
+        <div className="absolute inset-0 bg-[#1a1c20]/40" />
+        {/* Left fade for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#f4f7f5]/80 via-[#f4f7f5]/35 to-transparent" />
         {/* Bottom fade into page bg */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#f4f7f5] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#f4f7f5]/90 via-transparent to-transparent" />
         {/* Subtle purple tint top-right */}
-        <div className="absolute top-0 right-0 w-[55vw] h-[55vw] bg-[#c1b4df]/20 rounded-full blur-[120px] pointer-events-none" />
-        {/* Green tint bottom-left */}
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-[#c7d6c1]/25 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-[#755eb1]/15 rounded-full blur-[120px] pointer-events-none" />
 
         {/* ── content ── */}
         <motion.div
-          style={{ y: contentY, opacity: fade, minHeight: '88vh' }}
+          style={{ y: contentY, opacity: fade, minHeight: '72vh' }}
           className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center"
         >
           {/* breadcrumb */}
@@ -303,14 +303,14 @@ export default function EventsPage() {
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center gap-2 text-[#4f475d]/50 text-[11px] font-black uppercase tracking-widest pt-32 mb-12"
+            className="flex items-center gap-2 text-[#4f475d]/50 text-sm font-black uppercase tracking-widest pt-24 mb-7"
           >
             <Link href="/" className="hover:text-[#755eb1] transition-colors">Home</Link>
-            <ChevronRight size={11} />
+            <ChevronRight size={14} />
             <span className="text-[#755eb1]">Events</span>
           </motion.div>
 
-          <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-20 pb-24">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-16 pb-14">
 
             {/* ── LEFT: logo + text ── */}
             <div className="flex-1 max-w-2xl">
@@ -319,21 +319,21 @@ export default function EventsPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: 0.1 }}
-                className="flex items-center gap-4 mb-8"
+                className="flex items-center gap-4 mb-5"
               >
-                <div className="relative w-14 h-14 bg-white rounded-2xl shadow-lg border border-[#c1b4df]/30 flex items-center justify-center p-1.5 flex-shrink-0">
+                <div className="relative w-16 h-16 flex-shrink-0">
                   <Image
                     src="/logo.png"
                     alt="The Capital P Lab"
                     fill
-                    className="object-contain p-2"
-                    sizes="56px"
+                    className="object-contain"
+                    sizes="64px"
                     quality={95}
                   />
                 </div>
                 <div>
-                  <p className="text-[#4f7f5d] text-xs font-black uppercase tracking-widest leading-none">The Capital P Lab</p>
-                  <p className="text-[#4f475d]/50 text-[11px] mt-0.5">Events &amp; Conferences</p>
+                  <p className="text-[#4f7f5d] text-base font-black uppercase tracking-widest leading-none">The Capital P Lab</p>
+                  <p className="text-[#4f475d]/50 text-sm mt-1">Events &amp; Conferences</p>
                 </div>
               </motion.div>
 
@@ -342,7 +342,7 @@ export default function EventsPage() {
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="font-serif text-[#755eb1] text-[clamp(2.8rem,6.5vw,6rem)] leading-tight mb-4"
+                className="font-serif text-[#755eb1] text-5xl md:text-6xl lg:text-7xl leading-tight mb-3"
               >
                 Our Events
               </motion.h1>
@@ -351,7 +351,7 @@ export default function EventsPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: 0.32 }}
-                className="font-serif italic text-[#4f7f5d] text-[clamp(1.1rem,2.5vw,2rem)] leading-tight mb-10"
+                className="font-serif italic text-[#4f7f5d] text-xl md:text-2xl leading-tight mb-7"
               >
                 Where research meets policy
               </motion.p>
@@ -369,13 +369,13 @@ export default function EventsPage() {
                     <p className="text-[#4f7f5d]/60 text-[10px] font-black uppercase tracking-wider mt-1">Upcoming</p>
                   </div>
                 )}
-                <div className="bg-white/90 backdrop-blur-sm border border-[#c1b4df]/60 rounded-2xl px-5 py-4 text-center shadow-sm">
-                  <p className="text-[#755eb1] text-2xl font-black leading-none"><Counter to={events.length} /></p>
-                  <p className="text-[#755eb1]/60 text-[10px] font-black uppercase tracking-wider mt-1">Total Events</p>
+                <div className="bg-white/90 backdrop-blur-sm border border-[#c1b4df]/60 rounded-2xl px-6 py-5 text-center shadow-sm">
+                  <p className="text-[#755eb1] text-3xl font-black leading-none"><Counter to={events.length} /></p>
+                  <p className="text-[#755eb1]/60 text-xs font-black uppercase tracking-wider mt-2">Total Events</p>
                 </div>
-                <div className="bg-white/90 backdrop-blur-sm border border-[#e8e4f0] rounded-2xl px-5 py-4 text-center shadow-sm">
-                  <p className="text-[#2b2e34] text-2xl font-black leading-none"><Counter to={past.length} /></p>
-                  <p className="text-[#4f475d]/50 text-[10px] font-black uppercase tracking-wider mt-1">Past Events</p>
+                <div className="bg-white/90 backdrop-blur-sm border border-[#e8e4f0] rounded-2xl px-6 py-5 text-center shadow-sm">
+                  <p className="text-[#2b2e34] text-3xl font-black leading-none"><Counter to={past.length} /></p>
+                  <p className="text-[#4f475d]/50 text-xs font-black uppercase tracking-wider mt-2">Past Events</p>
                 </div>
               </motion.div>
             </div>
@@ -385,33 +385,33 @@ export default function EventsPage() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="hidden lg:block flex-shrink-0 w-[300px]"
+              className="hidden lg:block flex-shrink-0 w-90"
             >
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-[#c1b4df]/30 shadow-2xl p-7 space-y-5">
-                <div className="flex items-center gap-3 pb-5 border-b border-[#f0edf8]">
-                  <div className="relative w-10 h-10 flex-shrink-0">
-                    <Image src="/logo.png" alt="Logo" fill className="object-contain" sizes="40px" quality={90} />
+              <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-[#c1b4df]/30 shadow-2xl p-9 space-y-6">
+                <div className="flex items-center gap-4 pb-6 border-b border-[#f0edf8]">
+                  <div className="relative w-14 h-14 flex-shrink-0">
+                    <Image src="/logo.png" alt="Logo" fill className="object-contain" sizes="56px" quality={90} />
                   </div>
                   <div>
-                    <p className="text-[#2b2e34] text-sm font-black leading-none">Capital P Lab</p>
-                    <p className="text-[#4f475d]/50 text-xs mt-0.5">Policy · People · Planet</p>
+                    <p className="text-[#2b2e34] text-base font-black leading-none">The Capital P Lab</p>
+                    <p className="text-[#4f475d]/50 text-sm mt-1">Policy · People · Planet</p>
                   </div>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {[
                     { label: 'Focus Area', value: 'Urban Policy' },
                     { label: 'Domain', value: 'Gender Equity' },
                     { label: 'Approach', value: 'Evidence-Based' },
                   ].map(item => (
                     <div key={item.label} className="flex items-center justify-between">
-                      <span className="text-[#4f475d]/50 text-xs font-semibold">{item.label}</span>
-                      <span className="bg-[#f4f7f5] border border-[#c7d6c1] text-[#4f7f5d] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide">{item.value}</span>
+                      <span className="text-[#4f475d]/50 text-sm font-semibold">{item.label}</span>
+                      <span className="bg-[#f4f7f5] border border-[#c7d6c1] text-[#4f7f5d] text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wide">{item.value}</span>
                     </div>
                   ))}
                 </div>
                 <Link
                   href="/#contact"
-                  className="block w-full text-center bg-gradient-to-r from-[#755eb1] to-[#4f475d] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-md mt-2"
+                  className="block w-full text-center bg-gradient-to-r from-[#755eb1] to-[#4f475d] text-white rounded-xl py-4 text-sm font-black uppercase tracking-widest hover:from-[#6b54a5] hover:to-[#5a8a6a] transition-all shadow-md mt-2"
                 >
                   Collaborate with us
                 </Link>
@@ -486,7 +486,7 @@ export default function EventsPage() {
               <div className="w-16 h-16 rounded-full bg-[#c1b4df]/20 flex items-center justify-center mx-auto mb-5">
                 <Calendar size={26} className="text-[#755eb1]/40" />
               </div>
-              <h3 className="text-[#2b2e34] text-xl font-bold mb-2">No events yet</h3>
+              <h3 className="text-[#2b2e34] text-xl font-serif mb-2">No events yet</h3>
               <p className="text-[#4f475d]/50 text-sm">Check back soon.</p>
             </div>
           </Reveal>
@@ -511,7 +511,7 @@ export default function EventsPage() {
               <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
                 <div>
                   <p className="text-white/50 text-[11px] font-black uppercase tracking-widest mb-2">Partner with us</p>
-                  <h3 className="text-white font-black text-2xl md:text-3xl leading-tight">
+                  <h3 className="text-white font-serif text-2xl md:text-3xl leading-tight">
                     Collaborate on research <br className="hidden md:block" />
                     &amp; policy design
                   </h3>
