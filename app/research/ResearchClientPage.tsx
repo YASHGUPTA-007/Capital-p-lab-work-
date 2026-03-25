@@ -105,15 +105,23 @@ export default function ResearchClientPage({
                   Knowledge Hub
                 </span>
               </motion.div>
-              <motion.h1
-                variants={fadeInUp}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-[#2b2e34] leading-[0.9]"
-              >
-                Research <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#755eb1] to-[#4f7f5d]">
-                  Reports
-                </span>
-              </motion.h1>
+              <motion.div variants={fadeInUp} className="flex items-center gap-6">
+                <Image
+                  src="/logo.png"
+                  alt="The Capital P Lab"
+                  width={100}
+                  height={100}
+                  className="shrink-0"
+                />
+                <h1
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-[#2b2e34] leading-[0.9]"
+                >
+                  Research <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#755eb1] to-[#4f7f5d]">
+                    Reports
+                  </span>
+                </h1>
+              </motion.div>
             </div>
 
             <motion.div variants={fadeInUp} className="lg:col-span-4 lg:pb-4">
