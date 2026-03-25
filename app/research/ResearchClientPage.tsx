@@ -114,7 +114,7 @@ export default function ResearchClientPage({
                   className="shrink-0"
                 />
                 <h1
-                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-[#2b2e34] leading-[0.9]"
+                  className="text-4xl md:text-5xl lg:text-6xl font-serif text-[#2b2e34] leading-tight"
                 >
                   Research <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#755eb1] to-[#4f7f5d]">
