@@ -1,5 +1,7 @@
 // app/research/page.tsx
 import React from "react";
+
+export const dynamic = 'force-dynamic';
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { ResearchItem } from "@/types/research";
