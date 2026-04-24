@@ -11,10 +11,8 @@ import {
   FileText,
   ExternalLink,
   CheckCircle,
-  AlertCircle,
   Sparkles,
   Tag as TagIcon,
-  Plus,
   Undo,
   Redo,
 } from "lucide-react";
@@ -368,7 +366,7 @@ export default function ResearchEditor({
 
         toast.loading('Saving to database...', { id: loadingToast });
 
-        const description = editor.getHTML();
+        const description = editor!.getHTML();
         const readTime = calculateReadTime(description);
 
         const data: any = {
@@ -1054,7 +1052,7 @@ export default function ResearchEditor({
                 type="text"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) =>
+                onKeyDown={(e) =>
                   e.key === "Enter" && (e.preventDefault(), handleAddTag())
                 }
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 text-sm placeholder:text-gray-400 transition-all"

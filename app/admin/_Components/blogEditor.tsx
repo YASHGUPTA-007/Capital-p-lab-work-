@@ -837,7 +837,7 @@ export default function BlogEditorModal({
         formData.category === "Custom"
           ? formData.customCategory
           : formData.category;
-      const readTime = calculateReadingTime(editor.getText());
+      const readTime = calculateReadingTime(editor!.getText());
 
       const blogData = {
         title: formData.title,
