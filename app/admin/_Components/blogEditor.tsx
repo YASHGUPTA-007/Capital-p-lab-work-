@@ -26,6 +26,7 @@ import {
   Table as TableIcon,
 } from "lucide-react";
 import { db } from "@/lib/firebase";
+import toast, { Toaster } from 'react-hot-toast';
 import {
   doc,
   updateDoc,
@@ -195,6 +196,7 @@ export default function BlogEditorModal({
 
   const [tags, setTags] = useState<string[]>(blog?.tags || []);
   const [tagInput, setTagInput] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [useCustomSlug, setUseCustomSlug] = useState(false);
   const [isSlugUnique, setIsSlugUnique] = useState(true);
@@ -777,41 +779,45 @@ export default function BlogEditorModal({
   };
 
   const handleSave = async () => {
-    if (!formData.title || !editor?.getHTML()) {
-      alert("Title and content are required");
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.author.trim()) newErrors.author = "Author is required";
+    if (!formData.excerpt.trim()) newErrors.excerpt = "Excerpt is required";
+    if (!isSlugUnique) newErrors.slug = "This URL slug is already taken";
+
+    const contentText = editor?.getText()?.trim() ?? "";
+    if (!contentText) newErrors.content = "Content is required";
+
+    if (formData.category === "Custom" && !formData.customCategory.trim()) {
+      newErrors.category = "Please enter a custom category name";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    if (!isSlugUnique) {
-      alert("This URL slug is already taken. Please choose another.");
-      return;
-    }
+    setErrors({});
 
-    if (formData.category === "Custom" && !formData.customCategory) {
-      alert("Please enter a custom category name");
-      return;
-    }
+    const currentContent = editor!.getHTML();
 
-    // ✅ Validate featured image has alt text
+    // Validate featured image alt text
     if (formData.featuredImage && !formData.featuredImageAlt) {
-      alert(
-        "⚠️ Featured image is missing alt text. Please provide it for accessibility.",
-      );
+      toast.error("Featured image is missing alt text — please provide it for accessibility");
       return;
     }
 
-    // ✅ Validate all content images have alt text
-    const currentContent = editor.getHTML();
+    // Validate content image alt text
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = currentContent;
     const contentImages = tempDiv.querySelectorAll("img");
-
     const imagesWithoutAlt: string[] = [];
     contentImages.forEach((img) => {
       const alt = img.getAttribute("alt");
       const src = img.getAttribute("src");
       if (!alt || alt.trim() === "") {
-        // Get a preview of the image URL for the alert
         const urlPreview = src
           ? new URL(src).pathname.split("/").pop()?.substring(0, 30)
           : "Unknown";
@@ -820,9 +826,7 @@ export default function BlogEditorModal({
     });
 
     if (imagesWithoutAlt.length > 0) {
-      alert(
-        `⚠️ ${imagesWithoutAlt.length} image(s) in content are missing alt text:\n\n${imagesWithoutAlt.join("\n")}\n\nAll images must have alt text for accessibility.\n\nClick on images in the editor to add alt text.`,
-      );
+      toast.error(`${imagesWithoutAlt.length} image(s) in content are missing alt text. Click images to add alt text.`, { duration: 5000 });
       return;
     }
 
@@ -891,7 +895,7 @@ export default function BlogEditorModal({
       onSave();
     } catch (error) {
       console.error("Error saving blog:", error);
-      alert("Failed to save blog post");
+      toast.error("Failed to save blog post. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -901,6 +905,7 @@ export default function BlogEditorModal({
 
   return (
     <>
+      <Toaster position="top-right" />
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div className="bg-white rounded-lg w-full max-w-6xl my-8 shadow-2xl">
           {/* Header */}
@@ -946,10 +951,14 @@ export default function BlogEditorModal({
                   <input
                     type="text"
                     value={formData.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-lg"
+                    onChange={(e) => {
+                      handleTitleChange(e.target.value);
+                      if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+                    }}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900 text-lg ${errors.title ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                     placeholder="Enter an engaging title"
                   />
+                  {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
                 </div>
 
                 {/* Slug */}
@@ -992,9 +1001,9 @@ export default function BlogEditorModal({
                         {useCustomSlug ? "Auto" : "Custom"}
                       </button>
                     </div>
-                    {!isSlugUnique && (
+                    {(!isSlugUnique || errors.slug) && (
                       <p className="text-xs text-red-500 font-medium">
-                        This slug is already in use.
+                        {errors.slug || "This slug is already in use."}
                       </p>
                     )}
                     <p className="text-xs text-gray-500">
@@ -1012,15 +1021,14 @@ export default function BlogEditorModal({
                     <input
                       type="text"
                       value={formData.author}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          author: e.target.value,
-                        }))
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 text-gray-900"
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, author: e.target.value }));
+                        if (errors.author) setErrors((prev) => ({ ...prev, author: "" }));
+                      }}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 text-gray-900 ${errors.author ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                       placeholder="John Doe"
                     />
+                    {errors.author && <p className="mt-1 text-xs text-red-500">{errors.author}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -1065,18 +1073,19 @@ export default function BlogEditorModal({
                   </select>
 
                   {formData.category === "Custom" && (
-                    <input
-                      type="text"
-                      value={formData.customCategory}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          customCategory: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter custom category name"
-                      className="w-full px-4 py-2 border border-purple-300 bg-purple-50 rounded-lg focus:ring-2 focus:ring-purple-500 text-purple-900 placeholder-purple-300"
-                    />
+                    <>
+                      <input
+                        type="text"
+                        value={formData.customCategory}
+                        onChange={(e) => {
+                          setFormData((prev) => ({ ...prev, customCategory: e.target.value }));
+                          if (errors.category) setErrors((prev) => ({ ...prev, category: "" }));
+                        }}
+                        placeholder="Enter custom category name"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 text-purple-900 placeholder-purple-300 ${errors.category ? "border-red-400 bg-red-50" : "border-purple-300 bg-purple-50"}`}
+                      />
+                      {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
+                    </>
                   )}
                 </div>
 
@@ -1203,16 +1212,15 @@ export default function BlogEditorModal({
                   </label>
                   <textarea
                     value={formData.excerpt}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        excerpt: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, excerpt: e.target.value }));
+                      if (errors.excerpt) setErrors((prev) => ({ ...prev, excerpt: "" }));
+                    }}
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 resize-none text-gray-900"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-gray-900 resize-none text-gray-900 ${errors.excerpt ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                     placeholder="Brief description of the blog post..."
                   />
+                  {errors.excerpt && <p className="mt-1 text-xs text-red-500">{errors.excerpt}</p>}
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
                     <span>Used for SEO and blog cards</span>
                     <span>{formData.excerpt.length} chars</span>
@@ -1521,9 +1529,10 @@ export default function BlogEditorModal({
               </div>
 
               {/* Editor Input */}
-              <div className="border border-t-0 border-gray-300 rounded-b-lg bg-white min-h-[400px] overflow-x-auto">
-                <EditorContent editor={editor} />
+              <div className={`border border-t-0 rounded-b-lg bg-white min-h-[400px] overflow-x-auto ${errors.content ? "border-red-400" : "border-gray-300"}`}>
+                <EditorContent editor={editor} onInput={() => { if (errors.content) setErrors((prev) => ({ ...prev, content: "" })); }} />
               </div>
+              {errors.content && <p className="mt-1 text-xs text-red-500">{errors.content}</p>}
             </div>
           </div>
 

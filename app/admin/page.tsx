@@ -104,8 +104,8 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchResearchLeads();
-  }, []);
+    if (user) fetchResearchLeads();
+  }, [user]);
 
   // Fetch contacts
   useEffect(() => {

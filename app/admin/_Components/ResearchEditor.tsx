@@ -87,6 +87,7 @@ export default function ResearchEditor({
   const [tags, setTags] = useState<string[]>(item?.tags || []);
   const [tagInput, setTagInput] = useState("");
   const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   // ✅ Track undo/redo state
   const [canUndo, setCanUndo] = useState(false);
@@ -305,48 +306,36 @@ export default function ResearchEditor({
 
 // ✅ Save with deferred uploads and background processing
   const handleSave = async () => {
-    if (!formData.title || !editor?.getHTML()) {
-      toast.error("Title and description are required");
-      return;
-    }
+    const newErrors: Record<string, string> = {};
 
-    // Check if we have either existing or pending cover image
-    if (!formData.coverImage && !pendingCoverFile) {
-      toast.error("Cover image is required");
-      return;
-    }
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.slug.trim()) newErrors.slug = "URL slug is required";
+    if (!formData.coverImage && !pendingCoverFile) newErrors.coverImage = "Cover image is required";
 
-    if (!formData.slug) {
-      toast.error("URL slug is required");
-      return;
-    }
+    const descriptionText = editor?.getText()?.trim() ?? "";
+    if (!descriptionText) newErrors.description = "Description is required";
 
-    // Get final category
     const finalCategory =
       formData.category === "Custom"
         ? formData.customCategory.trim()
         : formData.category;
-
-    if (!finalCategory) {
-      toast.error("Category is required");
-      return;
-    }
+    if (!finalCategory) newErrors.category = "Category is required";
 
     if (formData.type === "document" && !formData.documentUrl && !pendingDocumentFile) {
-      toast.error("Please upload a document");
+      newErrors.document = "Please upload a document";
+    }
+    if (formData.type === "link") {
+      if (!formData.externalLink) newErrors.externalLink = "External link is required";
+      else if (!isValidUrl(formData.externalLink)) newErrors.externalLink = "Must be a valid URL (http:// or https://)";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    if (formData.type === "link") {
-      if (!formData.externalLink) {
-        toast.error("Please provide an external link");
-        return;
-      }
-      if (!isValidUrl(formData.externalLink)) {
-        toast.error("Please provide a valid URL (must start with http:// or https://)");
-        return;
-      }
-    }
+    setErrors({});
 
     // Close modal immediately for better UX
     onClose();
@@ -487,6 +476,7 @@ export default function ResearchEditor({
      
       
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <Toaster position="top-right" />
       <div className="bg-white rounded-lg w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col my-4 shadow-xl">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 via-white to-blue-50">
@@ -520,12 +510,14 @@ export default function ResearchEditor({
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 text-sm transition-all"
+                onChange={(e) => {
+                  setFormData({ ...formData, title: e.target.value });
+                  if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+                }}
+                className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 text-sm transition-all ${errors.title ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                 placeholder="e.g., Urban Resilience in Coastal Cities"
               />
+              {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
             </div>
 
             <div className="lg:col-span-2">
@@ -548,6 +540,7 @@ export default function ResearchEditor({
                         .replace(/-+/g, "-")
                         .replace(/^-+|-+$/g, "");
                       setFormData({ ...formData, slug });
+                      if (errors.slug) setErrors((prev) => ({ ...prev, slug: "" }));
                     }}
                     className="flex-1 bg-transparent focus:outline-none text-gray-900 font-mono text-sm placeholder:text-gray-400"
                     placeholder="urban-resilience-coastal-cities"
@@ -559,6 +552,7 @@ export default function ResearchEditor({
                     if (formData.title) {
                       const autoSlug = generateSlug(formData.title);
                       setFormData({ ...formData, slug: autoSlug });
+                      setErrors((prev) => ({ ...prev, slug: "" }));
                     }
                   }}
                   disabled={!formData.title}
@@ -567,6 +561,7 @@ export default function ResearchEditor({
                   Generate
                 </button>
               </div>
+              {errors.slug && <p className="mt-1 text-xs text-red-500">{errors.slug}</p>}
             </div>
           </div>
 
@@ -607,13 +602,15 @@ export default function ResearchEditor({
                 <input
                   type="text"
                   value={formData.customCategory}
-                  onChange={(e) =>
-                    setFormData({ ...formData, customCategory: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setFormData({ ...formData, customCategory: e.target.value });
+                    if (errors.category) setErrors((prev) => ({ ...prev, category: "" }));
+                  }}
                   className="mt-2 w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 text-sm placeholder:text-gray-400"
                   placeholder="Enter custom category"
                 />
               )}
+              {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
             </div>
 
             {/* Author */}
@@ -698,7 +695,7 @@ export default function ResearchEditor({
                 </div>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50/50 transition-all group">
+              <label className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50/50 transition-all group ${errors.coverImage ? "border-red-400 bg-red-50" : "border-gray-300"}`}>
                 <Upload className="w-10 h-10 text-gray-400 group-hover:text-purple-500 mb-2 transition-colors" />
                 <span className="text-sm text-gray-600 font-medium">
                   Click to upload cover image
@@ -709,11 +706,15 @@ export default function ResearchEditor({
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleCoverImageUpload}
+                  onChange={(e) => {
+                    handleCoverImageUpload(e);
+                    if (errors.coverImage) setErrors((prev) => ({ ...prev, coverImage: "" }));
+                  }}
                   className="hidden"
                 />
               </label>
             )}
+            {errors.coverImage && <p className="mt-1 text-xs text-red-500">{errors.coverImage}</p>}
           </div>
 
           {/* Content Type Selection */}
@@ -817,21 +818,27 @@ export default function ResearchEditor({
                   </button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50/50 transition-all group">
-                  <Upload className="w-8 h-8 text-gray-400 group-hover:text-purple-500 mb-2 transition-colors" />
-                  <span className="text-sm text-gray-600 font-medium">
-                    Click to upload document
-                  </span>
-                  <span className="text-xs text-gray-500 mt-1">
-                    PDF, DOC, XLS, PPT (max 25MB)
-                  </span>
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                    onChange={handleDocumentUpload}
-                    className="hidden"
-                  />
-                </label>
+                <>
+                  <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50/50 transition-all group ${errors.document ? "border-red-400 bg-red-50" : "border-gray-300"}`}>
+                    <Upload className="w-8 h-8 text-gray-400 group-hover:text-purple-500 mb-2 transition-colors" />
+                    <span className="text-sm text-gray-600 font-medium">
+                      Click to upload document
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      PDF, DOC, XLS, PPT (max 25MB)
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                      onChange={(e) => {
+                        handleDocumentUpload(e);
+                        if (errors.document) setErrors((prev) => ({ ...prev, document: "" }));
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                  {errors.document && <p className="mt-1 text-xs text-red-500">{errors.document}</p>}
+                </>
               )}
             </div>
           ) : (
@@ -842,12 +849,14 @@ export default function ResearchEditor({
               <input
                 type="url"
                 value={formData.externalLink}
-                onChange={(e) =>
-                  setFormData({ ...formData, externalLink: e.target.value })
-                }
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 text-sm placeholder:text-gray-400 font-mono transition-all"
+                onChange={(e) => {
+                  setFormData({ ...formData, externalLink: e.target.value });
+                  if (errors.externalLink) setErrors((prev) => ({ ...prev, externalLink: "" }));
+                }}
+                className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 text-sm placeholder:text-gray-400 font-mono transition-all ${errors.externalLink ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                 placeholder="https://example.com/research-paper"
               />
+              {errors.externalLink && <p className="mt-1 text-xs text-red-500">{errors.externalLink}</p>}
             </div>
           )}
 
@@ -1011,9 +1020,10 @@ export default function ResearchEditor({
               </div>
             </div>
 
-            <div className="min-h-[300px] max-h-[400px] overflow-y-auto border border-gray-200 rounded-b-lg">
-              <EditorContent editor={editor} />
+            <div className={`min-h-[300px] max-h-[400px] overflow-y-auto border rounded-b-lg ${errors.description ? "border-red-400" : "border-gray-200"}`}>
+              <EditorContent editor={editor} onInput={() => { if (errors.description) setErrors((prev) => ({ ...prev, description: "" })); }} />
             </div>
+            {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
           </div>
 
           {/* Tags */}

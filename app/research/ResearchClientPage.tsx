@@ -1,7 +1,7 @@
 // app/research/ResearchClientPage.tsx
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   Search,
@@ -15,6 +15,7 @@ import {
   User,
   ExternalLink as ExternalLinkIcon,
   FileText,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -39,6 +40,10 @@ export default function ResearchClientPage({
 }: ResearchClientPageProps) {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showMoreOpen, setShowMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  const MAX_VISIBLE = 5;
 
   // Extract unique categories from database items dynamically
   const categories = useMemo(() => {
@@ -47,6 +52,20 @@ export default function ResearchClientPage({
     ).sort();
     return ["All", ...uniqueCategories];
   }, [initialItems]);
+
+  const visibleCats = categories.slice(0, MAX_VISIBLE);
+  const overflowCats = categories.slice(MAX_VISIBLE);
+  const activeInOverflow = overflowCats.includes(activeCategory);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setShowMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Filter Logic
   const filteredItems = initialItems.filter((item) => {
@@ -139,8 +158,8 @@ export default function ResearchClientPage({
         <div className="max-w-[1400px] mx-auto">
           {/* Controls */}
           <div className="sticky top-4 z-40 mb-12 bg-white/80 backdrop-blur-xl border border-gray-100 p-2 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div className="flex items-center gap-1 overflow-x-auto w-full md:w-auto p-1 scrollbar-hide">
-              {categories.map((cat) => (
+            <div className="flex items-center gap-1 w-full md:w-auto p-1 flex-wrap">
+              {visibleCats.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
@@ -153,6 +172,40 @@ export default function ResearchClientPage({
                   {cat}
                 </button>
               ))}
+
+              {overflowCats.length > 0 && (
+                <div ref={moreRef} className="relative">
+                  <button
+                    onClick={() => setShowMoreOpen((o) => !o)}
+                    className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                      activeInOverflow
+                        ? "bg-[#2b2e34] text-white shadow-md"
+                        : "text-gray-500 hover:bg-gray-100"
+                    }`}
+                  >
+                    +{overflowCats.length} more
+                    <ChevronDown size={12} className={`transition-transform ${showMoreOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {showMoreOpen && (
+                    <div className="absolute left-0 top-full mt-2 z-50 bg-white border border-gray-100 rounded-xl shadow-lg py-1 min-w-[180px]">
+                      {overflowCats.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => { setActiveCategory(cat); setShowMoreOpen(false); }}
+                          className={`w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all ${
+                            activeCategory === cat
+                              ? "bg-[#2b2e34] text-white"
+                              : "text-gray-500 hover:bg-gray-100"
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="relative w-full md:w-64">
